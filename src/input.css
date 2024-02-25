@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Rosarivo:ital@0;1&family=Salsa&display=swap');
+
+body {
+    background-color: var(--brown);
+}
+:root {
+    --brown: #361500;
+    --dark-brown: #1C0A00;
+    --light-brown: #CC9544;
+    --white: #ffffff;
+}
+.salsa {
+    font-family: "Salsa", cursive;
+    font-weight: 400;
+    font-style: normal;
+}
+.rosarivo {
+font-family: "Rosarivo", cursive;
+font-weight: 400;
+font-style: normal;
+}
+.message {
+    position: fixed;
+    top: 70px;
+    right: 15px;
+    max-width: 24rem;
+    margin: 0 auto;
+    background-color: var(--light-brown);
+    gap: 1rem;
+    z-index: 10000;
+}
+
+.message button, #profileBtn{
+    cursor: pointer;
+}
+.message button:hover{
+    color:var(--black);
+}
+.header .flex .nav-profile.active{
+    display: inline-block;
+}
