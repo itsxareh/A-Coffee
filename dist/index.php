@@ -12,19 +12,24 @@ if(!isset($uid)){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homes</title>
+    <title>Home</title>
 
     <link href="../src/style.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <script src="/node_modules/jquery/dist/jquery.min.js"></script>
 </head>
 <body>
     <?php include 'header.php'; ?>
     <?php include 'sidebar.php'; ?>
     <?php $page = isset($_GET['page']) ? $_GET['page'] :'dashboard'; ?>
-    <main id="view-panel" class="absolute top-14 left-80 w-full">
+    <main id="view-panel" class="absolute top-16 left-80 p-10 -z-10">
       <?php include $page.'.php' ?>
     </main>
 
-<script src="js/script.js"></script>
+<script src="../src/script.js"></script>
+<script>
+$(function() {
+   $('.nav-<?php echo isset($_GET['page']) ? $_GET['page'] : '' ?>').addClass('active');
+});
+</script>
 </body>
 </html>

@@ -6,21 +6,36 @@
 body {
     background-color: var(--brown);
 }
+#view-panel {
+    width: calc(    100% - 20rem);
+    transition: all 0.3s ease;
+}
 :root {
     --brown: #361500;
     --dark-brown: #1C0A00;
     --light-brown: #CC9544;
     --white: #ffffff;
+    --light-white: #d1d5db;
 }
 .salsa {
     font-family: "Salsa", cursive;
-    font-weight: 400;
     font-style: normal;
 }
 .rosarivo {
-font-family: "Rosarivo", cursive;
-font-weight: 400;
-font-style: normal;
+    font-family: "Rosarivo", cursive;
+    font-style: normal;
+}
+.bg-dark-brown {
+    background-color: var(--dark-brown);
+}
+.bg-brown {
+    background-color: var(--brown);
+}
+.bg-light-brown {
+    background-color: var(--light-brown);
+}
+.text-gray {
+    color: var(--light-white);
 }
 .message {
     position: fixed;
@@ -32,7 +47,6 @@ font-style: normal;
     gap: 1rem;
     z-index: 10000;
 }
-
 .message button, #profileBtn{
     cursor: pointer;
 }
@@ -41,4 +55,64 @@ font-style: normal;
 }
 .header .flex .nav-profile.active{
     display: inline-block;
+}
+.nav-profile {
+    z-index: 201;
+}
+.sidebar {
+    z-index: 200;
+    transition: all 0.3s ease;
+}
+.navigation img {
+    object-fit: cover;
+    background-position: center;
+}
+.nav > .active {
+    background-color: var(--light-brown);
+}
+.datetime, .navigation {
+    transition: all 0.3s ease;
+}
+.border-color {
+    border-color: rgb(209 213 219);
+    border-top-width: 1px;
+}
+.border-lightcolor {
+    border-color: rgb(121, 122, 124);
+    border-top-width: 1px;
+}
+.autofit-grid {
+   grid-template-columns: repeat(auto-fit, minmax(20rem,1fr));
+   justify-content: center;
+}
+@media (min-width: 370px) and (max-width: 850px) {
+    .datetime {
+        display: none;
+    }
+    .sidebar {
+        width: 72px;
+    }
+    .sidebar span{
+        display: none;
+    }
+    #view-panel {
+        width: calc(100% - 5rem);
+        right: 0;
+        left: 72px;
+    }
+}
+@media (max-width: 369px) {
+    .datetime {
+        display: none;
+    }
+    .sidebar {
+        width: 72px;
+    }
+    .sidebar span{
+        display: none;
+    }
+    #view-panel {
+        width: calc(100% - 3rem);
+        left: 72px;
+    }
 }

@@ -26,7 +26,7 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
 
 ?>
 
-<header class="fixed inset-x-0 top-0 h-16" style="background-color: var(--dark-brown);">
+<header class="fixed inset-x-0 top-0 h-16 shadow-md" style="background-color: var(--dark-brown);">
 
     <div class="flex justify-between items-center h-16 px-4">
 
@@ -42,8 +42,8 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
             <div id="profileBtn">
                 <img class="w-10 h-10" src="../images/profile-circle-svgrepo-com.svg" alt="">
             </div>
-            <div class="absolute right-1 -bottom-32 shadow-lg border rounded-lg p-4 nav-profile w-60 hidden" style="background-color: var(--light-brown);">
-                <a href="index.php?page=profile_update" class="salsa text-lg block w-full p-2 rounded-md text-center text-white shadow-sm bg-orange-600 hover:bg-orange-500 hover:text-white transition-colors duration-300">Update profile</a>
+            <div class="nav-profile absolute right-1 -bottom-32 shadow-lg border rounded-lg p-4 w-60 hidden" style="background-color: var(--light-brown);">
+                <a href="index.php?page=profile_update" class="salsa text-lg block w-full p-2 mt-2 rounded-md text-center text-white bg-orange-600 shadow-sm hover:text-white hover:bg-orange-500 transition-colors duration-300">Update profile</a>
                 <a href="logout.php" class="salsa text-lg block w-full p-2 mt-2 rounded-md text-center text-white bg-red-600 shadow-sm hover:text-white hover:bg-red-500 transition-colors duration-300">Logout</a>
             </div>
         </div>
@@ -59,7 +59,7 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
     });
 
 window.addEventListener('scroll', () => {
-   profile.classList.remove('active');
+    navProfile.classList.remove('active');
 });
       
 $(function() {

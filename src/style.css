@@ -565,10 +565,6 @@ video {
   bottom: 0px;
 }
 
-.left-0 {
-  left: 0px;
-}
-
 .left-80 {
   left: 20rem;
 }
@@ -581,12 +577,12 @@ video {
   top: 0px;
 }
 
-.top-14 {
-  top: 3.5rem;
-}
-
 .top-16 {
   top: 4rem;
+}
+
+.-z-10 {
+  z-index: -10;
 }
 
 .-m-1 {
@@ -598,6 +594,14 @@ video {
   margin-bottom: 2.5rem;
 }
 
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
+.ml-4 {
+  margin-left: 1rem;
+}
+
 .mt-1 {
   margin-top: 0.25rem;
 }
@@ -606,24 +610,24 @@ video {
   margin-top: 0.5rem;
 }
 
-.mt-16 {
-  margin-top: 4rem;
-}
-
-.mt-6 {
-  margin-top: 1.5rem;
-}
-
-.mt-10 {
-  margin-top: 2.5rem;
-}
-
 .block {
   display: block;
 }
 
 .flex {
   display: flex;
+}
+
+.table {
+  display: table;
+}
+
+.flow-root {
+  display: flow-root;
+}
+
+.grid {
+  display: grid;
 }
 
 .hidden {
@@ -640,6 +644,10 @@ video {
 
 .h-5 {
   height: 1.25rem;
+}
+
+.h-52 {
+  height: 13rem;
 }
 
 .h-screen {
@@ -674,6 +682,10 @@ video {
   width: 100%;
 }
 
+.border-collapse {
+  border-collapse: collapse;
+}
+
 .select-none {
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -700,10 +712,26 @@ video {
   justify-content: space-between;
 }
 
+.justify-around {
+  justify-content: space-around;
+}
+
+.gap-12 {
+  gap: 3rem;
+}
+
 .space-y-4 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse: 0;
   margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(1rem * var(--tw-space-y-reverse));
+}
+
+.overflow-x-auto {
+  overflow-x: auto;
+}
+
+.whitespace-nowrap {
+  white-space: nowrap;
 }
 
 .rounded-lg {
@@ -737,8 +765,16 @@ video {
   background-color: rgb(220 38 38 / var(--tw-bg-opacity));
 }
 
+.p-10 {
+  padding: 2.5rem;
+}
+
 .p-2 {
   padding: 0.5rem;
+}
+
+.p-3 {
+  padding: 0.75rem;
 }
 
 .p-4 {
@@ -747,6 +783,11 @@ video {
 
 .p-8 {
   padding: 2rem;
+}
+
+.px-2 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 }
 
 .px-4 {
@@ -759,13 +800,46 @@ video {
   padding-bottom: 0.5rem;
 }
 
+.py-4 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.py-6 {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.text-left {
+  text-align: left;
+}
+
 .text-center {
   text-align: center;
+}
+
+.indent-0 {
+  text-indent: 0px;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
 }
 
 .text-4xl {
   font-size: 2.25rem;
   line-height: 2.5rem;
+}
+
+.text-7xl {
+  font-size: 4.5rem;
+  line-height: 1;
 }
 
 .text-8xl {
@@ -781,11 +855,6 @@ video {
 .text-sm {
   font-size: 0.875rem;
   line-height: 1.25rem;
-}
-
-.text-xl {
-  font-size: 1.25rem;
-  line-height: 1.75rem;
 }
 
 .font-medium {
@@ -835,23 +904,43 @@ body {
   background-color: var(--brown);
 }
 
+#view-panel {
+  width: calc(    100% - 20rem);
+  transition: all 0.3s ease;
+}
+
 :root {
   --brown: #361500;
   --dark-brown: #1C0A00;
   --light-brown: #CC9544;
   --white: #ffffff;
+  --light-white: #d1d5db;
 }
 
 .salsa {
   font-family: "Salsa", cursive;
-  font-weight: 400;
   font-style: normal;
 }
 
 .rosarivo {
   font-family: "Rosarivo", cursive;
-  font-weight: 400;
   font-style: normal;
+}
+
+.bg-dark-brown {
+  background-color: var(--dark-brown);
+}
+
+.bg-brown {
+  background-color: var(--brown);
+}
+
+.bg-light-brown {
+  background-color: var(--light-brown);
+}
+
+.text-gray {
+  color: var(--light-white);
 }
 
 .message {
@@ -875,6 +964,83 @@ body {
 
 .header .flex .nav-profile.active{
   display: inline-block;
+}
+
+.nav-profile {
+  z-index: 201;
+}
+
+.sidebar {
+  z-index: 200;
+  transition: all 0.3s ease;
+}
+
+.navigation img {
+  -o-object-fit: cover;
+     object-fit: cover;
+  background-position: center;
+}
+
+.nav > .active {
+  background-color: var(--light-brown);
+}
+
+.datetime, .navigation {
+  transition: all 0.3s ease;
+}
+
+.border-color {
+  border-color: rgb(209 213 219);
+  border-top-width: 1px;
+}
+
+.border-lightcolor {
+  border-color: rgb(121, 122, 124);
+  border-top-width: 1px;
+}
+
+.autofit-grid {
+  grid-template-columns: repeat(auto-fit, minmax(20rem,1fr));
+  justify-content: center;
+}
+
+@media (min-width: 370px) and (max-width: 850px) {
+  .datetime {
+    display: none;
+  }
+
+  .sidebar {
+    width: 72px;
+  }
+
+  .sidebar span{
+    display: none;
+  }
+
+  #view-panel {
+    width: calc(100% - 5rem);
+    right: 0;
+    left: 72px;
+  }
+}
+
+@media (max-width: 369px) {
+  .datetime {
+    display: none;
+  }
+
+  .sidebar {
+    width: 72px;
+  }
+
+  .sidebar span{
+    display: none;
+  }
+
+  #view-panel {
+    width: calc(100% - 3rem);
+    left: 72px;
+  }
 }
 
 .hover\:bg-orange-500:hover {
