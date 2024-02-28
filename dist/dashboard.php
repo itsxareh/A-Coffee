@@ -22,62 +22,62 @@
     </div>
 </div>
 <div class="text-3xl text-center text-white rosarivo">Orders</div>
-<div class="flow-root overflow-x-auto">
-<table class="indent-0 border-collapse py-6 px-2  w-full">
-    <thead>
-        <tr>
-            <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Order ID</th>
-            <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Orders</th>
-            <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Price</th>
-            <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Status</th>
-            <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr class="border-color">
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dadsadasdaasdasdasdasdasdasdasdasdasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdasddasdadsdsaasddasdasas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-        </tr>
-        <tr class="border-lightcolor">
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-        </tr>
-        <tr class="border-lightcolor">
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-        </tr>
-        <tr class="border-lightcolor">
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-        </tr>
-        <tr class="border-lightcolor">
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-        </tr>
-        <tr class="border-lightcolor">
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
-        </tr>
-    </tbody>
-</table>
+<div class="overflow-x-auto">
+    <table class="indent-0 border-collapse py-6 px-2  w-full">
+        <thead>
+            <tr>
+                <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Order ID</th>
+                <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Orders</th>
+                <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Price</th>
+                <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Status</th>
+                <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="border-color">
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dadsadasdaasdasdasdasdasdasdasdasdasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdasddasdadsdsaasddasdasas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+            </tr>
+            <tr class="border-lightcolor">
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+            </tr>
+            <tr class="border-lightcolor">
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+            </tr>
+            <tr class="border-lightcolor">
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+            </tr>
+            <tr class="border-lightcolor">
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+            </tr>
+            <tr class="border-lightcolor">
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">dasdas</td>
+            </tr>
+        </tbody>
+    </table>
 </div>
 </body>
 </html>
