@@ -28,7 +28,7 @@ if ($searchTerm !== '') {
                </div>';
         }
     } else {
-        echo '<p class="text-gray text-2xl">No Products Found!</p>';
+        echo '<p class="text-gray text-medium font-semibold p-3 py-4 text-center">No products found.</p>';
     }
 } else {
     echo '<p class="text-gray text-2xl">Please enter a search term!</p>';

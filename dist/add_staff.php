@@ -10,7 +10,7 @@ function generateUID() {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     date_default_timezone_set('Asia/Manila');
-    $current_time = date('Y-m-d');
+    $current_time = date('m-d-Y');
     $name = trim($_POST['name']);
     $pnumber = trim($_POST['pnumber']);
     $password = trim($_POST['password']);
@@ -67,7 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
-        $select_new_staff = $conn->prepare("SELECT u.id, u.image, u.name, u.uid, SUM(o.amount) AS total, SUM(o.quantity) AS quantity FROM users u LEFT JOIN orders o ON u.uid = o.uid WHERE u.uid = ? GROUP BY u.uid");
+        $select_new_staff = $conn->prepare("SELECT u.id, u.image, u.name, u.uid, SUM(o.amount) AS total, SUM(o.amount) AS quantity FROM users u LEFT JOIN orders o ON u.uid = o.uid WHERE u.uid = ? GROUP BY u.uid");
         $select_new_staff->execute([$uid]);
         $staff = $select_new_staff->fetch(PDO::FETCH_ASSOC);
 

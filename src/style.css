@@ -627,8 +627,12 @@ video {
   bottom: 0px;
 }
 
-.bottom-3 {
-  bottom: 0.75rem;
+.bottom-2 {
+  bottom: 0.5rem;
+}
+
+.bottom-8 {
+  bottom: 2rem;
 }
 
 .left-0 {
@@ -645,6 +649,14 @@ video {
 
 .right-1 {
   right: 0.25rem;
+}
+
+.right-16 {
+  right: 4rem;
+}
+
+.right-2 {
+  right: 0.5rem;
 }
 
 .right-4 {
@@ -691,9 +703,19 @@ video {
   margin: -0.25rem;
 }
 
+.mx-1 {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+}
+
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
+}
+
+.my-1 {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
 }
 
 .my-10 {
@@ -720,6 +742,10 @@ video {
 
 .mb-8 {
   margin-bottom: 2rem;
+}
+
+.ml-2 {
+  margin-left: 0.5rem;
 }
 
 .ml-3 {
@@ -774,16 +800,16 @@ video {
   display: none;
 }
 
-.h-1\/2 {
-  height: 50%;
-}
-
 .h-10 {
   height: 2.5rem;
 }
 
 .h-16 {
   height: 4rem;
+}
+
+.h-28 {
+  height: 7rem;
 }
 
 .h-4 {
@@ -848,6 +874,10 @@ video {
 
 .w-2\/5 {
   width: 40%;
+}
+
+.w-28 {
+  width: 7rem;
 }
 
 .w-3\/5 {
@@ -952,6 +982,10 @@ video {
   gap: 3rem;
 }
 
+.gap-3 {
+  gap: 0.75rem;
+}
+
 .gap-4 {
   gap: 1rem;
 }
@@ -989,6 +1023,10 @@ video {
   border-radius: 0.25rem;
 }
 
+.rounded-3xl {
+  border-radius: 1.5rem;
+}
+
 .rounded-full {
   border-radius: 9999px;
 }
@@ -1003,6 +1041,22 @@ video {
 
 .rounded-xl {
   border-radius: 0.75rem;
+}
+
+.rounded-bl-md {
+  border-bottom-left-radius: 0.375rem;
+}
+
+.rounded-br-md {
+  border-bottom-right-radius: 0.375rem;
+}
+
+.rounded-tl-md {
+  border-top-left-radius: 0.375rem;
+}
+
+.rounded-tr-md {
+  border-top-right-radius: 0.375rem;
 }
 
 .border {
@@ -1233,6 +1287,10 @@ video {
   text-transform: none;
 }
 
+.leading-none {
+  line-height: 1;
+}
+
 .leading-tight {
   line-height: 1.25;
 }
@@ -1443,7 +1501,15 @@ body {
 }
 
 .autofit-grid {
-  grid-template-columns: repeat(auto-fit, minmax(16rem,1fr));
+  grid-template-columns: repeat(auto-fit, minmax(20rem,1fr));
+}
+
+.autofit-grid1 {
+  grid-template-columns: repeat(auto-fit, minmax(22rem,1fr));
+}
+
+.autofit-grid2 {
+  grid-template-columns: repeat(auto-fit, minmax(14rem,1fr));
 }
 
 .cols-grid-1 {
@@ -1457,6 +1523,12 @@ body {
 @media (min-width: 640px){
   .cols-grid-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width:600px) {
+  .cols-grid-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
   }
 }
 
@@ -1521,7 +1593,7 @@ body {
 }
 
 .edit-btn:hover, .delete-btn:hover {
-  filter: brightness(10%);
+  filter: brightness(30%);
 }
 
 .hover\:block:hover {

@@ -16,7 +16,7 @@
             <img class="w-5 h-5" src="/images/coffee-svgrepo-com.svg" alt="">
             <span class="text-white salsa ml-4">Products</span>
         </a>
-        <?php if ($fetch_profile['user_type'] == 1){?>         
+        <?php if ($fetch_profile['user_type'] == 0  ){?>         
         <a class="flex items-center navigation nav-orders rounded-lg w-full p-4" href="./index.php?page=orders">
             <img class="w-5 h-5" src="/images/cart-plus-svgrepo-com.svg" alt="">
             <span class="text-white salsa ml-4">Order</span>

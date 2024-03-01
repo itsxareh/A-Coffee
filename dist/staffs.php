@@ -19,7 +19,7 @@
         </thead>
         <tbody id="staffsList">
             <?php 
-                $select_staffs = $conn->prepare("SELECT u.id, u.image, u.name, u.uid, SUM(o.amount) AS total, SUM(o.quantity) AS quantity FROM users u LEFT JOIN orders o ON u.uid = o.uid GROUP BY u.uid");
+                $select_staffs = $conn->prepare("SELECT u.id, u.image, u.name, u.uid, SUM(o.amount) AS total, SUM(o.amount) AS quantity FROM users u LEFT JOIN orders o ON u.uid = o.uid GROUP BY u.uid");
                 $select_staffs->execute();
                 $staffs = $select_staffs->fetchAll(PDO::FETCH_ASSOC);
                 if (count($staffs) > 0){
@@ -238,7 +238,7 @@
     function submitForm(event) {
         event.preventDefault();
         const formData = new FormData(formElement); 
-
+        
         fetch('add_staff.php', {
             method: 'POST',
             body: formData

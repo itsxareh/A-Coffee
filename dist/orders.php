@@ -29,9 +29,9 @@ ini_set('display_errors', 1);
     if (count($products) > 0){
         foreach ($products as $product){
     ?>
-        <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown flex flex-col items-center justify-center" style="min-width: 175px; max-width: 300px; height: 264px;" data-id="<?= $product['id'] ?>" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">
+        <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown flex flex-col items-center justify-center" style="height: 264px;" data-id="<?= $product['id'] ?>" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">
             <div class="blur-bg absolute w-full h-full hidden rounded-lg" style="background-color: rgba(0,0,0,0.5);"></div>
-            <div class="absolute w-1/2 h-1/2">
+            <div class="absolute w-1/2">
                 <form id="add_to_cart" action="add_to_cart.php" method="POST" enctype="multipart/form-data">
                     <input type="text" class="hidden" id="uid" name="uid" value="<?= $uid ?>">
                     <input type="text" class="hidden" id="pid" name="pid" value="<?= $product['id']?>">
@@ -103,6 +103,11 @@ ini_set('display_errors', 1);
                 }
                 messages.textContent = data.message;
             }
+            setTimeout(function() {
+                if (divMessage) {
+                    divMessage.classList.add('hidden');
+                }
+            }, 1000);
         })
         .catch(error => {
             console.error('Error submitting form:', error);
