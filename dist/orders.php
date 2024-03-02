@@ -29,8 +29,9 @@ ini_set('display_errors', 1);
     if (count($products) > 0){
         foreach ($products as $product){
     ?>
-        <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown flex flex-col items-center justify-center" style="height: 264px;" data-id="<?= $product['id'] ?>" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">
-            <div class="blur-bg absolute w-full h-full hidden rounded-lg" style="background-color: rgba(0,0,0,0.5);"></div>
+    <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown" style="height: 264px;" data-id="<?= $product['id'] ?>" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">
+        <div style="height: 14rem;" class="relative w-full h-full flex flex-col items-center justify-center">
+            <div class="blur-bg absolute w-full h-full hidden rounded-md" style="background-color: rgba(0,0,0,0.5);"></div>
             <div class="absolute w-1/2">
                 <form id="add_to_cart" action="add_to_cart.php" method="POST" enctype="multipart/form-data">
                     <input type="text" class="hidden" id="uid" name="uid" value="<?= $uid ?>">
@@ -45,12 +46,13 @@ ini_set('display_errors', 1);
                 </form>
             </div>
             <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= $product['image'] ?>">
-            <p class="text-white salsa text-xl"><?= ucwords($product['name']) ?></p>
         </div>
+        <p style="padding: 0.25rem;" class="text-white salsa text-xl p-1"><?= ucwords($product['name']) ?></p>
+    </div>
         <?php 
         }
     } else{
-        echo '<p class="text-gray text-2xl">No Products Added Yet!</p>';
+        echo '<p class="text-gray text-medium font-semibold p-3 py-4 text-center">No products found.</p>';
     }
     ?>
 </div>
@@ -62,7 +64,7 @@ ini_set('display_errors', 1);
     searchInput.addEventListener('input', function(){
         const searchTerm = this.value.trim();
 
-        fetch(`search_product.php?search=${searchTerm}`)
+        fetch(`search_order.php?search=${searchTerm}`)
         .then(response => response.text())
         .then(data => {
             productsList.innerHTML = data;

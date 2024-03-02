@@ -43,7 +43,7 @@ if(!isset($uid)){
     <?php include 'header.php'; ?>
     <?php include 'sidebar.php'; ?>
     <?php $page = isset($_GET['page']) ? $_GET['page'] :'dashboard'; ?>
-    <main id="view-panel" class="absolute top-16 left-80 p-10 -z-10">
+    <main id="view-panel" class="absolute top-16 left-80 p-10 ">
       <?php include $page.'.php' ?>
     </main>
 

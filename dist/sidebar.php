@@ -1,4 +1,7 @@
 <div class="sidebar text-center fixed bottom-0 top-16 w-80 bg-dark-brown">
+    <button class="absolute rounded-md -top-5 left-2">
+        <img class="burger w-10 h-10 rounded-md " src="../images/hamburger-svgrepo-com.svg">
+    </button>
     <div class="datetime p-2 my-10 ">
         <div id="date" class="text-lg text-gray rosarivo"></div>
         <div id="time" class="text-lg text-gray rosarivo"></div>
@@ -16,13 +19,13 @@
             <img class="w-5 h-5" src="/images/coffee-svgrepo-com.svg" alt="">
             <span class="text-white salsa ml-4">Products</span>
         </a>
-        <?php if ($fetch_profile['user_type'] == 0  ){?>         
+        <?php if ($fetch_profile['user_type'] == 0 ){?>         
         <a class="flex items-center navigation nav-orders rounded-lg w-full p-4" href="./index.php?page=orders">
             <img class="w-5 h-5" src="/images/cart-plus-svgrepo-com.svg" alt="">
             <span class="text-white salsa ml-4">Order</span>
         </a> 
         <?php } ?>
-        <?php if ($fetch_profile['user_type'] == 1){?> 
+        <?php if ($fetch_profile['user_type'] == 0){?> 
         <a class="flex items-center navigation nav-sales rounded-lg w-full p-4" href="./index.php?page=sales">
             <img class="w-5 h-5" src="/images/sales-up-graph-svgrepo-com.svg" alt="">
             <span class="text-white salsa ml-4">Sales</span>

@@ -38,12 +38,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
       $cart_query = $conn->prepare("SELECT c.*, p.ingredients FROM `cart` c LEFT JOIN  products p ON p.id = c.product_id WHERE uid = ?");
       $cart_query->execute([$uid]);
       while ($cart_item = $cart_query->fetch(PDO::FETCH_ASSOC)) {
-            $product_id = $cart_item['product_id'];
-            $product_quantity = $cart_item['quantity'];
-            $ingredients = $cart_item['ingredients'];
-            $ingredientList = explode(', ', $ingredients);
+         $product_id = $cart_item['product_id'];
+         $product_quantity = $cart_item['quantity'];
+         $ingredients = $cart_item['ingredients'];
+         $ingredientList = explode(', ', $ingredients);
 
-            foreach ($ingredientList as $ingredient) {
+         foreach ($ingredientList as $ingredient) {
+            if (preg_match('/(\d+)([a-zA-Z]+)/', $ingredient, $matches)) {
+               $quantity = isset($matches[1]) ? $matches[1] : 1;
+               $unit_of_measurement = isset($matches[2]) ? $matches[2] : '';
+               $itemName = substr($ingredient, strlen($quantity . $unit_of_measurement));
+            } else {
+               $quantity = 1;
+               $unit_of_measurement = '';
+               $itemName = $ingredient;
                list($ingredient_quantity, $itemName) = explode(' ', $ingredient, 2);
                $ingredient_quantity *= $product_quantity;
                $inventory_query = $conn->prepare("SELECT quantity FROM `inventory` WHERE name = ?");
@@ -51,19 +59,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
                $current_quantity = $inventory_query->fetchColumn();
                if ($current_quantity === false) {
                   $response['message'] = "Failed to retrieve quantity for {$itemName}";
-              } elseif ($current_quantity < $ingredient_quantity) {
-                  $response['message'] = "Insufficient quantity for {$itemName}";
-              } else {
-                  $new_quantity = $current_quantity - $ingredient_quantity;
-                  $update_inventory = $conn->prepare("UPDATE `inventory` SET quantity = ? WHERE name = ?");
-                  $update_inventory->execute([$new_quantity, $itemName]);
-              }
+               } elseif ($current_quantity < $ingredient_quantity) {
+                     $response['message'] = "Insufficient quantity for {$itemName}";
+               } else {
+                     $new_quantity = $current_quantity - $ingredient_quantity;
+                     $update_inventory = $conn->prepare("UPDATE `inventory` SET quantity = ? WHERE name = ?");
+                     $update_inventory->execute([$new_quantity, $itemName]);
+               }
             }
-      }
+         }
+      }  
       $insert_order->execute([$uid, $total_products, $cart_total, $status, $current_time]);
       $delete_cart->execute([$uid]);
       $conn->commit();
       $response['message'] = "Product added to cart successfully";
-   }  
+   }
 }
 ?>

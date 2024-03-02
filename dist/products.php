@@ -1,7 +1,3 @@
-<?php
-error_reporting(E_ALL); 
-ini_set('display_errors', 1);
-?>
 <div class="upper flex justify-between mb-4">
     <span class="text-gray text-4xl salsa title">Products</span>
     <div class="button-input flex">
@@ -15,10 +11,11 @@ ini_set('display_errors', 1);
     $select_products->execute();
     $products = $select_products->fetchAll(PDO::FETCH_ASSOC);
     if (count($products) > 0){
-        foreach ($products as $product){
-    ?>
-        <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown" style="min-width: 175px; max-width: 300px; height: 264px;" data-id="<?= $product['id'] ?>" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">
-            <div class="absolute flex flex-col items-center top-4 right-4">
+        foreach ($products as $product){ ?>
+    <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown" style="height: 264px;" data-id="<?= $product['id'] ?>" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">
+        <div class="relative flex w-full h-full flex-col items-center justify-center">
+            <div class="blur-bg absolute w-full h-full hidden rounded-md" style="background-color: rgba(0,0,0,0.5);"></div>
+            <div class="absolute flex flex-col items-center top-4 right-4 z-10">
                 <button class="edit-btn rounded-md p-2 cursor-pointer hover:block hidden" onclick="showEditModal(<?= $product['id'] ?>)">
                     <img class="w-8 h-8 rounded-md" src="../images/edit-svgrepo-com.svg">
                 </button>
@@ -26,10 +23,12 @@ ini_set('display_errors', 1);
                     <img class="w-8 h-8 rounded-md" src="../images/delete-svgrepo-com.svg">
                 </button>
             </div>
-            <button class="w-full h-full" onclick="showViewModal(<?= $product['id'] ?>)">
-                <img class="w-full h-full object-cover" src="../uploaded_img/<?= $product['image'] ?>">
+            <button type="button" id="view-btn" class="view-btn w-full h-full absolute cart-btn rounded-md cursor-pointer hidden" onclick="showViewModal(<?= $product['id'] ?>)">
+                <center><img class="rounded-md w-1/3 h-1/3 text-center" src="../images/view-svgrepo-com.svg"></center>
             </button>
+            <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= $product['image'] ?>">
         </div>
+    </div>
         <?php 
         }
     } else{
@@ -47,7 +46,7 @@ ini_set('display_errors', 1);
                 <div class="mt-10 grid cols-grid-1 cols-grid-2 gap-x-2">
                     <div class="col-span-full flex justify-center">
                         <div class="text-center">
-                            <img id="previewImage" class="w-48 h-48 rounded-full bg-center object-cover" src="../images/default-coffee.svg">
+                            <img id="previewImage" class="w-48 h-48 rounded-full bg-center object-cover" src="../images/image-svgrepo-com.svg">
                             <label class="relative cursor-pointer rounded-lg float-end" for="image">
                                 <img class="w-6 h-6" src="../images/upload-minimalistic-svgrepo-com.svg">
                                 <input id="image" name="image" class="sr-only" type="file" accept="image/jpg, image/jpeg, image/png" onchange="previewFile()">
@@ -146,6 +145,7 @@ ini_set('display_errors', 1);
     const openModalBtn = document.getElementById("openModalBtn");
 
 openModalBtn.addEventListener("click", () => {
+    formElement.reset();
     fadeIn(modal);
 });
 
@@ -310,10 +310,14 @@ function fadeIn(el, display) {
     function showButtons(element) {
     element.querySelector('.delete-btn').classList.remove('hidden');
     element.querySelector('.edit-btn').classList.remove('hidden');
+    element.querySelector('.view-btn').classList.remove('hidden');
+    element.querySelector('.blur-bg').classList.remove('hidden');
     }
 
     function hideButtons(element) {
         element.querySelector('.delete-btn').classList.add('hidden');
         element.querySelector('.edit-btn').classList.add('hidden');
+        element.querySelector('.view-btn').classList.add('hidden');
+        element.querySelector('.blur-bg').classList.add('hidden');
     }
 </script>

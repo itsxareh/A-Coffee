@@ -59,7 +59,7 @@
                 <div class="mt-5 grid cols-grid-1 cols-grid-2 gap-x-2">
                     <div class="col-span-full flex justify-center">
                         <div class="text-center">
-                            <img id="previewImage" class="w-48 h-48 rounded-full bg-center object-cover" src="../images/profile-circle.svg">
+                            <img id="previewImage" class="w-48 h-48 rounded-full bg-center object-cover" src="../images/image-svgrepo-com.svg">
                             <label class="relative cursor-pointer rounded-lg float-end" for="image">
                                 <img class="w-6 h-6" src="../images/upload-minimalistic-svgrepo-com.svg">
                                 <input id="image" name="image" class="sr-only" type="file" accept="image/jpg, image/jpeg, image/png" onchange="previewFile()" required>
@@ -124,7 +124,7 @@
     </div>
 </div>
 
-<div class="py-20 transition duration-150 ease-in-out z-10 absolute top-0 right-0 bottom-0 left-0 hidden h-full" id="delete-modal">
+<div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="delete-modal">
    	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
     <div class="w-full  max-w-lg p-5 relative mx-auto h-80 rounded-xl shadow-lg  bg-white ">
         <div class="">

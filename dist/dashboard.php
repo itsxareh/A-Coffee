@@ -6,7 +6,7 @@
     ?>
     <div class="rounded-lg shadow-lg bg-dark-brown text-center flex flex-col justify-around h-52">
         <p class="text-white text-7xl salsa"><?= $total_orders ?></p>
-        <p class="text-gray text-2xl salsa">Total Orders</p>
+        <span class="text-gray text-2xl salsa">Total Orders</span>
     </div>
     <?php 
         $get_products = $conn->prepare("SELECT * FROM products");
@@ -15,7 +15,7 @@
     ?>
     <div class="rounded-lg shadow-lg bg-dark-brown text-center flex flex-col justify-around h-52">
         <p class="text-white text-7xl salsa"><?= $total_products ?></p>
-        <p class="text-gray text-2xl salsa">Products</p>
+        <span class="text-gray text-2xl salsa">Products</span>
     </div>
     <?php
         $get_total = $conn->prepare("SELECT SUM(amount) AS total_amount FROM orders");
@@ -24,8 +24,8 @@
         $total_amount = $get_total_amount['total_amount'];
     ?>
     <div class="rounded-lg shadow-lg bg-dark-brown text-center flex flex-col justify-around h-52">
-        <p class="text-white text-4xl salsa">₱<?= $total_amount ?></p>
-        <p class="text-gray text-2xl salsa">Total Sales</p>        
+        <p class="text-white text-4xl salsa line-clamp-1 hover:line-clamp-1">₱<?= $total_amount ?></p>
+        <span class="text-gray text-2xl salsa">Total Sales</span>        
     </div>
 </div>
 <div class="text-3xl text-center text-white rosarivo">Orders</div>
@@ -42,24 +42,38 @@
         </thead>
         <tbody>
             <?php
-            $get_orders = $conn->prepare("SELECT * FROM orders ORDER by id DESC");
+            $get_orders = $conn->prepare("SELECT * FROM orders ORDER by status DESC");
             $get_orders->execute();
             $orders = $get_orders->fetchAll(PDO::FETCH_ASSOC);
             if (count($orders) > 0){
                 foreach($orders as $order){ ?>
-                <tr class="border-color" data-id=<?= $order['id']?>>
-                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $order['id'] ?></td>
-                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?php $comma = strpos($order['products'], ','); $orders = trim(substr_replace($order['products'], '', $comma, 1)); echo $orders?></td>
-                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">₱<?= $order['amount'];?></td>
-                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?php switch($order['status']){ case 1: echo "Done"; break; case 2: echo "On process"; break; default: echo "N/A"; break; }?></td>
-                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
-                        <div class="flex items-center gap-4">
+                <tr class="border-color" data-id="<?= $order['id'] ?>">
+                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap rosarivo"><?= $order['id'] ?></td>
+                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap rosarivo">
                         <?php 
-                            if (($order['status']) === 2){
-                                echo '<button id="editModalBtn" class="w-6 h-6" onclick="showEditModal('.$order['id'].')"><img src="../images/edit-svgrepo-com.svg" alt=""></button>';
-                            }
+                            $comma = strpos($order['products'], ','); 
+                            $orders = trim(substr_replace($order['products'], '', $comma, 1)); 
+                            echo $orders;
                         ?>
-                            <button id="deleteModalBtn" class="w-6 h-6" onclick="showDeleteModal(<?=$order['id']?>)"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
+                    </td>
+                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap rosarivo">₱<?= $order['amount']; ?></td>
+                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap rosarivo">
+                    <?php if ($order['status']===2) { ?>
+                        <select class="text-white text-medium text-sm bg-transparent whitespace-nowrap rosarivo status-select" name="status" data-id="<?= $order['id'] ?>">
+                            <option class="text-black text-medium rosarivo " value="2" <?= $order['status'] == 2 ? 'selected' : '' ?>>On Process</option>
+                            <option class="text-black text-medium rosarivo " value="1" <?= $order['status'] == 1 ? 'selected' : '' ?>>Done</option>
+                        </select>
+                        <?php
+                    } else {
+                        echo 'Done';
+                    }?>
+                    </td>
+                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap rosarivo">
+                        <div class="flex items-center gap-4">
+                            <?php if ($order['status'] == 2): ?>
+                                <button id="statusBtn" class="statusBtn w-6 h-6" title="Save" data-id="<?= $order['id'] ?>"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
+                                <button id="deleteModalBtn" class="deleteModalBtn w-6 h-6" title="Delete" onclick="showDeleteModal(<?= $order['id'] ?>)"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
+                            <?php endif; ?>
                         </div>
                     </td>
                 </tr>
@@ -67,11 +81,10 @@
                 }
             }
             ?>
-            
         </tbody>
     </table>
 </div>
-<div class="py-20 transition duration-150 ease-in-out z-10 absolute top-0 right-0 bottom-0 left-0 hidden h-full" id="delete-modal">
+<div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="delete-modal">
    	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
     <div class="w-full  max-w-lg p-5 relative mx-auto h-80 rounded-xl shadow-lg  bg-white ">
         <div class="">
@@ -93,6 +106,32 @@
     </div>
 </div>
 <script>
+document.querySelectorAll('.statusBtn').forEach(button => {
+    button.addEventListener('click', function() {
+        const orderId = this.getAttribute('data-id');
+        const statusSelect = document.querySelector(`.status-select[data-id="${orderId}"]`);
+        const status = statusSelect.value;
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'update_status.php', true);
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                const response = JSON.parse(xhr.responseText);
+                if (response.success) {
+                    if (status === '1') {
+                        const row = button.closest('tr');
+                        const tbody = row.parentNode;
+                        tbody.appendChild(row);
+                    }
+                } else {
+                    console.error('Error updating status');
+                }
+            }
+        };
+        xhr.send('orderId=' + orderId + '&status=' + status);
+    });
+});
     const deleteModal = document.getElementById("delete-modal");
     const deleteModalBtn = document.getElementById("deleteModalBtn");
     function deleteModalHandler(val) {
@@ -123,6 +162,7 @@
             }
         })();
     }
+   
     function showDeleteModal(orderId) {
         const deleteBtn = deleteModal.querySelector(".deleteOrder");
         deleteBtn.setAttribute("data-id", orderId);

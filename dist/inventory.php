@@ -46,7 +46,8 @@
         </tbody>
     </table>
 </div>
-<div class="py-20 transition duration-150 ease-in-out z-10 absolute top-0 right-0 bottom-0 left-0 hidden h-full" style="background-color: rgba(0, 0, 0, 0.7);" id="add-modal">
+<div class="py-20 transition duration-150 ease-in-out z-10 absolute top-0 right-0 bottom-0 left-0 hidden h-full" id="add-modal">
+   	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
     <div role="alert" class="container mx-auto w-11/12 md:w-2/3 max-w-xl">
         <div class="relative py-8 px-5 md:px-10 bg-white shadow-md rounded border border-gray-400">
             <h1 class="text-gray-800 font-lg font-medium tracking-normal leading-tight mb-4">Enter Item Details</h1>
@@ -56,7 +57,7 @@
                 <div class="mt-5 grid cols-grid-1 cols-grid-2 gap-x-2">
                     <div class="col-span-full flex justify-center items-center">
                         <div class="text-center">
-                            <img id="previewImage" class="w-48 h-48 rounded-full bg-center object-cover" src="../images/profile-circle.svg">
+                            <img id="previewImage" class="w-48 h-48 rounded-full bg-center object-cover" src="../images/image-svgrepo-com.svg">
                             <label class="relative cursor-pointer rounded-lg float-end" for="image">
                                 <img class="w-6 h-6" src="../images/upload-minimalistic-svgrepo-com.svg">
                                 <input id="image" name="image" class="sr-only" type="file" accept="image/jpg, image/jpeg, image/png" onchange="previewFile()" required>
@@ -70,7 +71,7 @@
                     </div>
                     <div class="col-span-1">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="quantity">Quantity</label>
-                            <input name="quantity" id="quantity" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="50" />
+                            <input name="quantity" id="quantity" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="10ml/stock"/>
                         <div id="quantityError" class=" bottom-0 text-red-500 salsa"></div>
                     </div>
                     <div class="col-span-full">
@@ -78,6 +79,7 @@
                         <textarea name="description" id="description" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" rows="3" autocomplete="off" required></textarea>
                     </div>
                 </div>
+                <i class="text-sm mb-4">Note: Please be aware that modifying the quantity will increase the existing quantity.</i></p>
                 <div class="flex items-center justify-start w-full">
                     <button type="submit" name="submit" id="submitBtn" class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-600 transition duration-150 ease-in-out bg-light-brown rounded text-white px-8 py-2 text-sm">Submit</button>
                     <button type="button" class="focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-gray-400 ml-3 bg-gray-100 transition duration-150 text-gray-600 ease-in-out hover:border-gray-400 hover:bg-gray-300 border rounded px-8 py-2 text-sm" onclick="modalHandler()">Cancel</button>
@@ -90,7 +92,7 @@
     </div>
 </div>
 
-<div class="py-20 transition duration-150 ease-in-out z-10 absolute top-0 right-0 bottom-0 left-0 hidden h-full" id="delete-modal">
+<div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="delete-modal">
    	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
     <div class="w-full  max-w-lg p-5 relative mx-auto h-80 rounded-xl shadow-lg  bg-white ">
         <div class="">

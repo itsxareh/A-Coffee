@@ -26,18 +26,11 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
 
 ?>
 
-<header class="fixed inset-x-0 top-0 h-16 shadow-md" style="background-color: var(--dark-brown);">
+<header class="fixed inset-x-0 top-0 h-16 shadow-md z-10" style="background-color: var(--dark-brown);">
 
     <div class="flex justify-between items-center h-16 px-4">
-
+        <div class=""></div>
         <a href="index.php" class="text-white text-4xl rosarivo">A Coffee</a>
-
-        <!-- <nav class="navbar">
-            <a href="index.php?page=marketplace" class="nav-marketplace"><img src="images/icons/marketplace.png" alt=""></a>
-            <a href="index.php?page=contact" class="nav-contact"><img src="images/icons/contact-mail.png" alt=""></a>
-            <a href="index.php?page=about" class="nav-about"><img src="images/icons/info.png" alt=""></a>
-        </nav> -->
-
         <div class="user">
             <div id="profileBtn">
                 <img class="w-10 h-10" src="../images/profile-circle-svgrepo-com.svg" alt="">
@@ -51,13 +44,12 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
 
 </header>
 <script>
-    const profileBtn = document.querySelector('#profileBtn');
-    const navProfile = document.querySelector('.nav-profile');
+const profileBtn = document.querySelector('#profileBtn');
+const navProfile = document.querySelector('.nav-profile');
 
-    profileBtn.addEventListener('click', () => {
-        navProfile.classList.toggle('hidden');
-    });
-
+profileBtn.addEventListener('click', () => {
+    navProfile.classList.toggle('hidden');
+});
 window.addEventListener('scroll', () => {
     navProfile.classList.remove('active');
 });
@@ -65,4 +57,6 @@ window.addEventListener('scroll', () => {
 $(function() {
    $('.nav-<?php echo isset($_GET['page']) ? $_GET['page'] : '' ?>').addClass('active');
 });
+
+
 </script>
