@@ -1,4 +1,10 @@
 
+<div class="hide-message hidden">
+    <div class="message rounded-lg p-4 flex items-start">
+        <span id="message" class="text-sm text-white"></span>
+        <button class="-m-1" onclick="this.parentElement.remove();"><img class="w-5 h-5" src="../images/close-svgrepo-com.svg"></button>
+    </div>
+</div>
 <div class="grid autofit-grid1 gap-3">
 <?php
     $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE uid = ?");
@@ -177,6 +183,8 @@ function updateQuantity(cartId, action) {
         console.error('Error updating quantity:', error);
     });
 }
+const messages = document.getElementById("message");
+const divMessage = document.getElementsByClassName('hide-message')[0];
 const submitBtn = document.getElementById('submitBtn');
 const formOrder = document.getElementById('add_order'); 
 submitBtn.addEventListener('click', addToCart);
@@ -189,10 +197,18 @@ function addToCart() {
         method: 'POST',
         body: formData
     })
-    .then(response => response.text())
+    .then(response => response.json())
     .then(data => {
         console.log(data);
-        // window.location.href = 'index.php?page=dashboard';
+        if (divMessage) {
+        divMessage.classList.remove('hidden');
+        messages.textContent = data.message;
+        }
+        setTimeout(function() {
+            if (divMessage) {
+                divMessage.classList.add('hidden');
+            }
+        }, 1000);
     })
     .catch(error => {
         console.error('Error adding order:', error);
