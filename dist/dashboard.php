@@ -30,11 +30,11 @@
 </div>
 <div class="text-3xl text-center text-white rosarivo">Orders</div>
 <div class="overflow-x-auto">
-    <table class="orderLists indent-0 border-collapse py-6 px-2  w-full" data-id="<?= $item['id']?>">
+    <table class="orderLists indent-0 border-collapse py-6 px-2  w-full">
         <thead>
             <tr>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Order ID</th>
-                <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Orders</th>
+                <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left min-w-48 max-w-72">Orders</th>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Price</th>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Status</th>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Action</th>
@@ -49,15 +49,9 @@
                 foreach($orders as $order){ ?>
                 <tr class="border-color" data-id="<?= $order['id'] ?>">
                     <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap rosarivo"><?= $order['id'] ?></td>
-                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap rosarivo">
-                        <?php 
-                            $comma = strpos($order['products'], ','); 
-                            $orders = trim(substr_replace($order['products'], '', $comma, 1)); 
-                            echo $orders;
-                        ?>
-                    </td>
+                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-wrap rosarivo min-w-48 max-w-72"><?= $order['products']?></td>
                     <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap rosarivo">₱<?= $order['amount']; ?></td>
-                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap rosarivo">
+                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap text-balance rosarivo">
                     <?php if ($order['status']===2) { ?>
                         <select class="text-white text-medium text-sm bg-transparent whitespace-nowrap rosarivo status-select" name="status" data-id="<?= $order['id'] ?>">
                             <option class="text-black text-medium rosarivo " value="2" <?= $order['status'] == 2 ? 'selected' : '' ?>>On Process</option>

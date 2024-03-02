@@ -200,14 +200,19 @@ function addToCart() {
     .then(response => response.json())
     .then(data => {
         console.log(data);
+        if (data.success === true){
+            setTimeout(function() {
+            window.location.href = 'index.php?page=dashboard';
+        }, 1000);
+        }
         if (divMessage) {
-        divMessage.classList.remove('hidden');
-        messages.textContent = data.message;
+            divMessage.classList.remove('hidden');
+            messages.textContent = data.message;
         }
         setTimeout(function() {
-            if (divMessage) {
-                divMessage.classList.add('hidden');
-            }
+        if (divMessage) {
+            divMessage.classList.add('hidden');
+        }
         }, 1000);
     })
     .catch(error => {

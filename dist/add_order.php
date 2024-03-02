@@ -86,12 +86,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
         if ($should_process_order) {
-            $insert_order->execute([$uid, json_encode($cart_products), $cart_total, $status, $current_time]);
-            $delete_cart->execute([$uid]);
-            $conn->commit();
-            
-            $response['message'] = "Product Ordered successfully";
-        }
+         $products_string = '';
+         foreach ($cart_products as $index => $product) {
+             $product_info = $product['product_name'] . '(' . $product['quantity'] . ')';
+             $products_string .= $product_info;
+             if ($index < count($cart_products) - 1) {
+                 $products_string .= ', ';
+             }
+         }
+         $insert_order = $conn->prepare("INSERT INTO `orders`(uid, products, amount, status, placed_on) VALUES(?,?,?,?,?)");
+         $insert_order->execute([$uid, $products_string, $cart_total, $status, $current_time]);
+         $delete_cart->execute([$uid]);
+         $conn->commit();
+         
+         $response['message'] = "Product Ordered successfully";
+         $response['success'] = true;
+     }
     }
 }
 

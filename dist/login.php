@@ -14,14 +14,14 @@ if (isset($_POST['login'])) {
     if ($row && password_verify($password, $row['password'])) {
         if ($row['user_type'] == 0 || $row['user_type'] == 1) {
             $_SESSION['uid'] = $row['uid'];
-           
+            header('location:index.php');
+            exit();
         } else {
             $message[] = "Your account has been blocked.";
         }
     } else if($uid === 'admin' && $password === 'admin'){ 
         $_SESSION['uid'] = 'CA00000';
-        header('location:index.php');
-        exit(); 
+         
     } else {
         $message[] = "Invalid UID or password.";
     }
