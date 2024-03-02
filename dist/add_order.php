@@ -1,78 +1,84 @@
-<?php
+<?php 
 include 'config.php';
-if ($_SERVER['REQUEST_METHOD'] == 'POST'){
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
    date_default_timezone_set('Asia/Manila');
    $current_time = date('m-d-Y h:m:s');
    $uid = $_POST['uid'];
    $status = '2';
    $cart_total = 0;
-   $cart_products[] = '';
+   $cart_products = [];
 
    $select_cart = $conn->prepare("SELECT c.*, p.ingredients, p.name AS product_name FROM `cart` c LEFT JOIN  products p ON p.id = c.product_id WHERE uid = ?");
    $select_cart->execute([$uid]);
-   if($select_cart->rowCount() > 0){
-      while($cart_item = $select_cart->fetch(PDO::FETCH_ASSOC)){
-         $cart_products[] = $cart_item['product_name'].' ('.$cart_item['quantity'].')';
+
+   if ($select_cart->rowCount() > 0) {
+      while ($cart_item = $select_cart->fetch(PDO::FETCH_ASSOC)) {
+         $cart_products[] = $cart_item;
          $sub_total = ($cart_item['price'] * $cart_item['quantity']);
          $cart_total += $sub_total;
-      };
-   };
-
-   $total_products = $cart_products[0];
-   
-   for ($i = 1; $i < count($cart_products); $i++) {
-      $total_products .= ', ' . $cart_products[$i];
+      }
    }
-   $order_query = $conn->prepare("SELECT * FROM `orders` WHERE uid = ? AND products = ? AND amount = ? AND status = ?");
-   $order_query->execute([$uid, $total_products, $cart_total, $status]);
-   
+
    if ($cart_total == 0) {
       $response['message'] = 'Your cart is empty';
-   } elseif ($order_query->rowCount() > 0) {
-      $response['message'] = 'Order placed already!';
    } else {
       $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE uid = ?");
       $insert_order = $conn->prepare("INSERT INTO `orders`(uid, products, amount, status, placed_on) VALUES(?,?,?,?,?)");
-      
+
       $conn->beginTransaction();
-      $cart_query = $conn->prepare("SELECT c.*, p.ingredients FROM `cart` c LEFT JOIN  products p ON p.id = c.product_id WHERE uid = ?");
-      $cart_query->execute([$uid]);
-      while ($cart_item = $cart_query->fetch(PDO::FETCH_ASSOC)) {
+        
+      foreach ($cart_products as $cart_item) {
          $product_id = $cart_item['product_id'];
          $product_quantity = $cart_item['quantity'];
          $ingredients = $cart_item['ingredients'];
-         $ingredientList = explode(', ', $ingredients);
+         $ingredients_array = explode(',', $ingredients);
+         $parsed_ingredients = [];
+         $pattern = '/(?:(\d+)\s*([a-z]*)\s+)?(\w+)/i';
 
-         foreach ($ingredientList as $ingredient) {
-            if (preg_match('/(\d+)([a-zA-Z]+)/', $ingredient, $matches)) {
-               $quantity = isset($matches[1]) ? $matches[1] : 1;
-               $unit_of_measurement = isset($matches[2]) ? $matches[2] : '';
-               $itemName = substr($ingredient, strlen($quantity . $unit_of_measurement));
-            } else {
-               $quantity = 1;
-               $unit_of_measurement = '';
-               $itemName = $ingredient;
-               list($ingredient_quantity, $itemName) = explode(' ', $ingredient, 2);
-               $ingredient_quantity *= $product_quantity;
-               $inventory_query = $conn->prepare("SELECT quantity FROM `inventory` WHERE name = ?");
-               $inventory_query->execute([$itemName]);
-               $current_quantity = $inventory_query->fetchColumn();
-               if ($current_quantity === false) {
+         foreach ($ingredients_array as $ingredient) {
+            preg_match($pattern, trim($ingredient), $matches);
+            $quantity = !empty($matches[1]) ? (int)$matches[1] : $product_quantity;
+            $unit = !empty($matches[2]) ? $matches[2] : '';
+            $itemName = $matches[3];
+            if (empty($unit) && is_numeric($itemName)) {
+               $temp = $quantity;
+               $quantity = $product_quantity;
+               $itemName = $temp;
+            }
+            $parsed_ingredients[] = [
+               'itemName' => $itemName,
+               'quantity' => $quantity,
+               'unit' => $unit,
+            ];
+         }
+         foreach ($parsed_ingredients as $ingredient) {
+            $ingredient_quantity = $ingredient['quantity'];
+            $itemName = $ingredient['itemName'];
+
+            // Query inventory to check availability
+            $inventory_query = $conn->prepare("SELECT quantity FROM `inventory` WHERE name = ?");
+            $inventory_query->execute([$itemName]);
+            $current_quantity = $inventory_query->fetchColumn();
+
+            if ($current_quantity === false) {
                   $response['message'] = "Failed to retrieve quantity for {$itemName}";
-               } elseif ($current_quantity < $ingredient_quantity) {
-                     $response['message'] = "Insufficient quantity for {$itemName}";
-               } else {
-                     $new_quantity = $current_quantity - $ingredient_quantity;
-                     $update_inventory = $conn->prepare("UPDATE `inventory` SET quantity = ? WHERE name = ?");
-                     $update_inventory->execute([$new_quantity, $itemName]);
-               }
+            } elseif ($current_quantity < $ingredient_quantity) {
+                  $response['message'] = "Insufficient quantity for {$itemName}";
+            } else {
+               $new_quantity = $current_quantity - $ingredient_quantity;
+               $update_inventory = $conn->prepare("UPDATE `inventory` SET quantity = ? WHERE name = ?");
+               $update_inventory->execute([$new_quantity, $itemName]);
             }
          }
-      }  
-      $insert_order->execute([$uid, $total_products, $cart_total, $status, $current_time]);
+      }
+      $insert_order->execute([$uid, json_encode($cart_products), $cart_total, $status, $current_time]);
       $delete_cart->execute([$uid]);
       $conn->commit();
+      
       $response['message'] = "Product added to cart successfully";
    }
 }
+
+echo json_encode($response);
 ?>
