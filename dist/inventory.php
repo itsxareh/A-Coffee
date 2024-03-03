@@ -1,3 +1,9 @@
+<div class="hide-message hidden">
+    <div class="message rounded-lg p-4 flex items-start">
+        <span id="message" class="text-sm text-white"></span>
+        <button class="-m-1" onclick="this.parentElement.remove();"><img class="w-5 h-5" src="../images/close-svgrepo-com.svg"></button>
+    </div>
+</div>
 <div class="upper flex justify-between mb-4">
     <span class="text-gray text-4xl salsa title">Inventory</span>
     <div class="button-input flex">
@@ -6,7 +12,7 @@
     </div>
 </div>
 <div class="overflow-x-auto">
-    <table class="indent-0 border-collapse py-6 px-2  w-full">
+    <table class="indent-0 border-collapse py-6 px-2  w-full" id="itemsTable">
         <thead>
             <tr>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Item</th>
@@ -120,7 +126,8 @@
     const deleteModalBtn = document.getElementById("deleteModalBtn");
     const editModal = document.getElementById("edit-modal");
     const editModalBtn = document.getElementById("editModalBtn");
-
+    const messages = document.getElementById("message");
+    const divMessage = document.getElementsByClassName('hide-message')[0];
     
     function modalHandler(val) {
         if (val) {
@@ -199,24 +206,73 @@
     submitBtn.addEventListener('click', submitForm);
 
     function submitForm(event) {
-        event.preventDefault();
-        const formData = new FormData(formElement); 
+    event.preventDefault();
+    const formData = new FormData(formElement);
 
-        fetch('add_item.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.text())
-        .then(data => {
-            console.log('Response data:', data);
-            itemsList.innerHTML += data;
-            formElement.reset(); 
-            modalHandler(false);
-        })
-        .catch(error => {
-            console.error('Error submitting form:', error);
-        });
-    }
+    fetch('add_item.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        formElement.reset();
+        if (data.insert === true) {
+            const newRow = document.createElement('tr');
+            newRow.setAttribute('class', 'border-color');
+            newRow.setAttribute('data-id', data.id);
+            newRow.innerHTML = `
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
+                    <img class="w-16 h-16 object-cover" src="../uploaded_img/${data.image}">
+                </td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.description}</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity}</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-4">
+                        <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(${data.id})"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
+                        <button id="deleteModalBtn" class="w-6 h-6" onclick="showDeleteModal(${data.id})"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
+                    </div>
+                </td>
+            `;
+            const tbody = document.getElementById('itemsList');
+            tbody.appendChild(newRow);
+            if (divMessage) {
+                divMessage.classList.remove('hidden');
+            }
+            messages.textContent = data.message;
+        } else if (data.update === true) {
+            const updatedRow = document.querySelector(`tr[data-id="${data.id}"]`);
+            updatedRow.innerHTML = `
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
+                    <img class="w-16 h-16 object-cover" src="../uploaded_img/${data.image}">
+                </td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.description}</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity}</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-4">
+                        <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(${data.id})"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
+                        <button id="deleteModalBtn" class="w-6 h-6" onclick="showDeleteModal(${data.id})"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
+                    </div>
+                </td>
+            `;
+            if (divMessage) {
+                divMessage.classList.remove('hidden');
+            }
+            messages.textContent = data.message;
+        }
+        setTimeout(function() {
+            if (divMessage) {
+                divMessage.classList.add('hidden');
+            }
+        }, 1000);
+        modalHandler(false);
+    })
+    .catch(error => {
+        console.error('Error submitting form:', error);
+    });
+}
+
     
     const quantityInput = document.getElementById('quantity');
     const quantityError = document.getElementById('quantityError');

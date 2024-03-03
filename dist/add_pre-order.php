@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $response['message'] = 'Your cart is empty';
     } else {
         $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE uid = ?");
-        $insert_order = $conn->prepare("INSERT INTO `orders`(uid, products, amount, status, placed_on) VALUES(?,?,?,?,?)");
+        $insert_order = $conn->prepare("INSERT INTO `pre-orders`(uid, products, amount, status, placed_on) VALUES(?,?,?,?,?)");
 
         $conn->beginTransaction();
         $should_process_order = true;
@@ -35,29 +35,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $ingredients = $cart_item['ingredients'];
             $ingredients_array = explode(',', $ingredients);
             $parsed_ingredients = [];
-
-            $pattern = '/(?:(\d+)\s*([a-z]*)\s+)?(\w+)/i';
-
+        
             foreach ($ingredients_array as $ingredient) {
-                preg_match($pattern, trim($ingredient), $matches);
-
-                $quantity = !empty($matches[1]) ? (int)$matches[1] : $product_quantity;
-                $unit = !empty($matches[2]) ? $matches[2] : '';
-                $itemName = $matches[3];
-
-                if (empty($unit) && is_numeric($itemName)) {
-                    $temp = $quantity;
+                // Check if ingredient contains only one word
+                if (strpos(trim($ingredient), ' ') === false) {
                     $quantity = $product_quantity;
-                    $itemName = $temp;
+                    $itemName = trim($ingredient);
+                    $unit = '';
+                } else {
+                    // Regular expression pattern to extract quantity, unit, and item name
+                    $pattern = '/(?:(\d*\.?\d+)\s*([a-z]*)\s+)?(.+)/i'; // Updated pattern to handle decimal quantities
+                    preg_match($pattern, trim($ingredient), $matches);
+        
+                    $quantity = !empty($matches[1]) ? (float)$matches[1] : $product_quantity; // Cast to float
+                    $unit = !empty($matches[2]) ? $matches[2] : '';
+                    $itemName = $matches[3];
                 }
-
+        
                 $parsed_ingredients[] = [
                     'itemName' => $itemName,
                     'quantity' => $quantity,
                     'unit' => $unit,
                 ];
             }
-
+    
             foreach ($parsed_ingredients as $ingredient) {
                 $ingredient_quantity = $ingredient['quantity'];
                 $itemName = $ingredient['itemName'];
@@ -88,13 +89,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                  $products_string .= ', ';
              }
          }
-         $insert_order = $conn->prepare("INSERT INTO `orders`(uid, products, amount, status, placed_on) VALUES(?,?,?,?,?)");
+         $insert_order = $conn->prepare("INSERT INTO `pre-orders`(uid, products, amount, status, placed_on) VALUES(?,?,?,?,?)");
          $insert_order->execute([$uid, $products_string, $cart_total, $status, $current_time]);
          $delete_cart->execute([$uid]);
          $conn->commit();
          
          $response['message'] = "Product Ordered successfully";
          $response['success'] = true;
+         $response['msg'] = $parsed_ingredients;
      }
     }
 }

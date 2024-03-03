@@ -24,7 +24,7 @@
                 </button>
             </div>
             <button type="button" id="view-btn" class="view-btn w-full h-full absolute cart-btn rounded-md cursor-pointer hidden" onclick="showViewModal(<?= $product['id'] ?>)">
-                <center><img class="rounded-md w-1/3 h-1/3 text-center" src="../images/view-svgrepo-com.svg"></center>
+                <center><img class="rounded-md w-1/3 h-1/3 text-center" src="../images/details-more-svgrepo-com.svg"></center>
             </button>
             <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= $product['image'] ?>">
         </div>

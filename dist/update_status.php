@@ -9,9 +9,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["orderId"]) && isset($_
     $update_query->bindParam(":status", $status);
     $update_query->bindParam(":orderId", $orderId);
     if ($update_query->execute()) {
-        $response = array("success" => true);
+        $response = array("success" => true, "message" => "Order {$orderId} mark as done");
     } else {
-        $response = array("success" => false);
+        $response = array("success" => false, "message" => "Invalid request");
     }
 } else {
     $response = array("success" => false, "message" => "Invalid request");

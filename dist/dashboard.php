@@ -1,3 +1,9 @@
+<div class="hide-message hidden">
+    <div class="message rounded-lg p-4 flex items-start">
+        <span id="message" class="text-sm text-white"></span>
+        <button class="-m-1" onclick="this.parentElement.remove();"><img class="w-5 h-5" src="../images/close-svgrepo-com.svg"></button>
+    </div>
+</div>
 <div class="grid autofit-grid2 gap-12 p-2 mb-8">
     <?php 
         $get_orders = $conn->prepare("SELECT * FROM orders");
@@ -42,7 +48,7 @@
         </thead>
         <tbody>
             <?php
-            $get_orders = $conn->prepare("SELECT * FROM orders ORDER by status DESC");
+            $get_orders = $conn->prepare("SELECT * FROM `pre-orders` ORDER BY CASE WHEN status = 2 THEN 0 WHEN status = 1 THEN 1 END, CASE WHEN status = 1 THEN id END DESC;");
             $get_orders->execute();
             $orders = $get_orders->fetchAll(PDO::FETCH_ASSOC);
             if (count($orders) > 0){
@@ -72,8 +78,10 @@
                     </td>
                 </tr>
                 <?php
-                }
-            }
+                } 
+            } else { ?>
+                <tr><td colspan="5" class=" text-gray text-medium font-semibold p-3 py-4 text-center">No orders found.</td></tr>
+            <?php }
             ?>
         </tbody>
     </table>
@@ -100,6 +108,8 @@
     </div>
 </div>
 <script>
+const messages = document.getElementById("message");
+const divMessage = document.getElementsByClassName('hide-message')[0];
 document.querySelectorAll('.statusBtn').forEach(button => {
     button.addEventListener('click', function() {
         const orderId = this.getAttribute('data-id');
@@ -117,6 +127,18 @@ document.querySelectorAll('.statusBtn').forEach(button => {
                         const row = button.closest('tr');
                         const tbody = row.parentNode;
                         tbody.appendChild(row);
+                        // setTimeout(function() {
+                        //     window.location.reload();
+                        // }, 1500);
+                        if (divMessage) {
+                            divMessage.classList.remove('hidden');
+                            messages.textContent = response.message;
+                        }
+                        setTimeout(function() {
+                        if (divMessage) {
+                            divMessage.classList.add('hidden');
+                        }
+                        }, 1500);
                     }
                 } else {
                     console.error('Error updating status');
