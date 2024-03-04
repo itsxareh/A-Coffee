@@ -48,7 +48,7 @@
         </thead>
         <tbody>
             <?php
-            $get_orders = $conn->prepare("SELECT * FROM `pre-orders` ORDER BY CASE WHEN status = 2 THEN 0 WHEN status = 1 THEN 1 END, CASE WHEN status = 1 THEN id END DESC;");
+            $get_orders = $conn->prepare("SELECT * FROM `orders` ORDER BY CASE WHEN status = 2 THEN 0 WHEN status = 1 THEN 1 END, CASE WHEN status = 1 THEN id END DESC;");
             $get_orders->execute();
             $orders = $get_orders->fetchAll(PDO::FETCH_ASSOC);
             if (count($orders) > 0){
@@ -86,6 +86,26 @@
         </tbody>
     </table>
 </div>
+
+<div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 h-full hidden" id="notification-modal">
+   	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
+    <div class="w-full  max-w-lg p-5 relative mx-auto h-80 rounded-xl shadow-lg  bg-white ">
+            <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-whit" onclick="notificationModalHandler()">
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                </svg>
+                <span class="sr-only">Close modal</span>
+            </button>
+            <div class="p-4 md:p-5 h-full flex flex-col justify-between">
+                <h3 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">Approaching Low Quantity</h3>
+                <p class="text-gray-500 text-md font-normal dark:text-gray-400 mb-6">The following item/s have low inventory quantity. Please restocking soon:<p>
+                <div class="text-center"><span id="notification" class="text-md font-medium text-gray-900 dark:text-white mb-6"></span></div>
+                <div class="p-3  mt-2 text-center space-x-4 md:block">
+                    <button class="mb-2 md:mb-0 bg-light-brown px-5 py-2 text-sm font-medium tracking-wider border text-white rounded-full hover:shadow-lg hover:bg-amber-400" onclick="notificationModalHandler()">Okay</button>
+                </div>
+        </div>
+    </div>
+</div> 
 <div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="delete-modal">
    	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
     <div class="w-full  max-w-lg p-5 relative mx-auto h-80 rounded-xl shadow-lg  bg-white ">
@@ -110,6 +130,8 @@
 <script>
 const messages = document.getElementById("message");
 const divMessage = document.getElementsByClassName('hide-message')[0];
+const notification = document.getElementById("notification");
+const divNotification = document.getElementById("notification-modal");
 document.querySelectorAll('.statusBtn').forEach(button => {
     button.addEventListener('click', function() {
         const orderId = this.getAttribute('data-id');
@@ -122,23 +144,26 @@ document.querySelectorAll('.statusBtn').forEach(button => {
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 const response = JSON.parse(xhr.responseText);
-                if (response.success) {
-                    if (status === '1') {
+                console.log(response);
+                console.log(response.success);
+                console.log(response.notification);
+                if (response.success === true) {
                         const row = button.closest('tr');
                         const tbody = row.parentNode;
                         tbody.appendChild(row);
-                        // setTimeout(function() {
-                        //     window.location.reload();
-                        // }, 1500);
+
                         if (divMessage) {
                             divMessage.classList.remove('hidden');
                             messages.textContent = response.message;
                         }
                         setTimeout(function() {
-                        if (divMessage) {
-                            divMessage.classList.add('hidden');
-                        }
-                        }, 1500);
+                            if (divMessage) {
+                                divMessage.classList.add('hidden');
+                            }
+                        }, 1500); 
+                    if (response.notification !== '') {
+                        divNotification.classList.remove('hidden');
+                        notification.textContent = response.notification;
                     }
                 } else {
                     console.error('Error updating status');
@@ -155,6 +180,14 @@ document.querySelectorAll('.statusBtn').forEach(button => {
             fadeIn(deleteModal);
         } else {
             fadeOut(deleteModal);
+        }
+    }
+    function notificationModalHandler(val) {
+        if (val) {
+            fadeIn(divNotification);
+        } else {
+            fadeOut(divNotification);
+            window.location.reload();
         }
     }
     function fadeOut(el) {

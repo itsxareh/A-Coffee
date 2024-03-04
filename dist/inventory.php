@@ -15,10 +15,10 @@
     <table class="indent-0 border-collapse py-6 px-2  w-full" id="itemsTable">
         <thead>
             <tr>
-                <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Item</th>
+                <!-- <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Item</th> -->
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Name</th>
-                <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Description</th>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Quantity</th>
+                <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Description</th>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Action</th>
             </tr>
         </thead>
@@ -28,14 +28,23 @@
                 $select_items->execute();
                 $items = $select_items->fetchAll(PDO::FETCH_ASSOC);
                 if (count($items) > 0){
-                    foreach ($items as $item){ ?>
+                    foreach ($items as $item){                
+                        $quantity = $item['quantity'];
+                        $matches = [];
+                        if (preg_match('/(\d*\.?\d+)\s*([a-zA-Z]+)/', $quantity, $matches)) {
+                            $db_value = (float)$matches[1];
+                            $db_unit = strtoupper($matches[2]);
+                        } else {
+                            $db_value = (float)$quantity;
+                            $db_unit = 'piece/s';
+                        }?>
                     <tr class="border-color" data-id="<?= $item['id']; ?>">
-                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
+                        <!-- <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                                 <img class="w-16 h-16 object-cover" src="../uploaded_img/<?= $item['image']; ?>">
-                        </td>
+                        </td> -->
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ucwords($item['name']); ?></td>
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $quantity_value.$quantity_unit ?></td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $item['description']; ?></td>
-                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ($item['quantity'] ? $item['quantity'] : "0") ?></td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                             <div class="flex items-center gap-4">
                                 <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(<?= $item['id'] ?>)"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
@@ -52,7 +61,7 @@
         </tbody>
     </table>
 </div>
-<div class="py-20 transition duration-150 ease-in-out z-10 absolute top-0 right-0 bottom-0 left-0 hidden h-full" id="add-modal">
+<div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="add-modal">
    	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
     <div role="alert" class="container mx-auto w-11/12 md:w-2/3 max-w-xl">
         <div class="relative py-8 px-5 md:px-10 bg-white shadow-md rounded border border-gray-400">
@@ -62,14 +71,14 @@
                 <input type="text" class="hidden" name="id" id="id">
                 <div class="mt-5 grid cols-grid-1 cols-grid-2 gap-x-2">
                     <div class="col-span-full flex justify-center items-center">
-                        <div class="text-center">
+                        <!-- <div class="text-center">
                             <img id="previewImage" class="w-48 h-48 rounded-full bg-center object-cover" src="../images/image-svgrepo-com.svg">
                             <label class="relative cursor-pointer rounded-lg float-end" for="image">
                                 <img class="w-6 h-6" src="../images/upload-minimalistic-svgrepo-com.svg">
                                 <input id="image" name="image" class="sr-only" type="file" accept="image/jpg, image/jpeg, image/png" onchange="previewFile()" required>
                                 <input type="hidden" name="old_image" id="old_image">
                             </label>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="col-span-1">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="name">Name</label>
@@ -77,8 +86,7 @@
                     </div>
                     <div class="col-span-1">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="quantity">Quantity</label>
-                            <input name="quantity" id="quantity" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="10ml/stock"/>
-                        <div id="quantityError" class=" bottom-0 text-red-500 salsa"></div>
+                        <input type="text" name="quantity" id="quantity" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="100/10L/10KG"/>
                     </div>
                     <div class="col-span-full">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="description">Description</label>
@@ -100,7 +108,7 @@
 
 <div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="delete-modal">
    	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
-    <div class="w-full  max-w-lg p-5 relative mx-auto h-80 rounded-xl shadow-lg  bg-white ">
+    <div class="w-full max-w-lg p-5 relative mx-auto h-80 rounded-xl shadow-lg  bg-white ">
         <div class="">
             <div class="text-center p-5 flex-auto justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 -m-1 flex items-center text-red-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -195,8 +203,8 @@
                 document.getElementById('name').value = data.name;
                 // document.getElementById('quantity').value = data.quantity;
                 document.getElementById('description').value = data.description;
-                document.getElementById('old_image').value = data.image;
-                document.getElementById('previewImage').src = '../uploaded_img/'+ data.image;
+                // document.getElementById('old_image').value = data.image;
+                // document.getElementById('previewImage').src = '../uploaded_img/'+ data.image;
                 fadeIn(modal);
             })
             .catch(error => console.error('Error fetching data:', error));
@@ -216,17 +224,18 @@
     .then(response => response.json())
     .then(data => {
         formElement.reset();
+        console.log(data);
         if (data.insert === true) {
             const newRow = document.createElement('tr');
             newRow.setAttribute('class', 'border-color');
             newRow.setAttribute('data-id', data.id);
             newRow.innerHTML = `
-                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
-                    <img class="w-16 h-16 object-cover" src="../uploaded_img/${data.image}">
-                </td>
+                <!--<td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
+                    <img class="w-16 h-16 object-cover" src="../uploaded_img/">
+                </td>-->
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
-                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.description}</td>
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity}</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.description}</td>
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                     <div class="flex items-center gap-4">
                         <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(${data.id})"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
@@ -243,12 +252,12 @@
         } else if (data.update === true) {
             const updatedRow = document.querySelector(`tr[data-id="${data.id}"]`);
             updatedRow.innerHTML = `
-                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
-                    <img class="w-16 h-16 object-cover" src="../uploaded_img/${data.image}">
-                </td>
+                <!--<td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
+                    <img class="w-16 h-16 object-cover" src="../uploaded_img/">
+                </td>-->
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity.toUpperCase()}</td>
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.description}</td>
-                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity}</td>
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                     <div class="flex items-center gap-4">
                         <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(${data.id})"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
@@ -272,25 +281,6 @@
         console.error('Error submitting form:', error);
     });
 }
-
-    
-    const quantityInput = document.getElementById('quantity');
-    const quantityError = document.getElementById('quantityError');
-
-    if (quantityInput && quantityError) {
-        quantityInput.addEventListener('input', function() {
-        const quantityValue = this.value.trim(); 
-        const isValid = /^[0-9]+(\.[0-9]{1,2})?$/.test(quantityValue); 
-        if (!isValid) {
-            quantityError.textContent = 'Please enter a valid number';
-            quantityInput.classList.add('border-red-500');
-        } else {
-            quantityError.textContent = '';
-            quantityInput.classList.remove('border-red-500');
-        }
-        });
-    } 
-
     const confirmDeleteBtn = deleteModal.querySelector(".deleteItem");
     confirmDeleteBtn.addEventListener("click", () => {
         const itemId = confirmDeleteBtn.getAttribute("data-id");

@@ -12,14 +12,23 @@ if ($searchTerm !== '') {
     $items = $select_items->fetchAll(PDO::FETCH_ASSOC);
 
     if (count($items) > 0) {
-        foreach ($items as $item) { ?>
+        foreach ($items as $item) {
+            $quantity = $item['quantity'];
+            $matches = [];
+            if (preg_match('/(\d*\.?\d+)\s*([a-zA-Z]+)/', $quantity, $matches)) {
+                $quantity_value = (float)$matches[1];
+                $quantity_unit = strtoupper($matches[2]);
+            } else {
+                $quantity_value = (float)$quantity;
+                $quantity_unit = 'piece/s';
+            } ?>
         <tr class="border-color" data-id="<?= $item['id']; ?>">
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
+            <!--<td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                     <img class="w-16 h-16 object-cover" src="../uploaded_img/<?= $item['image']; ?>">
-            </td>
+            </td>-->
             <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ucwords($item['name']); ?></td>
+            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $quantity_value.$quantity_unit ?></td>
             <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $item['description']; ?></td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ($item['quantity'] ? $item['quantity'] : "0") ?></td>
             <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                 <div class="flex items-center gap-4">
                     <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(<?= $item['id'] ?>)"><img src="../images/edit-svgrepo-com.svg" alt=""></button>

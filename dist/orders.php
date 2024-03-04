@@ -36,7 +36,7 @@ ini_set('display_errors', 1);
                     <form id="add_to_cart" action="add_to_cart.php" method="POST" enctype="multipart/form-data">
                         <input type="text" class="hidden" id="uid" name="uid" value="<?= $uid ?>">
                         <input type="text" class="hidden" id="pid" name="pid" value="<?= $product['id']?>">
-                        <input type="text" class="hidden" id="name" name="name" value="<?= $product['name']?>">
+                        <input type="text" class="hidden" id="name" name="name" value="<?= $product['name']?>" autocomplete="off">
                         <input type="text" class="hidden" id="price" name="price" value="<?= $product['price']?>">
                         <input type="text" class="hidden" id="quantity" name="quantity" value="1">
                         <input type="text" class="hidden" id="image" name="image" value="<?= $product['image']?>">

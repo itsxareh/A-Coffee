@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $response['message'] = 'Your cart is empty';
     } else {
         $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE uid = ?");
-        $insert_order = $conn->prepare("INSERT INTO `pre-orders`(uid, products, amount, status, placed_on) VALUES(?,?,?,?,?)");
+        $insert_order = $conn->prepare("INSERT INTO `orders`(uid, products, amount, status, placed_on) VALUES(?,?,?,?,?)");
 
         $conn->beginTransaction();
         $should_process_order = true;
@@ -37,17 +37,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $parsed_ingredients = [];
         
             foreach ($ingredients_array as $ingredient) {
-                // Check if ingredient contains only one word
                 if (strpos(trim($ingredient), ' ') === false) {
                     $quantity = $product_quantity;
                     $itemName = trim($ingredient);
                     $unit = '';
                 } else {
-                    // Regular expression pattern to extract quantity, unit, and item name
-                    $pattern = '/(?:(\d*\.?\d+)\s*([a-z]*)\s+)?(.+)/i'; // Updated pattern to handle decimal quantities
+                    $pattern = '/(?:(\d*\.?\d+)\s*([a-z]*)\s+)?(.+)/i';
                     preg_match($pattern, trim($ingredient), $matches);
         
-                    $quantity = !empty($matches[1]) ? (float)$matches[1] : $product_quantity; // Cast to float
+                    $quantity = !empty($matches[1]) ? (float)$matches[1] : $product_quantity;
                     $unit = !empty($matches[2]) ? $matches[2] : '';
                     $itemName = $matches[3];
                 }
@@ -58,7 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     'unit' => $unit,
                 ];
             }
-    
             foreach ($parsed_ingredients as $ingredient) {
                 $ingredient_quantity = $ingredient['quantity'];
                 $itemName = $ingredient['itemName'];
@@ -73,23 +70,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 } elseif ($current_quantity < $ingredient_quantity) {
                     $response['message'] = "Insufficient quantity for ".ucwords($itemName);
                     $should_process_order = false;
-                } else {
-                    $new_quantity = $current_quantity - $ingredient_quantity;
-                    $update_inventory = $conn->prepare("UPDATE `inventory` SET quantity = ? WHERE name = ?");
-                    $update_inventory->execute([$new_quantity, $itemName]);
                 }
             }
         }
         if ($should_process_order) {
          $products_string = '';
          foreach ($cart_products as $index => $product) {
-             $product_info = $product['quantity'].' '.$product['product_name'];
+             $product_info = $product['quantity'].' '.$product['product_name'].'';
              $products_string .= $product_info;
              if ($index < count($cart_products) - 1) {
                  $products_string .= ', ';
              }
          }
-         $insert_order = $conn->prepare("INSERT INTO `pre-orders`(uid, products, amount, status, placed_on) VALUES(?,?,?,?,?)");
+         $insert_order = $conn->prepare("INSERT INTO `orders`(uid, products, amount, status, placed_on) VALUES(?,?,?,?,?)");
          $insert_order->execute([$uid, $products_string, $cart_total, $status, $current_time]);
          $delete_cart->execute([$uid]);
          $conn->commit();

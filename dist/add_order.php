@@ -35,54 +35,52 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $ingredients = $cart_item['ingredients'];
             $ingredients_array = explode(',', $ingredients);
             $parsed_ingredients = [];
-
-            $pattern = '/(?:(\d+)\s*([a-z]*)\s+)?(\w+)/i';
-
+        
             foreach ($ingredients_array as $ingredient) {
-                preg_match($pattern, trim($ingredient), $matches);
-
-                $quantity = !empty($matches[1]) ? (int)$matches[1] : $product_quantity;
-                $unit = !empty($matches[2]) ? $matches[2] : '';
-                $itemName = $matches[3];
-
-                if (empty($unit) && is_numeric($itemName)) {
-                    $temp = $quantity;
+                if (strpos(trim($ingredient), ' ') === false) {
                     $quantity = $product_quantity;
-                    $itemName = $temp;
+                    $itemName = trim($ingredient);
+                    $unit = '';
+                } else {
+                    $pattern = '/(?:(\d*\.?\d+)\s*([a-z]*)\s+)?(.+)/i';
+                    preg_match($pattern, trim($ingredient), $matches);
+        
+                    $quantity = !empty($matches[1]) ? (float)$matches[1] : $product_quantity;
+                    $unit = !empty($matches[2]) ? $matches[2] : '';
+                    $itemName = $matches[3];
                 }
-
+        
                 $parsed_ingredients[] = [
                     'itemName' => $itemName,
                     'quantity' => $quantity,
                     'unit' => $unit,
                 ];
             }
-
             foreach ($parsed_ingredients as $ingredient) {
                 $ingredient_quantity = $ingredient['quantity'];
                 $itemName = $ingredient['itemName'];
-
+                $unit = $ingredient['unit'];
                 $inventory_query = $conn->prepare("SELECT quantity FROM `inventory` WHERE name = ?");
                 $inventory_query->execute([$itemName]);
                 $current_quantity = $inventory_query->fetchColumn();
-
-                if ($current_quantity === false) {
+                preg_match('/(\d*\.?\d+)\s*([a-zA-Z]+)/', $current_quantity, $matches);
+                $db_value = (float)$matches[1];
+                $db_unit = strtolower($matches[2]);
+                $standard_quantity = convertToBaseUnit($ingredient_quantity, $unit, $db_unit);
+                $total_quantity = number_format((floatval($db_value) - floatval($standard_quantity)), 3, '.', '').''.$db_unit;
+                if ($db_value === false) {
                     $response['message'] = "Failed to retrieve quantity for ".ucwords($itemName);
                     $should_process_order = false;
-                } elseif ($current_quantity < $ingredient_quantity) {
+                } elseif ($db_value < $standard_quantity) {
                     $response['message'] = "Insufficient quantity for ".ucwords($itemName);
                     $should_process_order = false;
-                } else {
-                    $new_quantity = $current_quantity - $ingredient_quantity;
-                    $update_inventory = $conn->prepare("UPDATE `inventory` SET quantity = ? WHERE name = ?");
-                    $update_inventory->execute([$new_quantity, $itemName]);
                 }
             }
         }
         if ($should_process_order) {
          $products_string = '';
          foreach ($cart_products as $index => $product) {
-             $product_info = $product['quantity'].' '.$product['product_name'];
+             $product_info = $product['quantity'].' '.$product['product_name'].'';
              $products_string .= $product_info;
              if ($index < count($cart_products) - 1) {
                  $products_string .= ', ';
@@ -95,8 +93,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
          
          $response['message'] = "Product Ordered successfully";
          $response['success'] = true;
+         $response['msg'] = $parsed_ingredients;
      }
     }
 }
 echo json_encode($response);
+
+function convertToBaseUnit($quantity, $unit, $unitDb) {
+
+    if ($unitDb == $unit) {
+        return $quantity * 1; 
+    } else if ($unitDb == "l" && $unit == 'ml' || $unitDb == "kg" && $unit == "g") {
+        return $quantity / 1000;
+    }
+    return $quantity;
+}
 ?>

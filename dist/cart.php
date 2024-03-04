@@ -193,17 +193,17 @@ function addToCart() {
     event.preventDefault();
     const formData = new FormData(formOrder); 
 
-    fetch('add_pre-order.php', {
+    fetch('add_order.php', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.text())
+    .then(response => response.json())
     .then(data => {
         console.log(data);
         if (data.success === true){
             setTimeout(function() {
             window.location.href = 'index.php?page=dashboard';
-        }, 1000);
+        }, 1200);
         }
         if (divMessage) {
             divMessage.classList.remove('hidden');
@@ -213,7 +213,7 @@ function addToCart() {
         if (divMessage) {
             divMessage.classList.add('hidden');
         }
-        }, 1000);
+        }, 1800);
     })
     .catch(error => {
         console.error('Error adding order:', error);
