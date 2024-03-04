@@ -43,7 +43,7 @@
                                 <img class="w-16 h-16 object-cover" src="../uploaded_img/<?= $item['image']; ?>">
                         </td> -->
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ucwords($item['name']); ?></td>
-                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $quantity_value.$quantity_unit ?></td>
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $db_value.''.$db_unit ?></td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $item['description']; ?></td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                             <div class="flex items-center gap-4">
@@ -234,7 +234,7 @@
                     <img class="w-16 h-16 object-cover" src="../uploaded_img/">
                 </td>-->
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
-                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity}</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity.toUpperCase()}</td>
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.description}</td>
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                     <div class="flex items-center gap-4">
