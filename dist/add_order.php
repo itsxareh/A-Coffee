@@ -62,13 +62,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $unit = $ingredient['unit'];
                 $inventory_query = $conn->prepare("SELECT quantity FROM `inventory` WHERE name = ?");
                 $inventory_query->execute([$itemName]);
-                $current_quantity = $inventory_query->fetchColumn();
-                preg_match('/(\d*\.?\d+)\s*([a-zA-Z]+)/', $current_quantity, $matches);
-                $db_value = (float)$matches[1];
-                $db_unit = strtolower($matches[2]);
+                if ($inventory_query->rowCount() > 0 ){
+                    $current_quantity = $inventory_query->fetchColumn();
+                    preg_match('/(\d*\.?\d+)\s*([a-zA-Z]+)/', $current_quantity, $matches);
+                    $db_value = (float)$matches[1];
+                    $db_unit = strtolower($matches[2]);
+                }
+                var_dump($db_value);
+                var_dump($db_unit);
                 $standard_quantity = convertToBaseUnit($ingredient_quantity, $unit, $db_unit);
                 $total_quantity = number_format((floatval($db_value) - floatval($standard_quantity)), 3, '.', '').''.$db_unit;
-                if ($db_value === false) {
+                if ($db_value === false || $db_value === 0) {
                     $response['message'] = "Failed to retrieve quantity for ".ucwords($itemName);
                     $should_process_order = false;
                 } elseif ($db_value < $standard_quantity) {

@@ -11,8 +11,8 @@
         $total_orders = $get_orders->rowCount();
     ?>
     <div class="rounded-lg shadow-lg bg-dark-brown text-center flex flex-col justify-around h-52">
-        <p class="text-white text-7xl salsa"><?= $total_orders ?></p>
-        <span class="text-gray text-2xl salsa">Total Orders</span>
+        <p class="text-white text-5xl"><?= $total_orders ?></p>
+        <span class="text-gray text-2xl">Total Orders</span>
     </div>
     <?php 
         $get_products = $conn->prepare("SELECT * FROM products");
@@ -20,8 +20,8 @@
         $total_products = $get_products->rowCount();
     ?>
     <div class="rounded-lg shadow-lg bg-dark-brown text-center flex flex-col justify-around h-52">
-        <p class="text-white text-7xl salsa"><?= $total_products ?></p>
-        <span class="text-gray text-2xl salsa">Products</span>
+        <p class="text-white text-5xl"><?= $total_products ?></p>
+        <span class="text-gray text-2xl">Products</span>
     </div>
     <?php
         $get_total = $conn->prepare("SELECT SUM(o.amount) AS total_amount FROM orders o LEFT JOIN users u ON o.uid = u.uid WHERE o.status = 1 AND o.uid = ?");
@@ -30,8 +30,8 @@
         $total_amount = $get_total_amount['total_amount'];
     ?>
     <div class="rounded-lg shadow-lg bg-dark-brown text-center flex flex-col justify-around h-52">
-        <p class="text-white text-4xl salsa line-clamp-1 hover:line-clamp-1">₱<?= $total_amount ? $total_amount : 0 ?></p>
-        <span class="text-gray text-2xl salsa">Total Sales</span>        
+        <p class="text-white text-5xl line-clamp-1 hover:line-clamp-1">₱<?= $total_amount ? $total_amount : 0 ?></p>
+        <span class="text-gray text-2xl">Total Sales</span>        
     </div>
 </div>
 <div class="text-3xl text-center text-white rosarivo">Orders</div>

@@ -12,7 +12,7 @@
     $products = $select_products->fetchAll(PDO::FETCH_ASSOC);
     if (count($products) > 0){
         foreach ($products as $product){ ?>
-    <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown" style="height: 264px;" data-id="<?= $product['id'] ?>" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">
+    <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-90" data-id="<?= $product['id'] ?>" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">
         <div class="relative flex w-full h-full flex-col items-center justify-center">
             <div class="blur-bg absolute w-full h-full hidden rounded-md" style="background-color: rgba(0,0,0,0.5);"></div>
             <div class="absolute flex flex-col items-center top-4 right-4 z-10">
@@ -36,9 +36,9 @@
     }
     ?>
 </div>
-<div class="py-20 transition duration-150 ease-in-out z-10 absolute top-0 right-0 bottom-0 left-0 hidden h-full" id="add-modal">
+<div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="add-modal">
    	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
-    <div role="alert" class="container mx-auto w-11/12 md:w-2/3 max-w-xl">
+    <div role="alert" class="container mx-auto w-11/12 md:w-2/3 max-w-3xl">
         <div class="relative py-8 px-5 md:px-10 bg-white shadow-md rounded border border-gray-400">
             <h1 class="text-gray-800 font-lg font-medium tracking-normal leading-tight mb-4">Enter Product Details</h1>
             <form id="add_product" action="add_product.php" method="POST" enctype="multipart/form-data">

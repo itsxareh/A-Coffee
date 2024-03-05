@@ -2,13 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Rosarivo:ital@0;1&family=Salsa&display=swap');
-
-body {
+html, body{
     height: 100%;
+}
+body {
     background-color: var(--brown);
+    font-family: 'Rosarivo', cursive;
+    font-weight: 400;
 }
 #view-panel {
-    width: calc(100% - 20rem);
+    width: 100%;
     transition: all 0.3s ease;
 }
 :root {
@@ -64,16 +67,13 @@ body {
 .nav-profile {
     z-index: 201;
 }
-.sidebar {
-    z-index: 0;
-    transition: all 0.3s ease;
-}
 .navigation img {
     object-fit: cover;
     background-position: center;
 }
-.nav > .active {
+li > .active {
     background-color: var(--light-brown);
+    opacity: 0.9;
 }
 .datetime, .navigation {
     transition: all 0.3s ease;
@@ -112,15 +112,11 @@ body {
      }
 }
 @media (max-width: 565px){
-    .title {
-        font-size: 1.5rem; 
-        line-height: 2rem; 
-    }
     .upper {
         display: block;
     }
     .search {
-        width: 100%;
+        width: 80%;
         margin-left: 0;
         margin-bottom: 4px;
     }
@@ -130,29 +126,9 @@ body {
 
 }
 @media (min-width: 370px) and (max-width: 850px) {
-    .datetime {
-        display: none;
-    }
-    .sidebar {
-        width: 72px;
-    }
-    .sidebar span{
-        display: none;
-    }
+
 }
 @media (max-width:850px){
-    #view-panel {
-        left: 0;
-        right: 0;
-        width: calc(100%);
-        padding: 1rem;
-    }
-    .sidebar {
-        display: none;
-    }
-    .burger {
-        display: block;
-    }
     .autofit-grid2 {
         grid-template-columns: repeat(auto-fit, minmax(10rem,1fr));
         gap: 1rem;
@@ -160,22 +136,8 @@ body {
     .autofit-grid2 > div {
         height: 144px;
     }
-    .autofit-grid2 > div p {
+    .autofit-grid2 > div p, .title{
         font-size: clamp(1.5rem, 0.3043rem + 3.4783vw, 3rem);
-    }
-}
-@media (max-width: 369px) {
-    .datetime {
-        display: none;
-    }
-    .sidebar {
-        width: 72px;
-    }
-    .sidebar span{
-        display: none;
-    }
-    #view-panel {
-        width: calc(100%);
     }
 }
 .edit-btn:hover, .delete-btn:hover, .view-btn:hover {
@@ -184,6 +146,5 @@ body {
 img {
     user-select: none;
     pointer-events: none;
-    user-drag: none;
     -webkit-user-drag: none;
 }

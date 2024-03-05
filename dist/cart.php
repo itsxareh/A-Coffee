@@ -2,7 +2,7 @@
 <div class="hide-message hidden">
     <div class="message rounded-lg p-4 flex items-start">
         <span id="message" class="text-sm text-white"></span>
-        <button class="-m-1" onclick="this.parentElement.remove();"><img class="w-5 h-5" src="../images/close-svgrepo-com.svg"></button>
+        <button title="Close" class="-m-1" onclick="this.parentElement.remove();"><img class="w-5 h-5" src="../images/close-svgrepo-com.svg"></button>
     </div>
 </div>
 <div class="grid autofit-grid1 gap-3">
@@ -22,19 +22,19 @@
                     <p class="text-white rosarivo">₱<span class="price"><?= $cart['price'] * $cart['quantity']?></span></p>
                     <p class="text-white rosarivo text-sm my-1">Quantity</p>
                     <div class="flex items-center">
-                    <button type="button" class="quantity-btn rounded-tl-md rounded-bl-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="<?= $cart['id'] ?>" onclick="addQuantity(<?= $cart['id'] ?>)"><span>+</span></button>
+                    <button title="Plus" type="button" class="quantity-btn rounded-tl-md rounded-bl-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="<?= $cart['id'] ?>" onclick="addQuantity(<?= $cart['id'] ?>)"><span>+</span></button>
                     <p class="text-white rosarivo mx-2"><span class="quantity"><?= $cart['quantity']?></span></p>
-                    <button type="button" class="quantity-btn rounded-tr-md rounded-br-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="<?= $cart['id'] ?>" onclick="minusQuantity(<?= $cart['id'] ?>)"><span>-</span></button>
+                    <button title="Minus" type="button" class="quantity-btn rounded-tr-md rounded-br-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="<?= $cart['id'] ?>" onclick="minusQuantity(<?= $cart['id'] ?>)"><span>-</span></button>
                     </div>
                 </div>
                 <div class="absolute bottom-2 right-2">
-                    <button type="button" class="delete-btn rounded-md p-2 cursor-pointer" onclick="showDeleteModal(<?= $cart['id'] ?>)">
+                    <button title="Delete" type="button" class="delete-btn rounded-md p-2 cursor-pointer" onclick="showDeleteModal(<?= $cart['id'] ?>)">
                         <img class="w-8 h-8 rounded-md" src="../images/delete-svgrepo-com.svg">
                     </button>
                 </div>
             </div>
             <div class="fixed right-16 bottom-8">
-                <button id="placeOrderBtn" type="button" class="px-8 py-2 rounded-3xl bg-light-brown focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-amber-400 focus:ring-amber-400 transition duration-150 ease-in-out  salsa text-xl text-white" onclick="confirmModalHandler(true)">Place order</button>
+                <button title="Place Order" id="placeOrder" type="button" class="px-8 py-2 rounded-3xl bg-light-brown focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-amber-400 focus:ring-amber-400 transition duration-150 ease-in-out  salsa text-xl text-white" onclick="confirmModalHandler(true)">Place order</button>
             </div>
             <?php
         }
@@ -45,15 +45,15 @@
 </div>
 
 
-    <div class="py-20 transition duration-150 ease-in-out z-10 absolute top-0 right-0 bottom-0 left-0 hidden h-full" id="confirm-modal">
-        <div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
-        <div class="w-full max-w-xl relative mx-auto my-auto rounded-xl shadow-lg  bg-white ">
+<div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="confirm-modal">
+    <div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
+    <div class="w-full max-w-4xl relative mx-auto my-auto rounded-xl shadow-lg  bg-white ">
         <div class="relative bg-white rounded-lg shadow">
                 <div class="flex items-center justify-between p-4 md:p-4 border-b rounded-t">
                     <h3 class="text-lg font-medium text-gray-900 rosarivo">
                         Confirm Order
                     </h3>
-                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm h-8 w-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" onclick="confirmModalHandler()">
+                    <button title="close" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm h-8 w-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" onclick="confirmModalHandler()">
                         <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                         </svg>
@@ -61,20 +61,14 @@
                     </button>
                 </div>
                 <div id="cartLists" class="p-4 md:p-5">
-                    <ol class="relative border-s border-gray-200 ms-3.5">                  
+                    <div class="grid autofit-grid1 gap-3">
                     <?php
                     $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE uid = ?");
                     $check_cart->execute([$uid]);
                     $carts = $check_cart->fetchAll(PDO::FETCH_ASSOC);
                     if(count($carts) > 0){
                         foreach($carts as $cart){ ?>
-                        <li class="mb-8 ms-8">            
-                            <span class="absolute flex items-center justify-center w-6 h-6 bg-gray-100 rounded-full -start-3.5 ring-8 ring-white">
-                            <svg width="800px" height="800px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-                                <path fill="#000000"
-                                    d="M822.592 192h14.272a32 32 0 0 1 31.616 26.752l21.312 128A32 32 0 0 1 858.24 384h-49.344l-39.04 546.304A32 32 0 0 1 737.92 960H285.824a32 32 0 0 1-32-29.696L214.912 384H165.76a32 32 0 0 1-31.552-37.248l21.312-128A32 32 0 0 1 187.136 192h14.016l-6.72-93.696A32 32 0 0 1 226.368 64h571.008a32 32 0 0 1 31.936 34.304L822.592 192zm-64.128 0 4.544-64H260.736l4.544 64h493.184zm-548.16 128H820.48l-10.688-64H214.208l-10.688 64h6.784zm68.736 64 36.544 512H708.16l36.544-512H279.04z" />
-                            </svg>
-                            </span>
+                        <div class="mb-4 ms-4">            
                             <div class="flex items-center">
                                 <img class="w-14 h-14 rounded-md mr-5" src="../uploaded_img/<?= $cart['image']?>" alt="">
                                 <div class="flex-1" data-id="<?= $cart['id'] ?>">
@@ -82,36 +76,37 @@
                                     <p class="block mb-3 text-sm font-normal leading-none text-gray-500">₱<span id="confirm-price" class="salsa"><?= $cart['price'] * $cart['quantity'] ?></span></p>
                                 </div>               
                             </div>
-                        </li>
+                        </div>
                     <?php
                         }
                     }
                     ?>
                     </ol>
-                    <?php
-                    $check_cart = $conn->prepare("SELECT *, SUM(price * quantity) as total FROM cart WHERE uid = ?");
-                    $check_cart->execute([$uid]);
-                    $carts = $check_cart->fetchAll(PDO::FETCH_ASSOC);
-                    if(count($carts) > 0){
-                        foreach($carts as $cart){ ?>
-                    <div class="flex justify-end items-center">
-                        <div class="pr-5">
-                            <p class="text-gray-500 text-sm font-medium leading-tight tracking-normal salsa" for="total">Total</p>
-                            <p id="total"  class="salsa block mb-3 text-md font-normal leading-none text-gray-800 dark:text-gray-700">₱<span id="confirm-total text-gray-800 salsa block mb-3 text-md font-normal leading-none"><?= $cart['total'] ?></span></p>
-                        </div>
-                        <form id="add_order" action="add_order.php" method="POST">
-                            <input type="text" class="hidden" name="uid" id="uid" value="<?= $cart['uid'] ?>">
-                            <button type="submit" id="submitBtn" class="addToOrder bg-light-brown border border-light-brown px-5 py-2 text-sm  font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-amber-400" data-id=<?= $cart['id']; ?> >Confirm</button>
-                        </form>
-                    </div>
-                    <?php
-                        }
-                    } 
-                    ?>
                 </div>
+                <?php
+                $check_cart = $conn->prepare("SELECT *, SUM(price * quantity) as total FROM cart WHERE uid = ?");
+                $check_cart->execute([$uid]);
+                $carts = $check_cart->fetchAll(PDO::FETCH_ASSOC);
+                if(count($carts) > 0){
+                    foreach($carts as $cart){ ?>
+                <div class="flex justify-end items-center">
+                    <div class="pr-5">
+                        <p class="text-gray-500 text-sm font-medium leading-tight tracking-normal salsa" for="total">Total</p>
+                        <p id="total"  class="salsa block mb-3 text-md font-normal leading-none text-gray-800 dark:text-gray-700">₱<span id="confirm-total text-gray-800 salsa block mb-3 text-md font-normal leading-none"><?= $cart['total'] ?></span></p>
+                    </div>
+                    <form id="add_order" action="add_order.php" method="POST">
+                        <input type="text" class="hidden" name="uid" id="uid" value="<?= $cart['uid'] ?>" title="uid" placeholder="">
+                        <button title="Confirm" type="submit" id="submitBtn" class="addToOrder bg-light-brown border border-light-brown px-5 py-2 text-sm  font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-amber-400" data-id=<?= $cart['id']; ?> >Confirm</button>
+                    </form>
+                </div>
+                <?php
+                    }
+                } 
+                ?>
             </div>
         </div>
     </div>
+</div>
     <div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="delete-modal">
         <div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
         <div class="w-full max-w-xl p-5 relative mx-auto my-auto rounded-xl shadow-lg  bg-white ">
@@ -123,22 +118,18 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 flex items-center text-red-500 mx-auto" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                     </svg>
-                    <h2 class="text-xl font-bold py-4 ">Are you sure?</h3>
+                    <h2 class="text-xl font-bold py-4 text-gray-700">Are you sure?</h3>
                     <p class="text-sm text-gray-500 px-8">Do you really want to this delete this product from cart? This process cannot be undone</p>    
                 </div>
                 <div class="p-3  mt-2 text-center space-x-4 md:block">
-                    <button type="button" class="deleteCart mb-2 md:mb-0 bg-red-500 border border-red-500 px-5 py-2 text-sm shadow-sm font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-red-600" data-id=<?= $cart['id']; ?> >Delete</button>
-                    <button type="button" class="mb-2 md:mb-0 bg-white px-5 py-2 text-sm shadow-sm font-medium tracking-wider border text-gray-600 rounded-full hover:shadow-lg hover:bg-gray-100" onclick="deleteModalHandler()">Cancel</button>
+                    <button title="Delete" type="button" class="deleteCart mb-2 md:mb-0 bg-red-500 border border-red-500 px-5 py-2 text-sm shadow-sm font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-red-600" data-id=<?= $cart['id']; ?> >Delete</button>
+                    <button title="Cancel" type="button" class="mb-2 md:mb-0 bg-white px-5 py-2 text-sm shadow-sm font-medium tracking-wider border text-gray-600 rounded-full hover:shadow-lg hover:bg-gray-100" onclick="deleteModalHandler()">Cancel</button>
                 </div>
             </div>
         </div>
     </div>
 
 <script>
-    const placeOrderBtn = document.querySelector('#placeOrderBtn');
-    placeOrderBtn.addEventListener('click', function() {
-        confirmModalHandler(true);
-    });
 function addQuantity(cartId) {
     updateQuantity(cartId, 'add');
 }
@@ -197,7 +188,7 @@ function addToCart() {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(response => response.text())
     .then(data => {
         console.log(data);
         if (data.success === true){
@@ -261,20 +252,11 @@ function fadeIn(el, display) {
 }
 
 const deleteModal = document.getElementById("delete-modal");
-function hidePlaceOrderBtn() {
-    document.getElementById('placeOrderBtn').style.display = 'none';
-}
-
-function showPlaceOrderBtn() {
-    document.getElementById('placeOrderBtn').style.display = 'block';
-}
-
 function showDeleteModal(cartId) {
     const deleteBtn = deleteModal.querySelector(".deleteCart");
     deleteBtn.setAttribute("data-id", cartId);
     fadeIn(deleteModal);
 }
-
 const confirmDeleteBtn = deleteModal.querySelector(".deleteCart");
 confirmDeleteBtn.addEventListener("click", () => {
     const cartId = confirmDeleteBtn.getAttribute("data-id");

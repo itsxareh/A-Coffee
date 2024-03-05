@@ -39,7 +39,7 @@
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ucwords($staff['name']); ?></td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $staff['uid']; ?></td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ($staff['quantity'] ? $staff['quantity'] : "0") ?></td>
-                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ($staff['total'] ? $staff['total'] : "0") ?></td>
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">₱<?= ($staff['total'] ? $staff['total'] : "0") ?></td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                             <div class="flex items-center gap-4">
                                 <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(<?= $staff['id'] ?>)"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
@@ -268,7 +268,7 @@
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.uid}</td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity}</td>
-                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.total}</td>
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">₱${data.total}</td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                             <div class="flex items-center gap-4">
                                 <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(${data.id})"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
@@ -295,7 +295,7 @@
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.uid}</td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity}</td>
-                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.total}</td>
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">₱${data.total}</td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                             <div class="flex items-center gap-4">
                                 <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(${data.id})"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
