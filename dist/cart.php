@@ -48,9 +48,9 @@
     <div class="py-20 transition duration-150 ease-in-out z-10 absolute top-0 right-0 bottom-0 left-0 hidden h-full" id="confirm-modal">
         <div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
         <div class="w-full max-w-xl relative mx-auto my-auto rounded-xl shadow-lg  bg-white ">
-        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                <div class="flex items-center justify-between p-4 md:p-4 border-b rounded-t dark:border-gray-600">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white rosarivo">
+        <div class="relative bg-white rounded-lg shadow">
+                <div class="flex items-center justify-between p-4 md:p-4 border-b rounded-t">
+                    <h3 class="text-lg font-medium text-gray-900 rosarivo">
                         Confirm Order
                     </h3>
                     <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm h-8 w-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" onclick="confirmModalHandler()">
@@ -61,7 +61,7 @@
                     </button>
                 </div>
                 <div id="cartLists" class="p-4 md:p-5">
-                    <ol class="relative border-s border-gray-200 dark:border-gray-600 ms-3.5">                  
+                    <ol class="relative border-s border-gray-200 ms-3.5">                  
                     <?php
                     $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE uid = ?");
                     $check_cart->execute([$uid]);
@@ -69,7 +69,7 @@
                     if(count($carts) > 0){
                         foreach($carts as $cart){ ?>
                         <li class="mb-8 ms-8">            
-                            <span class="absolute flex items-center justify-center w-6 h-6 bg-gray-100 rounded-full -start-3.5 ring-8 ring-white dark:ring-gray-700 dark:bg-gray-600">
+                            <span class="absolute flex items-center justify-center w-6 h-6 bg-gray-100 rounded-full -start-3.5 ring-8 ring-white">
                             <svg width="800px" height="800px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
                                 <path fill="#000000"
                                     d="M822.592 192h14.272a32 32 0 0 1 31.616 26.752l21.312 128A32 32 0 0 1 858.24 384h-49.344l-39.04 546.304A32 32 0 0 1 737.92 960H285.824a32 32 0 0 1-32-29.696L214.912 384H165.76a32 32 0 0 1-31.552-37.248l21.312-128A32 32 0 0 1 187.136 192h14.016l-6.72-93.696A32 32 0 0 1 226.368 64h571.008a32 32 0 0 1 31.936 34.304L822.592 192zm-64.128 0 4.544-64H260.736l4.544 64h493.184zm-548.16 128H820.48l-10.688-64H214.208l-10.688 64h6.784zm68.736 64 36.544 512H708.16l36.544-512H279.04z" />
@@ -78,8 +78,8 @@
                             <div class="flex items-center">
                                 <img class="w-14 h-14 rounded-md mr-5" src="../uploaded_img/<?= $cart['image']?>" alt="">
                                 <div class="flex-1" data-id="<?= $cart['id'] ?>">
-                                    <h3 class="flex items-start mb-1 text-lg font-semibold text-gray-900 dark:text-white"><?= ucwords($cart['name']) ?><p class="salsa bg-blue-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300 ms-3">x<span  id="confirm-quantity" ><?= $cart['quantity'] ?></span></p></h3>
-                                    <p class="block mb-3 text-sm font-normal leading-none text-gray-500 dark:text-gray-400">₱<span id="confirm-price" class="salsa"><?= $cart['price'] * $cart['quantity'] ?></span></p>
+                                    <h3 class="flex items-start mb-1 text-lg font-semibold text-gray-900"><?= ucwords($cart['name']) ?><p class="salsa bg-blue-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded ms-3">x<span  id="confirm-quantity" ><?= $cart['quantity'] ?></span></p></h3>
+                                    <p class="block mb-3 text-sm font-normal leading-none text-gray-500">₱<span id="confirm-price" class="salsa"><?= $cart['price'] * $cart['quantity'] ?></span></p>
                                 </div>               
                             </div>
                         </li>

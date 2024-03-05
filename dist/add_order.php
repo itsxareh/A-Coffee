@@ -105,6 +105,10 @@ function convertToBaseUnit($quantity, $unit, $unitDb) {
         return $quantity * 1; 
     } else if ($unitDb == "l" && $unit == 'ml' || $unitDb == "kg" && $unit == "g") {
         return $quantity / 1000;
+    } else if ($unitDb == "kg" && $unit == "cup"){
+        return $quantity * 0.236;
+    } else if ($unitDb == "oz" && $unit == "tbsp"){
+        return $quantity * 0.5216;
     }
     return $quantity;
 }

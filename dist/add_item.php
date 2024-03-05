@@ -5,7 +5,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $current_time = date('m-d-Y h:i:s');
     $name = trim($_POST['name']);
     $description = trim($_POST['description']);
-    $quantity = trim($_POST['quantity']);
+    $quantity = str_replace(" ", "", $_POST['quantity']);
     $uid = $_POST['uid'];
     $id = $_POST['id'];
     $data = array();
@@ -80,10 +80,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 function convertToBaseUnit($quantity, $unit, $unitDb) {
 
-    if ($unitDb == "l" && $unit == 'l' || $unitDb == "kg" && $unit == 'kg') {
+    if ($unitDb == $unit) {
         return $quantity * 1; 
     } else if ($unitDb == "l" && $unit == 'ml' || $unitDb == "kg" && $unit == "g") {
         return $quantity / 1000;
+    } else if ($unitDb == "kg" && $unit == "cup"){
+        return $quantity * 0.236;
+    } else if ($unitDb == "oz" && $unit == "tbsp"){
+        return $quantity * 0.5216;
     }
     return $quantity;
 }

@@ -1,4 +1,9 @@
-<div class="upper flex justify-between mb-4">
+<div class="hide-message hidden">
+    <div class="message rounded-lg p-4 flex items-start">
+        <span id="message" class="text-sm text-white"></span>
+        <button class="-m-1" onclick="this.parentElement.remove();"><img class="w-5 h-5" src="../images/close-svgrepo-com.svg"></button>
+    </div>
+</div><div class="upper flex justify-between mb-4">
     <span class="text-gray text-4xl salsa title">Staffs</span>
     <div class="button-input flex">
         <button class="focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-amber-400 focus:ring-amber-400 mx-auto transition duration-150 ease-in-out bg-light-brown rounded text-white px-4 sm:px-8 py-2 text-xs sm:text-sm salsa" onclick="modalHandler(true)" id="addModalBtn">Add staff</button>
@@ -19,11 +24,12 @@
         </thead>
         <tbody id="staffsList">
             <?php 
-                $select_staffs = $conn->prepare("SELECT u.id, u.image, u.name, u.uid, SUM(o.amount) AS total, SUM(o.amount) AS quantity FROM users u LEFT JOIN orders o ON u.uid = o.uid GROUP BY u.uid");
+                $select_staffs = $conn->prepare("SELECT u.id, u.image, u.name, u.uid, SUM(o.amount) AS total, COUNT(o.uid) AS quantity FROM users u LEFT JOIN orders o ON u.uid = o.uid GROUP BY u.uid");
                 $select_staffs->execute();
                 $staffs = $select_staffs->fetchAll(PDO::FETCH_ASSOC);
                 if (count($staffs) > 0){
                     foreach ($staffs as $staff){ ?>
+                    
                     <tr class="border-color" data-id="<?= $staff['id']; ?>">
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                             <a class="cursor-pointer" href="index.php?page=view_staff&id=<?= $staff['id']; ?>" title="View Staff Details">
@@ -152,7 +158,8 @@
     const deleteModalBtn = document.getElementById("deleteModalBtn");
     const editModal = document.getElementById("edit-modal");
     const editModalBtn = document.getElementById("editModalBtn");
-
+    const messages = document.getElementById("message");
+    const divMessage = document.getElementsByClassName('hide-message')[0];
     
     function modalHandler(val) {
         if (val) {
@@ -243,11 +250,70 @@
             method: 'POST',
             body: formData
         })
-        .then(response => response.text())
+        .then(response => response.json())
         .then(data => {
-            console.log('Response data:', data);
-            staffsList.innerHTML += data;
-            formElement.reset(); 
+            formElement.reset();
+            console.log(data);
+            if (data.insert === true) {
+                const newRow = document.createElement('tr');
+                newRow.setAttribute('class', 'border-color');
+                newRow.setAttribute('data-id', data.id);
+                newRow.innerHTML = `
+                    <tr class="border-color" data-id="${data.id}">
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
+                            <a class="cursor-pointer" href="index.php?page=view_staff&id=${data.id}" title="View Staff Details">
+                                <img class="w-16 h-16 object-cover" src="../uploaded_img/${data.image}">
+                            </a>
+                        </td>
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.uid}</td>
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity}</td>
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.total}</td>
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
+                            <div class="flex items-center gap-4">
+                                <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(${data.id})"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
+                                <button id="deleteModalBtn" class="w-6 h-6" onclick="showDeleteModal(${data.id})"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                const tbody = document.getElementById('staffsList');
+                tbody.appendChild(newRow);
+                if (divMessage) {
+                    divMessage.classList.remove('hidden');
+                }
+                messages.textContent = data.message;
+            } else if (data.update === true) {
+                const updatedRow = document.querySelector(`tr[data-id="${data.id}"]`);
+                updatedRow.innerHTML = `
+                    <tr class="border-color" data-id="${data.id}">
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
+                            <a class="cursor-pointer" href="index.php?page=view_staff&id=${data.id}" title="View Staff Details">
+                                <img class="w-16 h-16 object-cover" src="../uploaded_img/${data.image}">
+                            </a>
+                        </td>
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.uid}</td>
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity}</td>
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.total}</td>
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
+                            <div class="flex items-center gap-4">
+                                <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(${data.id})"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
+                                <button id="deleteModalBtn" class="w-6 h-6" onclick="showDeleteModal(${data.id})"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                if (divMessage) {
+                    divMessage.classList.remove('hidden');
+                }
+                messages.textContent = data.message;
+            }
+            setTimeout(function() {
+                if (divMessage) {
+                    divMessage.classList.add('hidden');
+                }
+            }, 1000);
             modalHandler(false);
         })
         .catch(error => {

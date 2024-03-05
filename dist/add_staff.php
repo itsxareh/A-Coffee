@@ -37,63 +37,71 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         $insert_staff = $conn->prepare("INSERT INTO `users`(uid, name, pnumber, password, email, gender, birthdate, user_type, address, joined_at) VALUES (?,?,?,?,?,?,?,?,?,?)");
         $insert_staff->execute([$uid, $name, $pnumber, password_hash($password, PASSWORD_DEFAULT), $email, $gender, $birthdate, $user_type, $address, $current_time]);
-    } else {
-    $update_staff = $conn->prepare("UPDATE `users` SET name = ?, pnumber = ?, password = ?, email = ?, gender = ?, birthdate = ?, user_type = ?, address = ?, joined_at = ? WHERE uid = ?");
-    $update_staff->execute([$name, $pnumber, password_hash($password, PASSWORD_DEFAULT), $email, $gender, $birthdate, $user_type, $address, $current_time, $uid]);
-    }
+        $last_insert_id = $conn->lastInsertId();
 
-    if ($insert_staff || $update_staff) {
-        $image = $_FILES['image']['name'];
-        $image_size = $_FILES['image']['size'];
-        $image_tmp_name = $_FILES['image']['tmp_name'];
-        $image_folder = '../uploaded_img/' . $image;
-        $old_image = $_POST['old_image'];
-
-        if (!empty($image)) {
-            if ($image_size > 10000000) {
-                $message[] = 'Image size is too large!';
+        $select_new_staff = $conn->prepare("SELECT * FROM users WHERE uid = ?");
+        $select_new_staff->execute([$last_insert_id]);
+        if ($insert_staff) {
+            $staff = $select_new_staff->fetch(PDO::FETCH_ASSOC);
+            if ($staff) {
+                $select_staff = $conn->prepare("SELECT u.id, u.image, u.name, u.uid, SUM(o.amount) AS total, SUM(o.amount) AS quantity FROM users u LEFT JOIN orders o ON u.uid = o.uid WHERE o.status = 1 AND u.uid = ?");
+                $select_staff->execute($staff['uid']);
+                $data = $select_staff->fetch(PDO::FETCH_ASSOC);
+                $data['message'] = "New staff added.";
+                $data['insert'] = true;
             } else {
-                if (move_uploaded_file($image_tmp_name, $image_folder)) {
-                    $update_image = $conn->prepare("UPDATE `users` SET image = ? WHERE uid = ?");
-                    $update_image->execute([$image, $uid]);
-
-                    if (!empty($old_image) && file_exists('../uploaded_img/' . $old_image)) {
-                        unlink('../uploaded_img/' . $old_image);
-                    }
-                    $message[] = 'Image updated successfully!';
-                } else {
-                    $message[] = 'Failed to move uploaded image!';
-                }
+                $data['message'] = "Staff not found.";
+                $data['insert'] = false;
             }
         }
-
-        $select_new_staff = $conn->prepare("SELECT u.id, u.image, u.name, u.uid, SUM(o.amount) AS total, SUM(o.amount) AS quantity FROM users u LEFT JOIN orders o ON u.uid = o.uid WHERE u.uid = ? GROUP BY u.uid");
-        $select_new_staff->execute([$uid]);
-        $staff = $select_new_staff->fetch(PDO::FETCH_ASSOC);
-
-        if ($staff) {
-            echo '<tr class="border-color" data-id="' . $staff['id'] . '">';
-            echo '<td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">';
-            echo '<a class="cursor-pointer" href="index.php?page=view_staff&id=' . $staff['id'] . 'title="View Staff Details">';
-            echo '<img class="w-16 h-16 object-cover" src="../uploaded_img/' . $staff['image'] . '">';
-            echo '</a>';
-            echo '</td>';
-            echo '<td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">' . ucwords($staff['name']) . '</td>';
-            echo '<td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">' . $staff['uid'] . '</td>';
-            echo '<td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">' . ($staff['quantity'] ? $staff['quantity'] : "0") . '</td>';
-            echo '<td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">' . ($staff['total'] ? $staff['total'] : "0") . '</td>';
-            echo '<td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">';
-            echo '<div class="flex items-center gap-4">';
-            echo '<button class="w-6 h-6"><img src="../images/edit-svgrepo-com.svg" alt=""></button>';
-            echo '<button id="deleteModalBtn" class="w-6 h-6"><img src="../images/delete-svgrepo-com.svg" alt=""></button>';
-            echo '</div>';
-            echo '</td>';
-            echo '</tr>';
-        } else {
-            echo '<tr><td colspan="6" class="text-gray text-medium font-semibold p-3 py-4 text-center">No staff data found.</td></tr>';
-        } 
     } else {
-        echo "Error executing SQL query.";
-    }
-}
+        $update_staff = $conn->prepare("UPDATE `users` SET name = ?, pnumber = ?, password = ?, email = ?, gender = ?, birthdate = ?, user_type = ?, address = ?, joined_at = ? WHERE uid = ?");
+        $update_staff->execute([$name, $pnumber, password_hash($password, PASSWORD_DEFAULT), $email, $gender, $birthdate, $user_type, $address, $current_time, $uid]);
+        $select_staff = $conn->prepare("SELECT * FROM users WHERE uid = ?");
+        $select_staff->execute([$uid]);
+
+        if ($insert_staff || $update_staff) {
+            $staff = $select_staff->fetch(PDO::FETCH_ASSOC);
+            $image = $_FILES['image']['name'];
+            $image_size = $_FILES['image']['size'];
+            $image_tmp_name = $_FILES['image']['tmp_name'];
+            $image_folder = '../uploaded_img/' . $image;
+            $old_image = $_POST['old_image'];
+
+            if (!empty($image)) {
+                if ($image_size > 10000000) {
+                    $message[] = 'Image size is too large!';
+                } else {
+                    if (move_uploaded_file($image_tmp_name, $image_folder)) {
+                        $update_image = $conn->prepare("UPDATE `users` SET image = ? WHERE uid = ?");
+                        $update_image->execute([$image, $uid]);
+
+                        if (!empty($old_image) && file_exists('../uploaded_img/' . $old_image)) {
+                            unlink('../uploaded_img/' . $old_image);
+                        }
+                        $message[] = 'Image updated successfully!';
+                    } else {
+                        $message[] = 'Failed to move uploaded image!';
+                    }
+                }
+            }
+            if ($staff) {
+                $select_staff = $conn->prepare("SELECT u.id, u.image, u.name, u.uid, SUM(o.amount) AS total, COUNT(o.uid) AS quantity FROM users u LEFT JOIN orders o ON u.uid = o.uid WHERE u.uid = ?");
+                $select_staff->execute([$staff['uid']]);
+                $data = $select_staff->fetch(PDO::FETCH_ASSOC);
+                if ($data['total'] === NULL) {
+                    $data['total'] = 0;
+                }
+                $data['message'] = $update_staff ? "Updated staff successfully" : "New staff added.";
+                $data[$update_staff ? 'update' : 'insert'] = true;
+            } else {
+                $data['message'] = "Staff not found.";
+                $data['insert'] = false;
+            }
+        } else {
+            $data['error'] = 'UID parameter is missing';
+        } 
+    }   
+    echo json_encode($data);
+} 
 ?>

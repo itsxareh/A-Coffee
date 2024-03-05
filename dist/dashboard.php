@@ -6,8 +6,8 @@
 </div>
 <div class="grid autofit-grid2 gap-12 p-2 mb-8">
     <?php 
-        $get_orders = $conn->prepare("SELECT * FROM orders");
-        $get_orders->execute();
+        $get_orders = $conn->prepare("SELECT o.uid  FROM orders o LEFT JOIN users u ON o.uid = u.uid WHERE o.uid = ?");
+        $get_orders->execute([$uid]);
         $total_orders = $get_orders->rowCount();
     ?>
     <div class="rounded-lg shadow-lg bg-dark-brown text-center flex flex-col justify-around h-52">
@@ -24,13 +24,13 @@
         <span class="text-gray text-2xl salsa">Products</span>
     </div>
     <?php
-        $get_total = $conn->prepare("SELECT SUM(amount) AS total_amount FROM orders");
-        $get_total->execute();
+        $get_total = $conn->prepare("SELECT SUM(o.amount) AS total_amount FROM orders o LEFT JOIN users u ON o.uid = u.uid WHERE o.status = 1 AND o.uid = ?");
+        $get_total->execute([$uid]);
         $get_total_amount = $get_total->fetch(PDO::FETCH_ASSOC);
         $total_amount = $get_total_amount['total_amount'];
     ?>
     <div class="rounded-lg shadow-lg bg-dark-brown text-center flex flex-col justify-around h-52">
-        <p class="text-white text-4xl salsa line-clamp-1 hover:line-clamp-1">₱<?= $total_amount ?></p>
+        <p class="text-white text-4xl salsa line-clamp-1 hover:line-clamp-1">₱<?= $total_amount ? $total_amount : 0 ?></p>
         <span class="text-gray text-2xl salsa">Total Sales</span>        
     </div>
 </div>
@@ -48,8 +48,8 @@
         </thead>
         <tbody>
             <?php
-            $get_orders = $conn->prepare("SELECT * FROM `orders` ORDER BY CASE WHEN status = 2 THEN 0 WHEN status = 1 THEN 1 END, CASE WHEN status = 1 THEN id END DESC;");
-            $get_orders->execute();
+            $get_orders = $conn->prepare("SELECT * FROM `orders` WHERE uid = ? ORDER BY CASE WHEN status = 2 THEN 0 WHEN status = 1 THEN 1 END, CASE WHEN status = 1 THEN id END DESC;");
+            $get_orders->execute([$uid]);
             $orders = $get_orders->fetchAll(PDO::FETCH_ASSOC);
             if (count($orders) > 0){
                 foreach($orders as $order){ ?>
@@ -97,9 +97,9 @@
                 <span class="sr-only">Close modal</span>
             </button>
             <div class="p-4 md:p-5 h-full flex flex-col justify-between">
-                <h3 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">Approaching Low Quantity</h3>
+                <h3 class="mb-4 text-xl font-bold text-gray-90">Approaching Low Quantity</h3>
                 <p class="text-gray-500 text-md font-normal dark:text-gray-400 mb-6">The following item/s have low inventory quantity. Please restocking soon:<p>
-                <div class="text-center"><span id="notification" class="text-md font-medium text-gray-900 dark:text-white mb-6"></span></div>
+                <div class="text-center"><span id="notification" class="text-md font-medium text-gray-900 mb-6"></span></div>
                 <div class="p-3  mt-2 text-center space-x-4 md:block">
                     <button class="mb-2 md:mb-0 bg-light-brown px-5 py-2 text-sm font-medium tracking-wider border text-white rounded-full hover:shadow-lg hover:bg-amber-400" onclick="notificationModalHandler()">Okay</button>
                 </div>
@@ -144,9 +144,6 @@ document.querySelectorAll('.statusBtn').forEach(button => {
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 const response = JSON.parse(xhr.responseText);
-                console.log(response);
-                console.log(response.success);
-                console.log(response.notification);
                 if (response.success === true) {
                         const row = button.closest('tr');
                         const tbody = row.parentNode;
@@ -161,7 +158,7 @@ document.querySelectorAll('.statusBtn').forEach(button => {
                                 divMessage.classList.add('hidden');
                             }
                         }, 1500); 
-                    if (response.notification !== '') {
+                    if (response.notification !== '' || !empty(response.notification)) {
                         divNotification.classList.remove('hidden');
                         notification.textContent = response.notification;
                     }
