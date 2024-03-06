@@ -103,7 +103,7 @@
                 </div>
                 <div class="w-3/5 p-5">
                     <div>
-                        <h3 id="viewName" class="text-2xl font-semibold  capitalize rosarivo"></h3>
+                        <h3 id="viewName" class="text-2xl font-semibold text-gray-800  capitalize rosarivo"></h3>
                         <p id="viewCategory" class="mb-2 text-gray-800 capitalize rosarivo"></p>
                         <p id="viewPrice" class="mb-2 rosarivo"></p>
                         <p id="viewIngredients" class="mb-2 text-sm text-gray-700 capitalize rosarivo"></p>

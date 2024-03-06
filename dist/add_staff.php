@@ -36,29 +36,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
         $insert_staff = $conn->prepare("INSERT INTO `users`(uid, name, pnumber, password, email, gender, birthdate, user_type, address, joined_at) VALUES (?,?,?,?,?,?,?,?,?,?)");
-        $insert_staff->execute([$uid, $name, $pnumber, password_hash($password, PASSWORD_DEFAULT), $email, $gender, $birthdate, $user_type, $address, $current_time]);
-        $last_insert_id = $conn->lastInsertId();
+        $insert_staff->bindParam(1, $uid);
+        $insert_staff->bindParam(2, $name);
+        $insert_staff->bindParam(3, $pnumber);
+        $password = password_hash($password, PASSWORD_DEFAULT);
+        $insert_staff->bindParam(4, $password);
+        $insert_staff->bindParam(5, $email);
+        $insert_staff->bindParam(6, $gender);
+        $insert_staff->bindParam(7, $birthdate);
+        $insert_staff->bindParam(8, $user_type);
+        $insert_staff->bindParam(9, $address);
+        $insert_staff->bindParam(10, $current_time);
+        $insert_staff->execute();
 
+        $last_insert_id = $conn->lastInsertId();
         $select_new_staff = $conn->prepare("SELECT * FROM users WHERE uid = ?");
-        $select_new_staff->execute([$last_insert_id]);
-        if ($insert_staff) {
+        $select_new_staff->bindParam(1, $last_insert_id);
+        $select_new_staff->execute();
+        if ($select_new_staff) {
             $staff = $select_new_staff->fetch(PDO::FETCH_ASSOC);
             if ($staff) {
-                $select_staff = $conn->prepare("SELECT u.id, u.image, u.name, u.uid, SUM(o.amount) AS total, SUM(o.amount) AS quantity FROM users u LEFT JOIN orders o ON u.uid = o.uid WHERE o.status = 1 AND u.uid = ?");
-                $select_staff->execute($staff['uid']);
-                $data = $select_staff->fetch(PDO::FETCH_ASSOC);
+                $select_staff = $conn->prepare("SELECT * FROM users WHERE uid = ?");
+                $select_staff->bindParam(1, $last_insert_id);
+                $select_staff->execute();
                 $data['message'] = "New staff added.";
                 $data['insert'] = true;
-            } else {
+            } else {    
                 $data['message'] = "Staff not found.";
                 $data['insert'] = false;
             }
         }
     } else {
-        $update_staff = $conn->prepare("UPDATE `users` SET name = ?, pnumber = ?, password = ?, email = ?, gender = ?, birthdate = ?, user_type = ?, address = ?, joined_at = ? WHERE uid = ?");
-        $update_staff->execute([$name, $pnumber, password_hash($password, PASSWORD_DEFAULT), $email, $gender, $birthdate, $user_type, $address, $current_time, $uid]);
+        $update_staff = $conn->prepare("UPDATE `users` SET name = :name, pnumber = :pnumber, password = :password, email = :email, gender = :gender, birthdate = :birthdate, user_type = :user_type, address = :address, joined_at = :current_time WHERE uid = :uid");
+        $params = array(':name' => $name, ':pnumber' => $pnumber,':password' => password_hash($password, PASSWORD_DEFAULT), ':email' => $email, ':gender' => $gender, ':birthdate' => $birthdate, ':user_type' => $user_type, ':address' => $address, ':current_time' => $current_time, ':uid' => $uid);
+        foreach ($params as $key => &$value) {
+            $update_staff->bindParam($key, $value);
+        }
+        $update_staff->execute();
         $select_staff = $conn->prepare("SELECT * FROM users WHERE uid = ?");
-        $select_staff->execute([$uid]);
+        $select_staff->bindParam(1, $uid);
+        $select_staff->execute();
 
         if ($insert_staff || $update_staff) {
             $staff = $select_staff->fetch(PDO::FETCH_ASSOC);
@@ -74,7 +91,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 } else {
                     if (move_uploaded_file($image_tmp_name, $image_folder)) {
                         $update_image = $conn->prepare("UPDATE `users` SET image = ? WHERE uid = ?");
-                        $update_image->execute([$image, $uid]);
+                        $update_image->bindParam(1, $image);
+                        $update_image->bindParam(2, $uid);
+                        $update_image->execute();
 
                         if (!empty($old_image) && file_exists('../uploaded_img/' . $old_image)) {
                             unlink('../uploaded_img/' . $old_image);
@@ -84,10 +103,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $message[] = 'Failed to move uploaded image!';
                     }
                 }
+            } else {
+                
             }
             if ($staff) {
+                var_dump($staff['uid']);
                 $select_staff = $conn->prepare("SELECT u.id, u.image, u.name, u.uid, SUM(o.amount) AS total, COUNT(o.uid) AS quantity FROM users u LEFT JOIN orders o ON u.uid = o.uid WHERE u.uid = ?");
-                $select_staff->execute([$staff['uid']]);
+                $select_staff->bindParam(1, $staff['uid']);
+                $select_staff->execute();
                 $data = $select_staff->fetch(PDO::FETCH_ASSOC);
                 if ($data['total'] === NULL) {
                     $data['total'] = 0;

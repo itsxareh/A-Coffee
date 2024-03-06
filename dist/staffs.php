@@ -243,6 +243,7 @@
     submitBtn.addEventListener('click', submitForm);
 
     function submitForm(event) {
+        modalHandler(false);
         event.preventDefault();
         const formData = new FormData(formElement); 
         
@@ -250,7 +251,7 @@
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
+        .then(response => response.text())
         .then(data => {
             formElement.reset();
             console.log(data);
@@ -314,7 +315,6 @@
                     divMessage.classList.add('hidden');
                 }
             }, 1000);
-            modalHandler(false);
         })
         .catch(error => {
             console.error('Error submitting form:', error);

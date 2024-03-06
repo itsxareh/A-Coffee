@@ -32,7 +32,7 @@
                         $quantity = $item['quantity'];
                         $matches = [];
                         if (preg_match('/(\d*\.?\d+)\s*([a-zA-Z]+)/', $quantity, $matches)) {
-                            $db_value = (float)$matches[1];
+                            $db_value = number_format((float)$matches[1], 3, '.');
                             $db_unit = strtoupper($matches[2]);
                         } else {
                             $db_value = (float)$quantity;

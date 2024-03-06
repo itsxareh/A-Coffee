@@ -19,10 +19,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
    if (!isset($id) || $id === '') {
       $insert_product = $conn->prepare("INSERT INTO `products`(name, price, category, description, ingredients) VALUES (?,?,?,?,?)");
-      $insert_product->execute([$name, $price, $category, $description, $ingredients]);
+      $insert_product->bindParam(1, $name);
+      $insert_product->bindParam(2, $price);
+      $insert_product->bindParam(3, $category);
+      $insert_product->bindParam(4, $description);
+      $insert_product->bindParam(5, $ingredients);
+      $insert_product->execute();
    } else {
       $update_product = $conn->prepare("UPDATE `products` SET name = ?, price = ?, category = ?, description = ?, ingredients = ? WHERE id = ?");
-      $update_product->execute([$name, $price, $category, $description, $ingredients, $id]);
+      $update_product->bindParam(1, $name);
+      $update_product->bindParam(2, $price);
+      $update_product->bindParam(3, $category);
+      $update_product->bindParam(4, $description);
+      $update_product->bindParam(5, $ingredients);
+      $update_product->bindParam(6, $id);
+      $update_product->execute();
    }
 
    if ($insert_product || $update_product) {
@@ -38,7 +49,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           } else {
               if (move_uploaded_file($image_tmp_name, $image_folder)) {
                   $update_image = $conn->prepare("UPDATE `products` SET image = ? WHERE id = ?");
-                  $update_image->execute([$image, $id]);
+                  $update_image->bindParam(1, $image);
+                  $update_image->bindParam(2, $id);
+                  $update_image->execute();
 
                   if (!empty($old_image) && file_exists('../uploaded_img/' . $old_image)) {
                       unlink('../uploaded_img/' . $old_image);
@@ -50,7 +63,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           }
       }
       $select_new_product = $conn->prepare("SELECT * FROM products WHERE id = ?");
-      $select_new_product->execute([$id]);
+      $select_new_product->bindParam(1, $id);
+      $select_new_product->execute();
       $product = $select_new_product->fetch(PDO::FETCH_ASSOC);
          if ($product){
             echo '<div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown" style="min-width: 175px; max-width: 300px; height: 264px;" data-id="'.$product['id'].'" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">

@@ -12,19 +12,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     if (!isset($id) || $id === '') {
         $insert_item = $conn->prepare("INSERT INTO `inventory`(name, description, quantity, added_at) VALUES (?,?,?,?)");
-        $insert_item->execute([$name, $description, $quantity, $current_time]);
+        $insert_item->bindParam(1, $name);
+        $insert_item->bindParam(2, $description);
+        $insert_item->bindParam(3, $quantity);
+        $insert_item->bindParam(4, $current_time);
+        $insert_item->execute();
 
         $last_insert_id = $conn->lastInsertId();
 
         $select_new_item = $conn->prepare("SELECT * FROM inventory WHERE id = ?");
-        $select_new_item->execute([$last_insert_id]);
+        $select_new_item->bindParam(1, $last_insert_id);
+        $select_new_item->execute();
 
         if ($insert_item) {
             $item = $select_new_item->fetch(PDO::FETCH_ASSOC);
             if ($item) {
                 $conn->prepare("INSERT INTO `inventory-log`(uid, item_id, quantity, date) VALUES (?,?,?,?)")->execute([$uid, $item['id'], $quantity, $current_time]);
                 $stmt = $conn->prepare("SELECT id, name, description, quantity FROM inventory WHERE id = ?");
-                $stmt->execute([$item['id']]);
+                $stmt->bindParam(1, $item['id']);
+                $stmt->execute();
                 $data = $stmt->fetch(PDO::FETCH_ASSOC);
                 $data['message'] = "Item added successfully";
                 $data['insert'] = true;
@@ -35,7 +41,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     } else {
         $select_item = $conn->prepare("SELECT quantity FROM `inventory` WHERE id = ?");
-        $select_item->execute([$id]);
+        $select_item->bindParam(1, $id);
+        $select_item->execute();
         $select_quantity = $select_item->fetch(PDO::FETCH_ASSOC);
         $quantity_db = $select_quantity['quantity'];
 
@@ -50,20 +57,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $total_quantity = number_format((floatval($standard_quantity) + floatval($db_value)), 3, '.', '').''.$db_unit;
         $update_item = $conn->prepare("UPDATE `inventory` SET name = ?, description = ?, quantity = ? WHERE id = ?");
-        $update_item->execute([$name, $description, $total_quantity, $id]);
+        $update_item->bindParam(1, $name);
+        $update_item->bindParam(2, $description);
+        $update_item->bindParam(3, $total_quantity);
+        $update_item->bindParam(4, $id);
+        $update_item->execute();
 
         if ($update_item){
             $insert_item = $conn->prepare("INSERT INTO `inventory-log`(uid, item_id, quantity, date) VALUES (?,?,?,?)");
-            $insert_item->execute([$uid, $id, $total_quantity, $current_time]);
+            $insert_item->bindParam(1, $uid);
+            $insert_item->bindParam(2, $id);
+            $insert_item->bindParam(3, $total_quantity);
+            $insert_item->bindParam(4, $current_time);
+            $insert_item->execute();
         }
         $select_new_item = $conn->prepare("SELECT * FROM inventory WHERE id = ?");
-        $select_new_item->execute([$id]);
+        $select_new_item->bindParam(1, $id);
+        $select_new_item->execute();
         
         if ($insert_item || $update_item) {
             $item = $select_new_item->fetch(PDO::FETCH_ASSOC);
             if ($item) {
                 $stmt = $conn->prepare("SELECT id, name, description, quantity FROM inventory WHERE id = ?");
-                $stmt->execute([$item['id']]);
+                $stmt->bindParam(1, $id);
+                $stmt->execute();
                 $data = $stmt->fetch(PDO::FETCH_ASSOC);
                 $data['message'] = $update_item ? "Updated item successfully" : "Item added successfully";
                 $data[$update_item ? 'update' : 'insert'] = true;

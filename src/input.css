@@ -116,7 +116,7 @@ li > .active {
         display: block;
     }
     .search {
-        width: 80%;
+        width: 100%;
         margin-left: 0;
         margin-bottom: 4px;
     }
@@ -125,8 +125,21 @@ li > .active {
     }
 
 }
-@media (min-width: 370px) and (max-width: 850px) {
-
+@media (max-width: 800px) {
+    #sidebar {
+        position: absolute;
+        bottom: 0;
+        top: 0;
+        width: 0px;
+        z-index: 99;
+        transition: all 0.3s ease 0.2s;
+    }
+    #sidebarBtn {
+        display: none;
+    }
+    #svpBtn {
+        display: block;
+    }
 }
 @media (max-width:850px){
     .autofit-grid2 {

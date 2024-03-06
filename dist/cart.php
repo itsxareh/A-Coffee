@@ -8,7 +8,8 @@
 <div class="grid autofit-grid1 gap-3">
 <?php
     $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE uid = ?");
-    $check_cart->execute([$uid]);
+    $check_cart->bindParam(1, $uid);
+    $check_cart->execute();
     $carts = $check_cart->fetchAll(PDO::FETCH_ASSOC);
 
     if(count($carts) > 0){
@@ -64,7 +65,8 @@
                     <div class="grid autofit-grid1 gap-3">
                     <?php
                     $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE uid = ?");
-                    $check_cart->execute([$uid]);
+                    $check_cart->bindParam(1, $uid);
+                    $check_cart->execute();
                     $carts = $check_cart->fetchAll(PDO::FETCH_ASSOC);
                     if(count($carts) > 0){
                         foreach($carts as $cart){ ?>
@@ -85,7 +87,8 @@
                 </div>
                 <?php
                 $check_cart = $conn->prepare("SELECT *, SUM(price * quantity) as total FROM cart WHERE uid = ?");
-                $check_cart->execute([$uid]);
+                $check_cart->bindParam(1, $uid);
+                $check_cart->execute();
                 $carts = $check_cart->fetchAll(PDO::FETCH_ASSOC);
                 if(count($carts) > 0){
                     foreach($carts as $cart){ ?>
@@ -188,7 +191,7 @@ function addToCart() {
         method: 'POST',
         body: formData
     })
-    .then(response => response.text())
+    .then(response => response.json())
     .then(data => {
         console.log(data);
         if (data.success === true){
