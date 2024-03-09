@@ -50,22 +50,53 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $insert_staff->execute();
 
         $last_insert_id = $conn->lastInsertId();
-        $select_new_staff = $conn->prepare("SELECT * FROM users WHERE uid = ?");
+        $select_new_staff = $conn->prepare("SELECT * FROM users WHERE id = ?");
         $select_new_staff->bindParam(1, $last_insert_id);
         $select_new_staff->execute();
-        if ($select_new_staff) {
+        if ($insert_staff) {
             $staff = $select_new_staff->fetch(PDO::FETCH_ASSOC);
+            $image = $_FILES['image']['name'];
+            $image_size = $_FILES['image']['size'];
+            $image_tmp_name = $_FILES['image']['tmp_name'];
+            $image_folder = '../uploaded_img/' . $image;
+            $old_image = $_POST['old_image'];
+    
+            if (!empty($image)) {
+                if ($image_size > 10000000) {
+                    $message[] = 'Image size is too large!';
+                } else {
+                    if (move_uploaded_file($image_tmp_name, $image_folder)) {
+                        $update_image = $conn->prepare("UPDATE `users` SET image = ? WHERE id = ?");
+                        $update_image->bindParam(1, $image);
+                        $update_image->bindParam(2, $staff['id']);
+                        $update_image->execute();
+    
+                        if (!empty($old_image) && file_exists('../uploaded_img/' . $old_image)) {
+                            unlink('../uploaded_img/' . $old_image);
+                        }
+                        $message[] = 'Image updated successfully!';
+                    } else {
+                        $message[] = 'Failed to move uploaded image!';
+                    }
+                }
+            }
             if ($staff) {
-                $select_staff = $conn->prepare("SELECT * FROM users WHERE uid = ?");
-                $select_staff->bindParam(1, $last_insert_id);
+                $select_staff = $conn->prepare("SELECT u.id, u.image, u.name, u.uid, SUM(o.amount) AS total, COUNT(o.uid) AS quantity FROM users u LEFT JOIN orders o ON u.uid = o.uid WHERE u.uid = ?");
+                $select_staff->bindParam(1, $staff['uid']);
                 $select_staff->execute();
+                $data = $select_staff->fetch(PDO::FETCH_ASSOC);
+                if ($data['total'] === NULL) {
+                    $data['total'] = 0;
+                }
                 $data['message'] = "New staff added.";
                 $data['insert'] = true;
             } else {    
                 $data['message'] = "Staff not found.";
                 $data['insert'] = false;
             }
-        }
+        } else {
+            $data['error'] = 'UID parameter is missing';
+        } 
     } else {
         $update_staff = $conn->prepare("UPDATE `users` SET name = :name, pnumber = :pnumber, password = :password, email = :email, gender = :gender, birthdate = :birthdate, user_type = :user_type, address = :address, joined_at = :current_time WHERE uid = :uid");
         $params = array(':name' => $name, ':pnumber' => $pnumber,':password' => password_hash($password, PASSWORD_DEFAULT), ':email' => $email, ':gender' => $gender, ':birthdate' => $birthdate, ':user_type' => $user_type, ':address' => $address, ':current_time' => $current_time, ':uid' => $uid);
@@ -73,6 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $update_staff->bindParam($key, $value);
         }
         $update_staff->execute();
+
         $select_staff = $conn->prepare("SELECT * FROM users WHERE uid = ?");
         $select_staff->bindParam(1, $uid);
         $select_staff->execute();
@@ -84,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $image_tmp_name = $_FILES['image']['tmp_name'];
             $image_folder = '../uploaded_img/' . $image;
             $old_image = $_POST['old_image'];
-
+    
             if (!empty($image)) {
                 if ($image_size > 10000000) {
                     $message[] = 'Image size is too large!';
@@ -94,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $update_image->bindParam(1, $image);
                         $update_image->bindParam(2, $uid);
                         $update_image->execute();
-
+    
                         if (!empty($old_image) && file_exists('../uploaded_img/' . $old_image)) {
                             unlink('../uploaded_img/' . $old_image);
                         }
@@ -103,13 +135,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $message[] = 'Failed to move uploaded image!';
                     }
                 }
-            } else {
-                
             }
             if ($staff) {
-                var_dump($staff['uid']);
                 $select_staff = $conn->prepare("SELECT u.id, u.image, u.name, u.uid, SUM(o.amount) AS total, COUNT(o.uid) AS quantity FROM users u LEFT JOIN orders o ON u.uid = o.uid WHERE u.uid = ?");
-                $select_staff->bindParam(1, $staff['uid']);
+                $select_staff->bindParam(1, $uid);
                 $select_staff->execute();
                 $data = $select_staff->fetch(PDO::FETCH_ASSOC);
                 if ($data['total'] === NULL) {

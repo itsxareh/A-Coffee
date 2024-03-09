@@ -252,7 +252,7 @@
             method: 'POST',
             body: formData
         })
-        .then(response => response.text())
+        .then(response => response.json())
         .then(data => {
             formElement.reset();
             console.log(data);

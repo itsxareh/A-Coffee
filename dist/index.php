@@ -16,8 +16,8 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-
+    <title>A Coffee</title>
+    <link rel="icon" href="../images/A-Coffee.png" type="image/x-icon">
     <link href="../src/style.css" rel="stylesheet">
     <script src="/node_modules/jquery/dist/jquery.min.js"></script>
 </head>
@@ -134,7 +134,6 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
         </div>
       </div>
     </div>
-    
     <div id="main" class="relative z-1 flex h-full max-w-full flex-1 flex-col overflow-hidden">
       <main class="relative h-full w-full flex-1 overflow-auto translate-width">
         <div id="sidebarBtn" class="cursor-pointer fixed left-0 top-1/2 z-10 active translate-x-[260px]">

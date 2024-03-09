@@ -50,40 +50,39 @@
     <div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
     <div class="w-full max-w-4xl relative mx-auto my-auto rounded-xl shadow-lg  bg-white ">
         <div class="relative bg-white rounded-lg shadow">
-                <div class="flex items-center justify-between p-4 md:p-4 border-b rounded-t">
-                    <h3 class="text-lg font-normal text-gray-900 rosarivo">
-                        Confirm Order
-                    </h3>
-                    <button title="close" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm h-8 w-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" onclick="confirmModalHandler()">
-                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                        </svg>
-                        <span class="sr-only">Close modal</span>
-                    </button>
-                </div>
-                <div id="cartLists" class="p-4 md:p-5">
-                    <div class="grid autofit-grid1 gap-3">
-                    <?php
-                    $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE uid = ?");
-                    $check_cart->bindParam(1, $uid);
-                    $check_cart->execute();
-                    $carts = $check_cart->fetchAll(PDO::FETCH_ASSOC);
-                    if(count($carts) > 0){
-                        foreach($carts as $cart){ ?>
-                        <div class="mb-4 ms-4">            
-                            <div class="flex items-center">
-                                <img class="w-14 h-14 rounded-md mr-5" src="../uploaded_img/<?= $cart['image']?>" alt="">
-                                <div class="flex-1" data-id="<?= $cart['id'] ?>">
-                                    <h3 class="flex items-start mb-1 text-lg font-medium text-gray-900"><?= ucwords($cart['name']) ?><p class="salsa bg-blue-100 text-black text-sm font-medium mr-2 px-2.5 py-0.5 rounded ms-3">x<span  id="confirm-quantity" ><?= $cart['quantity'] ?></span></p></h3>
-                                    <p class="block mb-3 text-sm font-normal leading-none text-gray-500">₱<span id="confirm-price" class="salsa"><?= $cart['price'] * $cart['quantity'] ?></span></p>
-                                </div>               
-                            </div>
+            <div class="flex items-center justify-between p-4 md:p-4 border-b rounded-t">
+                <h3 class="text-lg font-normal text-gray-900 rosarivo">
+                    Confirm Order
+                </h3>
+                <button title="close" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm h-8 w-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" onclick="confirmModalHandler()">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+            </div>
+            <div id="cartLists" class="p-4 md:p-5">
+                <div class="grid autofit-grid1 gap-3">
+                <?php
+                $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE uid = ?");
+                $check_cart->bindParam(1, $uid);
+                $check_cart->execute();
+                $carts = $check_cart->fetchAll(PDO::FETCH_ASSOC);
+                if(count($carts) > 0){
+                    foreach($carts as $cart){ ?>
+                    <div class="mb-4 ms-4">            
+                        <div class="flex items-center">
+                            <img class="w-14 h-14 rounded-md mr-5" src="../uploaded_img/<?= $cart['image']?>" alt="">
+                            <div class="flex-1" data-id="<?= $cart['id'] ?>">
+                                <h3 class="flex items-start mb-1 text-lg font-medium text-gray-900"><?= ucwords($cart['name']) ?><p class="salsa bg-blue-100 text-black text-sm font-medium mr-2 px-2.5 py-0.5 rounded ms-3">x<span  id="confirm-quantity" ><?= $cart['quantity'] ?></span></p></h3>
+                                <p class="block mb-3 text-sm font-normal leading-none text-gray-500">₱<span id="confirm-price" class="salsa"><?= $cart['price'] * $cart['quantity'] ?></span></p>
+                            </div>               
                         </div>
-                    <?php
-                        }
+                    </div>
+                <?php
                     }
-                    ?>
-                    </ol>
+                }
+                ?>
                 </div>
                 <?php
                 $check_cart = $conn->prepare("SELECT *, SUM(price * quantity) as total FROM cart WHERE uid = ?");

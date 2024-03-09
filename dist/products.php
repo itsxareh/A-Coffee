@@ -1,3 +1,9 @@
+<div class="hide-message hidden">
+    <div class="message rounded-lg p-4 flex items-start">
+        <span id="message" class="text-sm text-white"></span>
+        <button class="-m-1" onclick="this.parentElement.remove();"><img class="w-5 h-5" src="../images/close-svgrepo-com.svg"></button>
+    </div>
+</div>
 <div class="upper flex justify-between mb-4">
     <span class="text-gray text-2xl salsa title">Products</span>
     <div class="button-input flex">
@@ -26,7 +32,7 @@
             <button type="button" id="view-btn" class="view-btn w-full h-full absolute cart-btn rounded-md cursor-pointer hidden" onclick="showViewModal(<?= $product['id'] ?>)">
                 <center><img title="View" class="rounded-md w-12 h-12 text-center" src="../images/details-more-svgrepo-com.svg"></center>
             </button>
-            <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= $product['image'] ?>">
+            <img class="productImg w-full h-full object-cover rounded-md" src="../uploaded_img/<?= $product['image'] ?>">
         </div>
     </div>
         <?php 
@@ -211,29 +217,76 @@ function fadeIn(el, display) {
     });
 </script>
 <script>
+    const messages = document.getElementById("message");
+    const divMessage = document.getElementsByClassName('hide-message')[0];
     const submitBtn = document.getElementById('submitBtn');
     const formElement = document.getElementById('add_product'); 
     submitBtn.addEventListener('click', submitForm);
 
     function submitForm(event) {
-        event.preventDefault();
-        const formData = new FormData(formElement); 
+    event.preventDefault();
+    const formData = new FormData(formElement);
 
-        fetch('add_product.php', {
+    fetch('add_product.php', {
             method: 'POST',
             body: formData
         })
-        .then(response => response.text())
+        .then(response => response.json())
         .then(data => {
-            console.log('Response data:', data);
-            productsList.innerHTML += data;
-            formElement.reset(); 
+            console.log(data);
+            if (data.insert === true) {
+                const productsList = document.getElementById('productsList');
+                const newProduct = document.createElement('div');
+                newProduct.setAttribute('class', 'products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-90');
+                newProduct.setAttribute('data-id', data.id);
+                newProduct.setAttribute('title', data.name);
+                newProduct.setAttribute('onmouseover', 'showButtons(this)');
+                newProduct.setAttribute('onmouseout', 'hideButtons(this)');
+                newProduct.innerHTML = `
+                    <div class="relative flex w-full h-full flex-col items-center justify-center">
+                        <div class="blur-bg absolute w-full h-full hidden rounded-md" style="background-color: rgba(0,0,0,0.5);"></div>
+                        <div class="absolute flex flex-col items-center top-4 right-4 z-10">
+                            <button title="Edit" class="edit-btn rounded-md p-2 cursor-pointer hover:block hidden" onclick="showEditModal(${data.id})">
+                                <img class="w-8 h-8 rounded-md" src="../images/edit-svgrepo-com.svg">
+                            </button>
+                            <button title="Delete" class="delete-btn rounded-md p-2 cursor-pointer hover:block hidden" onclick="showDeleteModal(${data.id})">
+                                <img class="w-8 h-8 rounded-md" src="../images/delete-svgrepo-com.svg">
+                            </button>
+                        </div>
+                        <button type="button" id="view-btn" class="view-btn w-full h-full absolute cart-btn rounded-md cursor-pointer hidden" onclick="showViewModal(${data.id})">
+                            <center><img title="View" class="rounded-md w-12 h-12 text-center" src="../images/details-more-svgrepo-com.svg"></center>
+                        </button>
+                        <img class="productImg w-full h-full object-cover rounded-md" src="../uploaded_img/${data.image}">
+                    </div>
+                `;
+                productsList.appendChild(newProduct);
+                if (divMessage) {
+                    divMessage.classList.remove('hidden');
+                }
+                messages.textContent = data.message;
+            } else if (data.update === true) {
+                const updatedRow = document.querySelector(`div[data-id="${data.id}"]`);
+                updatedRow.querySelector('.productImg').src = '../uploaded_img/' + data.image;  
+                updatedRow.querySelector('button.edit-btn').setAttribute('onclick', `showEditModal(${data.id})`); // Update onclick function for edit button
+                updatedRow.querySelector('button.delete-btn').setAttribute('onclick', `showDeleteModal(${data.id})`); // Update onclick function for delete button
+                updatedRow.querySelector('button.view-btn').setAttribute('onclick', `showViewModal(${data.id})`); // Update onclick function for view button
+                if (divMessage) {
+                    divMessage.classList.remove('hidden');
+                }
+                messages.textContent = data.message;
+            }
+            setTimeout(function () {
+                if (divMessage) {
+                    divMessage.classList.add('hidden');
+                }
+            }, 1000);
             modalHandler(false);
         })
         .catch(error => {
             console.error('Error submitting form:', error);
         });
-    }
+}
+
 </script>
 <script>
     const priceInput = document.getElementById('price');
