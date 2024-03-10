@@ -10,10 +10,6 @@ body {
     font-family: 'Rosarivo', cursive;
     font-weight: 400;
 }
-#view-panel {
-    width: 100%;
-    transition: all 0.3s ease;
-}
 :root {
     --brown: #361500;
     --dark-brown: #1C0A00;
@@ -102,7 +98,7 @@ li > .active {
     border-top-width: 1px;
 }
 .autofit-grid {
-   grid-template-columns: repeat(auto-fit, minmax(18rem,1fr));
+   grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
 }
 .autofit-grid1 {
     grid-template-columns: repeat(auto-fit, minmax(22rem,1fr));
@@ -133,14 +129,15 @@ li > .active {
     .search {
         width: 100%;
         margin-left: 0;
-        margin-bottom: 4px;
+        margin-bottom: 1rem;
     }
     .button-input {
-        flex-direction: column-reverse;
+        flex-direction: column-reverse; 
     }
 
 }
 @media (max-width: 800px) {
+    
     #sidebar {
         position: absolute;
         bottom: 0;
@@ -154,6 +151,13 @@ li > .active {
     }
     #svpBtn {
         display: block;
+    }
+    #view-panel {
+        padding-inline: 1rem;
+    }
+    .autofit-grid1 {
+        grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+        gap: 0.25rem;
     }
 }
 @media (max-width:850px){

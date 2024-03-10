@@ -8,7 +8,7 @@
     <span class="text-gray text-2xl salsa title">Products</span>
     <div class="button-input flex">
         <button title="Add product" class="focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-amber-400 focus:ring-amber-400 mx-auto transition duration-150 ease-in-out bg-light-brown rounded text-white px-4 sm:px-8 py-2 text-xs sm:text-sm salsa" onclick="modalHandler(true)" id="openModalBtn">Add product</button>
-        <input title="Search" id="search" name="search" class="search ml-4 px-4 py-2 w-48 rounded-md salsa text-black" type="text">
+        <input placeholder="Search" title="Search" id="search" name="search" class="search ml-4 px-4 py-2 w-48 rounded-md salsa text-black" type="text">
     </div>
 </div>
 <div id="productsList" class="grid autofit-grid gap-6 justify-start items-start">
@@ -18,7 +18,7 @@
     $products = $select_products->fetchAll(PDO::FETCH_ASSOC);
     if (count($products) > 0){
         foreach ($products as $product){ ?>
-    <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-90" title="<?= ucwords($product['name']) ?>" data-id="<?= $product['id'] ?>" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">
+    <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-96 max-w-lg" title="<?= ucwords($product['name']) ?>" data-id="<?= $product['id'] ?>" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">
         <div class="relative flex w-full h-full flex-col items-center justify-center">
             <div class="blur-bg absolute w-full h-full hidden rounded-md" style="background-color: rgba(0,0,0,0.5);"></div>
             <div class="absolute flex flex-col items-center top-4 right-4 z-10">
@@ -55,7 +55,7 @@
                             <img id="previewImage" class="w-48 h-48 rounded-full bg-center object-cover" src="../images/image-svgrepo-com.svg">
                             <label class="relative cursor-pointer rounded-lg float-end" for="image">
                                 <img class="w-6 h-6" src="../images/upload-minimalistic-svgrepo-com.svg">
-                                <input id="image" name="image" class="sr-only" type="file" accept="image/jpg, image/jpeg, image/png" onchange="previewFile()">
+                                <input id="image" name="image" class="sr-only" type="file" accept="image/jpg, image/jpeg, image/png" onchange="previewFile()" >
                                 <input type="hidden" name="old_image" id="old_image">
                             </label>
                         </div>
@@ -70,7 +70,7 @@
                             <div class="absolute text-gray-600 flex items-center px-2 border-r h-full">
                                 <img width="16px"  src="../images/peso-svgrepo-com.svg" alt="">
                             </div>
-                            <input title="Price" name="price" id="price" class="text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-12 text-sm border-gray-300 rounded border" placeholder="150" />
+                            <input title="Price" name="price" id="price" class="text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-12 text-sm border-gray-300 rounded border" placeholder="150" required/>
                         </div>
                         <div id="priceError" class="text-red-500 salsa"></div>
                     </div>
@@ -237,7 +237,7 @@ function fadeIn(el, display) {
             if (data.insert === true) {
                 const productsList = document.getElementById('productsList');
                 const newProduct = document.createElement('div');
-                newProduct.setAttribute('class', 'products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-90');
+                newProduct.setAttribute('class', 'products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-96 max-w-lg');
                 newProduct.setAttribute('data-id', data.id);
                 newProduct.setAttribute('title', data.name);
                 newProduct.setAttribute('onmouseover', 'showButtons(this)');
@@ -267,9 +267,9 @@ function fadeIn(el, display) {
             } else if (data.update === true) {
                 const updatedRow = document.querySelector(`div[data-id="${data.id}"]`);
                 updatedRow.querySelector('.productImg').src = '../uploaded_img/' + data.image;  
-                updatedRow.querySelector('button.edit-btn').setAttribute('onclick', `showEditModal(${data.id})`); // Update onclick function for edit button
-                updatedRow.querySelector('button.delete-btn').setAttribute('onclick', `showDeleteModal(${data.id})`); // Update onclick function for delete button
-                updatedRow.querySelector('button.view-btn').setAttribute('onclick', `showViewModal(${data.id})`); // Update onclick function for view button
+                updatedRow.querySelector('button.edit-btn').setAttribute('onclick', `showEditModal(${data.id})`);
+                updatedRow.querySelector('button.delete-btn').setAttribute('onclick', `showDeleteModal(${data.id})`);
+                updatedRow.querySelector('button.view-btn').setAttribute('onclick', `showViewModal(${data.id})`);
                 if (divMessage) {
                     divMessage.classList.remove('hidden');
                 }

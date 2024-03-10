@@ -8,18 +8,18 @@ ini_set('display_errors', 1);
         <button class="-m-1" onclick="this.parentElement.remove();"><img class="w-5 h-5" src="../images/close-svgrepo-com.svg"></button>
     </div>
 </div>
-<div class="upper flex justify-between mb-4 h-10">
-    <span class="text-gray text-3xl salsa title">Order</span>
-    <div class="button-input flex">
+<div class="order flex flex-wrap mb-4">
+    <span class="text-gray text-3xl salsa title flex-1">Order</span>
         <?php 
         $check_cart_numbers = $conn->prepare("SELECT * FROM `cart` WHERE uid = ?");
         $check_cart_numbers->execute([$uid]);
     
         $total = $check_cart_numbers->rowCount();
         ?>
-        <a title="Cart" href="index.php?page=cart" class="w-10 h-10  mx-auto transition duration-150 ease-in-out rounded-md relative"><span id="ordersNo" class="absolute text-white bg-red-600 rounded-full px-2 -top-2 -right-2"><?= $total ?></span><img class="w-full h-full" src="../images/cart-shopping-svgrepo-com.svg"></a>
-        <input title="Search" id="search" name="search" class="search ml-4 px-4 py-2 w-48 rounded-md salsa text-black" type="text">
-    </div>
+        <div class="text-end w-10 h-10">
+            <a title="Cart" href="index.php?page=cart" class="w-full h-full  mx-auto transition duration-150 ease-in-out rounded-md relative"><span id="ordersNo" class="absolute text-white bg-red-600 rounded-full px-2 -top-2 -right-2"><?= $total ?></span><img class="w-full h-full" src="../images/cart-shopping-svgrepo-com.svg"></a>
+        </div>
+        <input title="Search" placeholder="Search" id="search" name="search" class="search ml-4 px-4 py-2 w-48 rounded-md salsa text-black" type="text">
 </div>
 <div id="productsList" class="grid autofit-grid gap-6 justify-start items-start">
     <?php 
@@ -28,7 +28,7 @@ ini_set('display_errors', 1);
     $products = $select_products->fetchAll(PDO::FETCH_ASSOC);
     if (count($products) > 0){
         foreach ($products as $product){ ?>
-    <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-96" data-id="<?= $product['id'] ?>" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">
+    <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-96 max-w-lg" data-id="<?= $product['id'] ?>" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">
         <div class="flex flex-col justify-center">
             <div class="rounded-md relative w-full h-80 flex flex-col items-center justify-center" title="Add to cart">
                 <div class="blur-bg absolute w-full h-full hidden rounded-md" style="background-color: rgba(0,0,0,0.5);"></div>

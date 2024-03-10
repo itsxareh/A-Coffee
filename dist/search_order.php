@@ -13,7 +13,7 @@ if ($searchTerm !== '') {
 
     if (count($products) > 0) {
         foreach ($products as $product) { ?>
-            <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-96" data-id="<?= $product['id'] ?>" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">
+            <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-96 max-w-lg" data-id="<?= $product['id'] ?>" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">
         <div class="flex flex-col justify-center">
             <div class="rounded-md relative w-full h-80 flex flex-col items-center justify-center">
                 <div class="blur-bg absolute w-full h-full hidden rounded-md" style="background-color: rgba(0,0,0,0.5);"></div>

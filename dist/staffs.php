@@ -8,7 +8,7 @@
     <span class="text-gray text-2xl salsa title">Staffs</span>
     <div class="button-input flex">
         <button title="Add staff" class="focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-amber-400 focus:ring-amber-400 mx-auto transition duration-150 ease-in-out bg-light-brown rounded text-white px-4 sm:px-8 py-2 text-xs sm:text-sm salsa" onclick="modalHandler(true)" id="addModalBtn">Add staff</button>
-        <input title="Search" id="search" name="search" class="search ml-4 px-4 py-2 w-48 rounded-md salsa text-black" type="text">
+        <input placeholder="Search" title="Search" id="search" name="search" class="search ml-4 px-4 py-2 w-48 rounded-md salsa text-black" type="text">
     </div>
 </div>
 <div class="overflow-x-auto">
@@ -116,7 +116,7 @@
                     </div>
                     <div class="col-span-full">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="address">Address</label>
-                        <textarea title="Address" name="address" id="address" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" rows="3" autocomplete="off" placeholder="12 Zamora St. Sampaloc, Manila City" required></textarea>
+                        <input title="Address" name="address" id="address" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" rows="3" autocomplete="off" placeholder="12 Zamora St. Sampaloc, Manila City" required></input>
                     </div>
                 </div>
                 <div class="flex items-center justify-start w-full">
@@ -230,7 +230,7 @@
                 document.getElementById('gender').value = data.gender;
                 document.getElementById('email').value = data.email;
                 document.getElementById('password').value = data.password;
-                document.getElementById('birthdate').value = data.birthdate;
+                document.getElementById('birthdate').value = data.bdate;
                 document.getElementById('usertype').value = data.user_type;
                 document.getElementById('address').value = data.address;
                 document.getElementById('old_image').value = data.image;

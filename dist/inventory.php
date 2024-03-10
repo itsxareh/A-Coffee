@@ -8,7 +8,7 @@
     <span class="text-gray text-2xl salsa title">Inventory</span>
     <div class="button-input flex">
         <button title="Add Item" class="focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-amber-400 focus:ring-amber-400 mx-auto transition duration-150 ease-in-out bg-light-brown rounded text-white px-4 sm:px-8 py-2 text-xs sm:text-sm salsa" onclick="modalHandler(true)" id="addModalBtn">Add item</button>
-        <input title="Search" id="search" name="search" class="search ml-4 px-4 py-2 w-48 rounded-md salsa text-black" type="text">
+        <input placeholder="Search" title="Search" id="search" name="search" class="search ml-4 px-4 py-2 w-48 rounded-md salsa text-black" type="text">
     </div>
 </div>
 <div class="overflow-x-auto">
@@ -22,7 +22,7 @@
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Action</th>
             </tr>
         </thead>
-        <tbody id="itemsList">
+        <tbody id="logsList">
             <?php 
                 $select_items = $conn->prepare("SELECT * FROM inventory ORDER BY id DESC");
                 $select_items->execute();
@@ -176,7 +176,7 @@
 
 
     const searchInput = document.getElementById('search');
-    const itemsList = document.getElementById('itemsList');
+    const itemsList = document.getElementById('logsList');
 
     searchInput.addEventListener('input', function(){
         const searchTerm = this.value.trim();

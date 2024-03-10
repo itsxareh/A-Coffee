@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = trim($_POST['password']);
     $email = trim($_POST['email']);
     $gender = $_POST['gender'];
-    $birthdate = $_POST['birthdate'];
+    $birthdate = date('m-d-Y', strtotime($_POST['birthdate']));
     $user_type = $_POST['usertype'];
     $address = $_POST['address'];
     $uid = $_POST['uid'];
@@ -63,7 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
             if (!empty($image)) {
                 if ($image_size > 10000000) {
-                    $message[] = 'Image size is too large!';
+                    $data['message'] = 'Image size is too large!';
                 } else {
                     if (move_uploaded_file($image_tmp_name, $image_folder)) {
                         $update_image = $conn->prepare("UPDATE `users` SET image = ? WHERE id = ?");
@@ -74,9 +74,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         if (!empty($old_image) && file_exists('../uploaded_img/' . $old_image)) {
                             unlink('../uploaded_img/' . $old_image);
                         }
-                        $message[] = 'Image updated successfully!';
+                        $data['message'] = 'Image updated successfully!';
                     } else {
-                        $message[] = 'Failed to move uploaded image!';
+                        $data['message'] = 'Failed to move uploaded image!';
                     }
                 }
             }
@@ -98,8 +98,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $data['error'] = 'UID parameter is missing';
         } 
     } else {
-        $update_staff = $conn->prepare("UPDATE `users` SET name = :name, pnumber = :pnumber, password = :password, email = :email, gender = :gender, birthdate = :birthdate, user_type = :user_type, address = :address, joined_at = :current_time WHERE uid = :uid");
-        $params = array(':name' => $name, ':pnumber' => $pnumber,':password' => password_hash($password, PASSWORD_DEFAULT), ':email' => $email, ':gender' => $gender, ':birthdate' => $birthdate, ':user_type' => $user_type, ':address' => $address, ':current_time' => $current_time, ':uid' => $uid);
+        $update_staff = $conn->prepare("UPDATE `users` SET name = :name, pnumber = :pnumber, password = :password, email = :email, gender = :gender, birthdate = :birthdate, user_type = :user_type, address = :address WHERE uid = :uid");
+        $params = array(':name' => $name, ':pnumber' => $pnumber,':password' => password_hash($password, PASSWORD_DEFAULT), ':email' => $email, ':gender' => $gender, ':birthdate' => $birthdate, ':user_type' => $user_type, ':address' => $address, ':uid' => $uid);
         foreach ($params as $key => &$value) {
             $update_staff->bindParam($key, $value);
         }
@@ -119,7 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
             if (!empty($image)) {
                 if ($image_size > 10000000) {
-                    $message[] = 'Image size is too large!';
+                    $data['message'] = 'Image size is too large!';
                 } else {
                     if (move_uploaded_file($image_tmp_name, $image_folder)) {
                         $update_image = $conn->prepare("UPDATE `users` SET image = ? WHERE uid = ?");
@@ -130,9 +130,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         if (!empty($old_image) && file_exists('../uploaded_img/' . $old_image)) {
                             unlink('../uploaded_img/' . $old_image);
                         }
-                        $message[] = 'Image updated successfully!';
+                        $data['message'] = 'Image updated successfully!';
                     } else {
-                        $message[] = 'Failed to move uploaded image!';
+                        $data['message'] = 'Failed to move uploaded image!';
                     }
                 }
             }

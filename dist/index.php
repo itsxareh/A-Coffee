@@ -148,28 +148,32 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
             <div class="relative h-full">
               <div class="w-full overflow-y-auto h-full">
                 <div class="flex flex-col text-sm pb-9">
-                  <div class="header sticky top-0 mb-1.5 flex items-center justify-between z-10 h-14 p-2 font-semibold bg-dark-brown">
+                  <div class="header sticky top-0 mb-1.5 flex items-center justify-between z-10 h-14 p-2 px-5 font-semibold bg-dark-brown">
                     <div id="svpBtn" class="hidden">
                       <button class="relative rounded-md w-10 h-10 flex items-center justify-center">
                         <img class="w-full h-full" src="../images/hamburger-svgrepo-com.svg" alt="">
                       </button>
                     </div>
-                    <div class="flex items-center gap-2">
-                      <div class="coffee-name"><span class="text-white text-2xl rosarivo">A Coffee</span></div>
+                    <div class="flex items-center">
+                      <div class="coffee-name">
+                        <a href="index.php">
+                          <img class="w-10 h-full" src="../images/A-Coffee.png" alt="">
+                        </a>
+                      </div>
                     </div>
-                    <div class="user">
+                    <div class="user" title="Profile">
                       <div id="profileBtn">
-                          <img class="w-10 h-10" src="../images/profile-circle-svgrepo-com.svg" alt="">
+                          <img class="w-7 h-7" src="../images/profile-circle-svgrepo-com.svg" alt="">
                       </div>
                       <div class="nav-profile absolute right-1 -bottom-32 shadow-lg border rounded-lg p-4 w-60 hidden bg-dark-brown">
-                          <a href="index.php?page=profile_update" class="salsa text-sm font-normal block w-full p-2 mt-2 rounded-md text-center text-white bg-light-brown shadow-sm hover:text-white transition-colors duration-300">Update profile</a>
-                          <a href="logout.php" class="salsa text-sm font-normal block w-full p-2 mt-2 rounded-md text-center text-white bg-red-600 shadow-sm hover:text-white hover:bg-red-500 transition-colors duration-300">Logout</a>
+                          <a title="Update profile" href="index.php?page=update_profile" class="salsa text-sm font-normal block w-full p-2 mt-2 rounded-md text-center text-white bg-light-brown shadow-sm hover:text-white transition-colors duration-300">Update profile</a>
+                          <a title="Logout" href="logout.php" class="salsa text-sm font-normal block w-full p-2 mt-2 rounded-md text-center text-white bg-red-600 shadow-sm hover:text-white hover:bg-red-500 transition-colors duration-300">Logout</a>
                       </div>
                     </div>
                   </div>
                   <div class="text-white w-full">
                     <?php $page = isset($_GET['page']) ? $_GET['page'] :'dashboard'; ?>
-                    <main class="w-full px-10 py-4">
+                    <main id="view-panel" class="w-full px-10 py-4">
                       <?php include $page.'.php' ?>
                     </main>
                   </div>

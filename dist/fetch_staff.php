@@ -3,7 +3,7 @@ include 'config.php';
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
-    $stmt = $conn->prepare("SELECT id, uid, name, pnumber, gender, email, password, birthdate, user_type, address, image  FROM users WHERE id = ?");
+    $stmt = $conn->prepare("SELECT id, uid, name, pnumber, gender, email, password, birthdate, user_type, address, image, DATE_FORMAT(STR_TO_DATE(birthdate, '%m-%d-%Y'), '%Y-%m-%d') AS bdate FROM users WHERE id = ?");
     $stmt->execute([$id]);
     $data = $stmt->fetch(PDO::FETCH_ASSOC);
 

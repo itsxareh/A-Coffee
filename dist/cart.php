@@ -14,14 +14,14 @@
 
     if(count($carts) > 0){
         foreach($carts as $cart){ ?>
-            <div class="relative rounded-md bg-dark-brown flex flex-start items-center h-28" data-id="<?= $cart['id'] ?>">
-                <div class="w-28 h-28">
+            <div class="cart relative rounded-md bg-dark-brown flex flex-start items-center h-28" data-id="<?= $cart['id'] ?>">
+                <div class="w-28 h-full">
                     <img class="rounded-tl-md rounded-bl-md w-full h-full object-cover" src="../uploaded_img/<?=$cart['image']?>">
                 </div>
-                <div class="ml-2 p-2">
-                    <h3 class="text-white text-xl font-medium  capitalize rosarivo leading-none"><?= $cart['name']?></h3>
-                    <p class="text-white rosarivo">₱<span class="price"><?= $cart['price'] * $cart['quantity']?></span></p>
-                    <p class="text-white rosarivo text-sm my-1">Quantity</p>
+                <div class="flex-1 ml-2 p-2">
+                    <h3 class="text-white font-normal text-sm capitalize rosarivo leading-3"><?= $cart['name']?></h3>
+                    <p class="text-gray-400 rosarivo">₱<span class="price"><?= $cart['price'] * $cart['quantity']?></span></p>
+                    <p class="text-white rosarivo my-1">Quantity</p>
                     <div class="flex items-center">
                     <button title="Plus" type="button" class="quantity-btn rounded-tl-md rounded-bl-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="<?= $cart['id'] ?>" onclick="addQuantity(<?= $cart['id'] ?>)"><span>+</span></button>
                     <p class="text-white rosarivo mx-2"><span class="quantity"><?= $cart['quantity']?></span></p>
