@@ -47,7 +47,6 @@
 <script>
 function fetchSales() {
     var selectedOption = document.getElementById("sales").value;
-    console.log(selectedOption);
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "fetch_sale.php?option=" + selectedOption, true);
     xhr.onreadystatechange = function () {
