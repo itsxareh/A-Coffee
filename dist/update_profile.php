@@ -57,7 +57,7 @@ if (isset($_SESSION['uid'])){
                 <div class="col-span-1">
                     <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="password">Current Password</label>
                     <input title="Current Password" name="password" id="password" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="********" type="password" autocomplete="off" required>
-                    <input title="Password" name="password" id="password" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="********" type="password" autocomplete="off" required>
+                    
                 </div>
                 <div class="col-span-1">
                     <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="birthdate">Birthdate</label>
@@ -69,9 +69,8 @@ if (isset($_SESSION['uid'])){
                 </div>
                 <div class="col-span-1">
                     <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="usertype">User Type</label>
-                    <select title="User Type" name="usertype" id="usertype" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border">
                     <select title="Usertype" name="usertype" id="usertype" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border">
-                        <option <?= $profile['user_type'] === 0 ? 'selected' : ''?> value="0" selected>Staff</option> 
+                        <option <?= $profile['user_type'] === 0 ? 'selected' : ''?> value="0">Staff</option> 
                         <option <?= $profile['user_type'] === 1 ? 'selected' : ''?> value="1">Manager</option>
                     </select>
                 </div>
@@ -82,7 +81,6 @@ if (isset($_SESSION['uid'])){
             </div>
             <div class="flex items-center justify-center w-full">
                 <button title="Update" type="submit" name="submit" id="submitBtn" class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-600 transition duration-150 ease-in-out bg-light-brown rounded text-white px-8 py-2 text-sm">Update</button>
-                <button title="Submit" type="submit" name="submit" id="submitBtn" class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-600 transition duration-150 ease-in-out bg-light-brown rounded text-white px-8 py-2 text-sm">Save</button>
             </div>
         </form>
     </div>

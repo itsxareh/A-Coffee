@@ -94,6 +94,9 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
                               </a>
                             </div>
                           </li>
+                          <?php
+                          if ($fetch_profile['user_type'] == 0){ 
+                          echo ' 
                           <li class="relative h-12 opacity-100">
                             <div class="relative rounded-lg active:opacity-80 hover:opacity-70 nav-order">
                               <a class="flex items-center gap-2 p-2" href="index.php?page=order" title="Order">
@@ -103,6 +106,12 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
                               </a>
                             </div>
                           </li>
+                          ';
+                          }
+                          ?>
+                          <?php
+                          if ($fetch_profile['user_type'] == 1){ 
+                          echo '                          
                           <li class="relative h-12 opacity-100">
                             <div class="relative rounded-lg active:opacity-80 hover:opacity-70 nav-sales">
                               <a class="flex items-center gap-2 p-2" href="index.php?page=sales" title="Sales">
@@ -121,6 +130,9 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
                               </a>
                             </div>
                           </li>
+                          ';
+                          }
+                          ?>
                         </ol>
                       </div>
                     </span>
@@ -243,7 +255,6 @@ function displayPhilippinesTime() {
     document.getElementById("time").innerText =  `${formattedTime}`;
 }
 
-// Update the display every second
 setInterval(displayPhilippinesTime, 100);
 
 </script>

@@ -98,7 +98,7 @@
                 <span class="sr-only">Close modal</span>
             </button>
             <div class="p-4 md:p-5 h-full flex flex-col justify-between">
-                <h3 class="mb-4 text-xl font-bold text-gray-90">Approaching Low Quantity</h3>
+                <h3 class="mb-4 text-xl font-bold text-gray-900">Approaching Low Quantity</h3>
                 <p class="text-gray-500 text-md font-normal dark:text-gray-400 mb-6">The following item/s have low inventory quantity. Please restocking soon:<p>
                 <div class="text-center"><span id="notification" class="text-md font-medium text-gray-900 mb-6"></span></div>
                 <div class="p-3  mt-2 text-center space-x-4 md:block">
