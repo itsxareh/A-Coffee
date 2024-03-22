@@ -20,7 +20,7 @@ if ($searchTerm !== '') {
         <?php 
         }
     } else {
-        echo '<tr><td colspan="6" class="text-gray text-medium font-semibold p-3 py-4 text-center">No log found.</td></tr>';
+        echo '<tr><td colspan="6" class="text-gray text-medium font-semibold p-3 py-4 text-center">No activity log found.</td></tr>';
     }
 } else {
     echo '<tr class="text-gray text-2xl">Please enter a search term!</tr>';

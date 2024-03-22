@@ -69,7 +69,7 @@ if (isset($_SESSION['uid'])){
                 </div>
                 <div class="col-span-1">
                     <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="usertype">User Type</label>
-                    <select title="Usertype" name="usertype" id="usertype" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border">
+                    <select disabled title="Usertype" name="usertype" id="usertype" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border">
                         <option <?= $profile['user_type'] === 0 ? 'selected' : ''?> value="0">Staff</option> 
                         <option <?= $profile['user_type'] === 1 ? 'selected' : ''?> value="1">Manager</option>
                     </select>

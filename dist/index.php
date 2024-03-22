@@ -1,15 +1,22 @@
 <?php 
+ob_start();
+error_reporting(0);
 include 'config.php';
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+
+if (!isset($_SESSION['uid'])) {
+  header('Location: login.php');
+  exit; 
+}
+
 $uid = $_SESSION['uid'];
-if(!isset($uid)){
-   header('location:login.php');
-};
 $select_profile = $conn->prepare("SELECT * FROM `users` WHERE uid = ?");
-$select_profile->execute([$uid]);
+$select_profile->bindParam(1, $uid);
+$select_profile->execute();
 $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
 
+ob_end_flush();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -139,11 +146,16 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
                   </div>
                 </div>
               </div>
-              <div class="flex flex-col pt-2">
-                <div class="flex w-full justify-end">
-                  <a title="Inventory Log" href="index.php?page=inventory_log"><img class="w-6 h-6" src="../images/time-past-svgrepo-com.svg" alt=""></a>
+              <?php 
+              if ($fetch_profile['user_type'] == 1)  { ?>
+                <div class="flex flex-col pt-2">
+                  <div class="flex w-full justify-end">
+                    <a title="Inventory Log" href="index.php?page=inventory_log"><img class="w-6 h-6" src="../images/time-past-svgrepo-com.svg" alt=""></a>
+                  </div>
                 </div>
-              </div>
+              <?php
+                }
+              ?>                
             </nav>
           </div>
         </div>

@@ -59,7 +59,6 @@ function displayPhilippinesTime() {
     document.getElementById("time").innerText =  `${formattedTime}`;
 }
 
-// Update the display every second
 setInterval(displayPhilippinesTime, 100);
 
 </script>

@@ -121,18 +121,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if ($image_size > 10000000) {
                     $data['message'] = 'Image size is too large!';
                 } else {
-                    if (move_uploaded_file($image_tmp_name, $image_folder)) {
-                        $update_image = $conn->prepare("UPDATE `users` SET image = ? WHERE uid = ?");
-                        $update_image->bindParam(1, $image);
-                        $update_image->bindParam(2, $uid);
-                        $update_image->execute();
-    
-                        if (!empty($old_image) && file_exists('../uploaded_img/' . $old_image)) {
-                            unlink('../uploaded_img/' . $old_image);
+                    if (!empty($old_image) && file_exists('../uploaded_img/' . $old_image)) {
+                        if (unlink('../uploaded_img/' . $old_image)) {
+                            if (move_uploaded_file($image_tmp_name, $image_folder)) {
+                                $update_image = $conn->prepare("UPDATE `users` SET image = ? WHERE uid = ?");
+                                $update_image->bindParam(1, $image);
+                                $update_image->bindParam(2, $uid);
+                                $update_image->execute();
+                                $data['message'] = 'Image updated successfully!';
+                            } else {
+                                $data['message'] = 'Failed to move uploaded image!';
+                            }
+                        } else {
+                            $data['message'] = 'Failed to delete old image!';
                         }
-                        $data['message'] = 'Image updated successfully!';
                     } else {
-                        $data['message'] = 'Failed to move uploaded image!';
+                        if (move_uploaded_file($image_tmp_name, $image_folder)) {
+                            $update_image = $conn->prepare("UPDATE `users` SET image = ? WHERE uid = ?");
+                            $update_image->bindParam(1, $image);
+                            $update_image->bindParam(2, $uid);
+                            $update_image->execute();
+                            $data['message'] = 'Image updated successfully!';
+                        } else {
+                            $data['message'] = 'Failed to move uploaded image!';
+                        }
                     }
                 }
             }

@@ -1,3 +1,5 @@
+<?php 
+if ($fetch_profile['user_type'] == 1) {  ?>
 <div class="hide-message hidden">
     <div class="message rounded-lg p-4 flex items-start">
         <span id="message" class="text-sm text-white"></span>
@@ -25,7 +27,8 @@
         </thead>
         <tbody id="staffsList">
             <?php 
-                $select_staffs = $conn->prepare("SELECT u.id, u.image, u.name, u.uid, SUM(o.amount) AS total, COUNT(o.uid) AS quantity FROM users u LEFT JOIN orders o ON u.uid = o.uid GROUP BY u.uid");
+                $select_staffs = $conn->prepare("SELECT u.id, u.image, u.name, u.uid, SUM(o.amount) AS total, COUNT(o.uid) AS quantity FROM users u LEFT JOIN orders o ON u.uid = o.uid WHERE u.uid != ? GROUP BY u.uid");
+                $select_staffs->bindParam(1, $uid);
                 $select_staffs->execute();
                 $staffs = $select_staffs->fetchAll(PDO::FETCH_ASSOC);
                 if (count($staffs) > 0){
@@ -152,6 +155,11 @@
         </div>
     </div>
 </div>
+<?php
+} else {
+    echo '<p class="text-gray text-medium p-3 py-4 text-center">Error 404: Unauthorized Access.</p>';
+}   
+?>
 <script>
     const modal = document.getElementById("add-modal");
     const openModalBtn = document.getElementById("addModalBtn");
