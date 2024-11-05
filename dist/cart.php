@@ -1,4 +1,3 @@
-
 <div class="hide-message hidden">
     <div class="message rounded-lg p-4 flex items-start">
         <span id="message" class="text-sm text-white"></span>
@@ -54,7 +53,7 @@
                 <h3 class="text-lg font-normal text-gray-900 rosarivo">
                     Confirm Order
                 </h3>
-                <button title="close" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm h-8 w-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" onclick="confirmModalHandler()">
+                <button title="Close" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm h-8 w-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" onclick="confirmModalHandler()">
                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                     </svg>
@@ -94,7 +93,7 @@
                 <div class="flex justify-end items-center">
                     <div class="pr-5">
                         <p class="text-gray-500 text-sm font-medium leading-tight tracking-normal salsa" for="total">Total</p>
-                        <p id="total"  class="salsa block mb-3 text-md font-normal leading-none text-gray-800 dark:text-gray-700">₱<span id="confirm-total text-gray-800 salsa block mb-3 text-md font-normal leading-none"><?= $cart['total'] ?></span></p>
+                        <p id="total"  class="salsa block mb-3 text-md font-normal leading-none text-gray-800 dark:text-gray-700">₱<span id="confirm-total" class="text-gray-800 salsa mb-3 text-md font-normal leading-none"><?= number_format($cart['total'], 2) ?></span></p>
                     </div>
                     <form id="add_order" action="add_order.php" method="POST">
                         <input type="text" class="hidden" name="uid" id="uid" value="<?= $cart['uid'] ?>" title="uid" placeholder="">
@@ -168,7 +167,7 @@ function updateQuantity(cartId, action) {
         }
         const confirmTotal = document.querySelector(`#confirm-total`);
         if (confirmTotal) {
-            confirmTotal.textContent = parseFloat(data.total).toFixed(2);
+            confirmTotal.textContent = parseFloat(data.total).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
     })
     .catch(error => {

@@ -21,7 +21,7 @@ if (isset($_SESSION['uid'])){
             <div class="mt-5 grid cols-grid-1 cols-grid-2 gap-x-2">
                 <div class="col-span-full flex justify-center">
                     <div class="text-center">
-                        <img id="previewImage" class="w-48 h-48 rounded-full bg-center object-cover" src="../uploaded_img/<?= $profile['image'] ?>">
+                        <img id="previewImage" class="w-48 h-48 rounded-full bg-center object-cover" src="<?= $profile['image'] ?>">
                         <label class="relative cursor-pointer rounded-lg float-end" for="image">
                             <img class="w-6 h-6" src="../images/upload-minimalistic-svgrepo-com.svg">
                             <input id="image" name="image" class="sr-only" type="file" accept="image/jpg, image/jpeg, image/png" onchange="previewFile()">
@@ -56,7 +56,7 @@ if (isset($_SESSION['uid'])){
                 </div>
                 <div class="col-span-1">
                     <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="password">Current Password</label>
-                    <input title="Current Password" name="password" id="password" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="********" type="password" autocomplete="off" required>
+                    <input title="Current Password" name="password" id="password" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="********" type="password" autocomplete="off">
                     
                 </div>
                 <div class="col-span-1">
@@ -65,13 +65,13 @@ if (isset($_SESSION['uid'])){
                 </div>
                 <div class="col-span-1">
                     <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="password">New Password</label>
-                    <input title="New Password" name="npassword" id="npassword" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="********" type="password" autocomplete="off" required>
+                    <input title="New Password" name="npassword" id="npassword" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="********" type="password" autocomplete="off">
                 </div>
                 <div class="col-span-1">
                     <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="usertype">User Type</label>
-                    <select disabled title="Usertype" name="usertype" id="usertype" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border">
+                    <select title="Usertype" name="usertype" id="usertype" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border">
                         <option <?= $profile['user_type'] === 0 ? 'selected' : ''?> value="0">Staff</option> 
-                        <option <?= $profile['user_type'] === 1 ? 'selected' : ''?> value="1">Manager</option>
+                        <option <?= $profile['user_type'] === 1 ? 'selected' : 'disabled'?> value="1">Manager</option>
                     </select>
                 </div>
                 <div class="col-span-full">
@@ -91,17 +91,28 @@ if (isset($_SESSION['uid'])){
     const submitBtn = document.getElementById('submitBtn');
     const formElement = document.getElementById('update_user');
     const password = document.getElementById('password');
+    const npassword = document.getElementById('npassword');
+
 
     submitBtn.addEventListener('click', submitForm);
 
     function submitForm(event){
-        if (password.value == ""){
-            messages.textContent = "Password needed";
-            return false;
-        }
         event.preventDefault();
-        const formData = new FormData(formElement);
+        if (password.value === "" && npassword.value !== "") {
+            messages.textContent = "Current password needed";
+            if (divMessage) {
+                divMessage.classList.remove('hidden');
+            }
+            setTimeout(() => {
+                if (divMessage) {
+                    divMessage.classList.add('hidden');
+                }
+            }, 2000);
+            return; 
+        }
 
+        const formData = new FormData(formElement);
+        
         fetch('update_user.php', {
             method: 'POST',
             body: formData
@@ -118,7 +129,7 @@ if (isset($_SESSION['uid'])){
                 document.getElementById('usertype').value = data.user_type;
                 document.getElementById('address').value = data.address;
                 document.getElementById('old_image').value = data.image;
-                document.getElementById('previewImage').src = '../uploaded_img/'+ data.image;
+                document.getElementById('previewImage').src = data.image;
             }
             if (divMessage) {
                 divMessage.classList.remove('hidden');

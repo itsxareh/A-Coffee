@@ -65,7 +65,7 @@
    	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
     <div role="alert" class="container mx-auto w-11/12 md:w-2/3 max-w-xl">
         <div class="relative py-8 px-5 md:px-10 bg-white shadow-md rounded border border-gray-400">
-            <h1 class="text-gray-800 font-lg font-medium tracking-normal leading-tight mb-4">Enter Item Details</h1>
+            <h1 class="text-gray-800 font-lg font-medium tracking-normal leading-tight">Enter Item Details</h1>
             <form id="add_item" action="add_item.php" method="POST" enctype="multipart/form-data">
                 <input type="text" class="hidden" name="uid" id="uid" value="<?= $uid ?>">
                 <input type="text" class="hidden" name="id" id="id">

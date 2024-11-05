@@ -36,9 +36,9 @@ if ($fetch_profile['user_type'] == 1) {  ?>
                     
                     <tr class="border-color" data-id="<?= $staff['id']; ?>">
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
-                            <a class="cursor-pointer" href="index.php?page=view_staff&id=<?= $staff['id']; ?>" title="View Staff Details">
+                            <button title="View Staff Details" class="cursor-pointer" onclick="showViewModal(<?= $staff['id'] ?>)">
                                 <img class="w-16 h-16 object-cover" src="../uploaded_img/<?= $staff['image']; ?>">
-                            </a>
+                            </button>
                         </td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ucwords($staff['name']); ?></td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $staff['uid']; ?></td>
@@ -60,17 +60,17 @@ if ($fetch_profile['user_type'] == 1) {  ?>
         </tbody>
     </table>
 </div>
-<div class="py-20 transition duration-150 ease-in-out z-10 absolute top-0 right-0 bottom-0 left-0 hidden h-full" style="background-color: rgba(0, 0, 0, 0.7);" id="add-modal">
+<div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" style="background-color: rgba(0, 0, 0, 0.7);" id="add-modal">
     <div role="alert" class="container mx-auto w-11/12 md:w-2/3 max-w-xl">
         <div class="relative py-8 px-5 md:px-10 bg-white shadow-md rounded border border-gray-400">
-            <h1 class="text-gray-800 font-lg font-medium tracking-normal leading-tight mb-4">Enter Staff Details</h1>
+            <h1 class="text-gray-800 font-lg font-medium tracking-normal leading-tight">Enter Staff Details</h1>
             <form id="add_staff" action="add_staff.php" method="POST" enctype="multipart/form-data">
                 <input type="text" class="hidden" name="uid" id="uid">
-                <div class="mt-5 grid cols-grid-1 cols-grid-2 gap-x-2">
-                    <div class="col-span-full flex justify-center">
+                <div class="grid cols-grid-1 cols-grid-2 gap-x-2">
+                    <div class="col-span-full flex justify-center mb-4">
                         <div class="text-center">
                             <img id="previewImage" class="w-48 h-48 rounded-full bg-center object-cover" src="../images/image-svgrepo-com.svg">
-                            <label class="relative cursor-pointer rounded-lg float-end" for="image">
+                            <label id="imageValid" class="relative cursor-pointer rounded-lg float-end" for="image">
                                 <img class="w-6 h-6" src="../images/upload-minimalistic-svgrepo-com.svg">
                                 <input id="image" name="image" class="sr-only" type="file" accept="image/jpg, image/jpeg, image/png" onchange="previewFile()" required>
                                 <input type="hidden" name="old_image" id="old_image">
@@ -79,15 +79,15 @@ if ($fetch_profile['user_type'] == 1) {  ?>
                     </div>
                     <div class="col-span-1">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="name">Name</label>
-                        <input title="Name" name="name" id="name" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="Juan Dela Cruz" type="text" autocomplete="off" required>
+                        <input title="Name" name="name" id="name" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="Juan Dela Cruz" type="text" autocomplete="off" required onchange="checkInputValue(this)">
                     </div>
                     <div class="col-span-1">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="pnumber">Phone number</label>
-                        <div class="relative mb-5 mt-2">
+                        <div id="pValid" class="relative mb-5 mt-2">
                             <div class="absolute text-gray-600 flex items-center px-2 border-r h-full">
                                 <p class="text-sm text-gray-600 font-normal ">+63</p>
                             </div>
-                            <input title="Phone number" name="pnumber" id="pnumber" class="text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-12 text-sm border-gray-300 rounded border" placeholder="9123456789" />
+                            <input title="Phone number" name="pnumber" id="pnumber" class="text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-12 text-sm border-gray-300 rounded border" placeholder="9123456789" required onchange="checkInputValue(this)"/>
                         </div>
                         <div id="pnumberError" class="text-red-500 salsa"></div>
                     </div>
@@ -100,15 +100,15 @@ if ($fetch_profile['user_type'] == 1) {  ?>
                     </div>
                     <div class="col-span-1">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="email">Email address</label>
-                        <input title="Email address" name="email" id="email" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" autocomplete="off" placeholder="juandelacruz@gmail.com" type="email" required>
+                        <input title="Email address" name="email" id="email" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" autocomplete="off" placeholder="juandelacruz@gmail.com" type="email" required onchange="checkInputValue(this)">
                     </div>
                     <div class="col-span-1">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="password">Password</label>
-                        <input title="Password" name="password" id="password" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="********" type="password" autocomplete="off" required>
+                        <input title="Password" name="password" id="password" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="********" type="password" autocomplete="off" required onchange="checkInputValue(this)">
                     </div>
                     <div class="col-span-1">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="birthdate">Birthdate</label>
-                        <input title="Birthdate" name="birthdate" id="birthdate" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" type="date" required>
+                        <input title="Birthdate" name="birthdate" id="birthdate" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" type="date" required onchange="checkInputValue(this)">
                     </div>
                     <div class="col-span-1">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="usertype">User Type</label>
@@ -119,11 +119,11 @@ if ($fetch_profile['user_type'] == 1) {  ?>
                     </div>
                     <div class="col-span-full">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="address">Address</label>
-                        <input title="Address" name="address" id="address" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" rows="3" autocomplete="off" placeholder="12 Zamora St. Sampaloc, Manila City" required></input>
+                        <input title="Address" name="address" id="address" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" rows="3" autocomplete="off" placeholder="12 Zamora St. Sampaloc, Manila City" required onchange="checkInputValue(this)"></input>
                     </div>
                 </div>
                 <div class="flex items-center justify-start w-full">
-                    <button title="Submit" type="submit" name="submit" id="submitBtn" class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-600 transition duration-150 ease-in-out bg-light-brown rounded text-white px-8 py-2 text-sm">Submit</button>
+                    <button title="Submit" type="submit" name="submit" id="submitBtn" class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400 transition duration-150 ease-in-out bg-light-brown rounded text-white px-8 py-2 text-sm">Submit</button>
                     <button title="Cancel" type="button" class="focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-gray-400 ml-3 bg-gray-100 transition duration-150 text-gray-600 ease-in-out hover:border-gray-400 hover:bg-gray-300 border rounded px-8 py-2 text-sm" onclick="modalHandler()">Cancel</button>
                 </div>
                 <button title="Close" type="button" class="cursor-pointer absolute top-0 right-0 mt-4 mr-5 text-gray-400 hover:text-gray-600 transition duration-150 ease-in-out rounded focus:ring-2 focus:outline-none focus:ring-gray-600" onclick="modalHandler()" aria-label="close modal" role="button">
@@ -133,7 +133,36 @@ if ($fetch_profile['user_type'] == 1) {  ?>
         </div>
     </div>
 </div>
-
+<div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="view-modal">
+   	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
+    <div class="w-full  max-w-xl p-5 relative mx-auto my-auto rounded-xl shadow-lg  bg-white ">
+        <div class="">
+        <div class="flex flex-row items-start">
+                <div class="w-2/5 flex flex-col">
+                    <img class="size-20 object-cover rounded-lg" id="viewImage" src="">
+                    <div class="flex-1">
+                        <p id="viewUID" class="mb-2 text-sm text-gray-700 rosarivo"></p>
+                        <h3 id="viewName" class="mb-2 text-md text-gray-700 rosarivo"></h3>
+                    </div>
+                </div>
+                <div class="w-3/5 p-5">
+                    <div>
+                        <p id="viewPnumber" class="mb-2 text-sm text-gray-700 rosarivo"></p>
+                        <p id="viewEmail" class="mb-2 text-sm text-gray-700 rosarivo"></p>
+                        <p id="viewGender" class="mb-2 text-sm text-gray-700 rosarivo"></p>
+                        <p id="viewBirthdate" class="mb-2 text-sm text-gray-700 rosarivo"></p>
+                        <p id="viewUsertype" class="mb-2 text-sm text-gray-700 rosarivo"></p>
+                        <p id="viewAddress" class="mb-2 text-sm text-gray-700 rosarivo"></p>
+                        <p id="viewJoinedAt" class="mb-2 text-sm text-gray-700 rosarivo"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-3  mt-2 text-center space-x-4 md:block">
+                <button class="mb-2 md:mb-0 bg-light-brown px-5 py-2 text-sm font-medium tracking-wider border text-white rounded-full hover:shadow-lg hover:bg-amber-400" onclick="viewModalHandler()">Okay</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="delete-modal">
    	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
     <div class="w-full  max-w-lg p-5 relative mx-auto h-80 rounded-xl shadow-lg  bg-white ">
@@ -167,6 +196,7 @@ if ($fetch_profile['user_type'] == 1) {  ?>
     const deleteModalBtn = document.getElementById("deleteModalBtn");
     const editModal = document.getElementById("edit-modal");
     const editModalBtn = document.getElementById("editModalBtn");
+    const viewModal = document.getElementById("view-modal");
     const messages = document.getElementById("message");
     const divMessage = document.getElementsByClassName('hide-message')[0];
     
@@ -176,7 +206,15 @@ if ($fetch_profile['user_type'] == 1) {  ?>
             fadeIn(modal);
         } else {
             fadeOut(modal);
+            
         }
+    }
+    function viewModalHandler(val) {
+    if (val) {
+        fadeIn(viewModal);
+    } else {
+        fadeOut(viewModal);
+    }
     }
     function deleteModalHandler(val) {
         if (val) {
@@ -223,6 +261,23 @@ if ($fetch_profile['user_type'] == 1) {  ?>
             console.error('Error fetching staffs:', error);
         });
     });
+    function showViewModal(id) {
+        fetch('fetch_viewStaff.php?id=' + id)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('viewName').innerHTML = data.name;
+                document.getElementById('viewUID').innerHTML = data.uid;
+                document.getElementById('viewPnumber').innerHTML = '0' + data.pnumber;
+                document.getElementById('viewEmail').innerHTML = data.email;
+                document.getElementById('viewGender').innerHTML = data.gender;
+                document.getElementById('viewBirthdate').innerHTML = data.bdate;
+                document.getElementById('viewUsertype').innerHTML = data.user_type;
+                document.getElementById('viewAddress').innerHTML = data.address;
+                document.getElementById('viewImage').src = '../uploaded_img/'+ data.image;
+                fadeIn(viewModal);
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }
     function showDeleteModal(staffId) {
         const deleteBtn = deleteModal.querySelector(".deleteStaff");
         deleteBtn.setAttribute("data-id", staffId);
@@ -247,13 +302,87 @@ if ($fetch_profile['user_type'] == 1) {  ?>
             })
             .catch(error => console.error('Error fetching data:', error));
     }
+    function checkInputValue(inputElement) {
+        const value = inputElement.value.trim();
+        const divMessage = document.getElementsByClassName('hide-message')[0];
+        const messages = document.getElementById("message");
+
+        if (value !== '') {
+            inputElement.classList.remove('border-red-500');
+        } else {
+            inputElement.classList.add('border-red-500');
+            divMessage.classList.remove('hidden');
+            messages.textContent = 'Please fill in all fields';
+        }
+    }
+    function validateForm() {
+        const old_image = document.getElementById('old_image').value;
+        const image = document.getElementById('image').value; 
+        const name = document.getElementById('name').value;
+        const pnumber = document.getElementById('pnumber').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const birthdate = document.getElementById('birthdate').value;
+        const address = document.getElementById('address').value;
+        const divMessage = document.getElementsByClassName('hide-message')[0];
+        const messages = document.getElementById("message");
+
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.classList.remove('border-red-500');
+        });
+
+        let isValid = true;
+        
+        if (image === '' && old_image === '') {
+            document.getElementById('imageValid').classList.add('border', 'border-red-500');
+            isValid = false;
+        }
+        if (name === '') {
+            document.getElementById('name').classList.add('border-red-500');
+            isValid = false;
+        }
+        if (pnumber === '') {
+            document.getElementById('pnumber').classList.add('border-red-500');
+            isValid = false;
+        }
+        if (email === '') {
+            document.getElementById('email').classList.add('border-red-500');
+            isValid = false;
+        }
+        if (password === '') {
+            document.getElementById('password').classList.add('border-red-500');
+            isValid = false;
+        }
+        if (birthdate === '') {
+            document.getElementById('birthdate').classList.add('border-red-500');
+            isValid = false;
+        }
+        if (address === '') {
+            document.getElementById('address').classList.add('border-red-500');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            divMessage.classList.remove('hidden');
+            messages.textContent = 'Please fill in all fields';
+        } else {
+            divMessage.classList.add('hidden');
+            messages.textContent = '';
+        }
+
+        return isValid;
+    }
     const submitBtn = document.getElementById('submitBtn');
     const formElement = document.getElementById('add_staff'); 
     submitBtn.addEventListener('click', submitForm);
 
     function submitForm(event) {
-        modalHandler(false);
         event.preventDefault();
+        if (!validateForm()) {
+            return;
+        }
+
         const formData = new FormData(formElement); 
         
         fetch('add_staff.php', {
@@ -263,6 +392,7 @@ if ($fetch_profile['user_type'] == 1) {  ?>
         .then(response => response.json())
         .then(data => {
             formElement.reset();
+            modalHandler(false);
             if (data.insert === true) {
                 const newRow = document.createElement('tr');
                 newRow.setAttribute('class', 'border-color');
@@ -330,6 +460,7 @@ if ($fetch_profile['user_type'] == 1) {  ?>
     }
     
     const pnumberInput = document.getElementById('pnumber');
+    const pContainer = document.getElementById('pValid');
     const pnumberError = document.getElementById('pnumberError');
 
     if (pnumberInput && pnumberError) {
@@ -337,8 +468,9 @@ if ($fetch_profile['user_type'] == 1) {  ?>
         const pnumberValue = this.value.trim(); 
         const isValid = /^[0-9]+(\.[0-9]{1,2})?$/.test(pnumberValue); 
         if (!isValid) {
-            pnumberError.textContent = 'Please enter a valid phone number';
+            pnumberError.textContent = 'Please enter a valid phone number.';
             pnumberInput.classList.add('border-red-500');
+            pContainer.classList.remove('mb-5');
         } else {
             pnumberError.textContent = '';
             pnumberInput.classList.remove('border-red-500');

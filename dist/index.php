@@ -177,13 +177,13 @@ ob_end_flush();
                 <div class="flex flex-col text-sm pb-9">
                   <div class="header sticky top-0 mb-1.5 flex items-center justify-between z-10 h-14 p-2 px-5 font-semibold bg-dark-brown">
                     <div id="svpBtn" class="hidden">
-                      <button class="relative rounded-md w-10 h-10 flex items-center justify-center">
+                      <button title="Sidebar" class="relative rounded-md w-10 h-10 flex items-center justify-center">
                         <img class="w-full h-full" src="../images/hamburger-svgrepo-com.svg" alt="">
                       </button>
                     </div>
                     <div class="flex items-center">
                       <div class="coffee-name">
-                        <a href="index.php">
+                        <a title="Home" href="index.php">
                           <img class="w-10 h-full" src="../images/A-Coffee.png" alt="">
                         </a>
                       </div>

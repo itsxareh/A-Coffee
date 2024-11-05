@@ -6,9 +6,15 @@
 </div>
 <div class="grid autofit-grid2 gap-12 p-2 mb-8">
     <?php 
-        $get_orders = $conn->prepare("SELECT o.uid  FROM orders o LEFT JOIN users u ON o.uid = u.uid WHERE o.uid = ?");
-        $get_orders->execute([$uid]);
-        $total_orders = $get_orders->rowCount();
+        if ($fetch_profile['user_type'] == 0) {
+            $get_orders = $conn->prepare("SELECT o.uid  FROM orders o LEFT JOIN users u ON o.uid = u.uid WHERE o.uid = ?");
+            $get_orders->execute([$uid]);
+            $total_orders = $get_orders->rowCount();
+        } else {
+            $get_orders = $conn->prepare("SELECT *  FROM orders");
+            $get_orders->execute();
+            $total_orders = $get_orders->rowCount();
+        }
     ?>
     <div class="rounded-lg shadow-lg bg-dark-brown text-center flex flex-col justify-around h-52">
         <p class="text-white text-5xl"><?= $total_orders ?></p>
@@ -25,14 +31,38 @@
 
     </div>
     <?php
-        $get_total = $conn->prepare("SELECT SUM(o.amount) AS total_amount FROM orders o LEFT JOIN users u ON o.uid = u.uid WHERE o.status = 1 AND o.uid = ?");
+        if ($fetch_profile['user_type'] == 1){
+            $get_total = $conn->prepare("SELECT DATE(STR_TO_DATE(o.placed_on, '%m-%d-%Y %H:%i:%s')) AS order_date, 
+                SUM(o.amount) AS total_amount 
+                FROM orders o 
+                LEFT JOIN users u ON o.uid = u.uid 
+                WHERE o.status = 1 
+                AND DATE(STR_TO_DATE(o.placed_on, '%m-%d-%Y %H:%i:%s')) = CURDATE() 
+                GROUP BY DATE(STR_TO_DATE(o.placed_on, '%m-%d-%Y %H:%i:%s')) 
+                ORDER BY order_date DESC 
+                LIMIT 1;");
+            $get_total->execute();
+            $get_total_amount = $get_total->fetch(PDO::FETCH_ASSOC);
+            $total_amount = $get_total_amount ? $get_total_amount['total_amount'] : 0;
+        } else {
+            $get_total = $conn->prepare("SELECT DATE(STR_TO_DATE(o.placed_on, '%m-%d-%Y %H:%i:%s')) AS order_date, 
+            SUM(o.amount) AS total_amount 
+            FROM orders o 
+            LEFT JOIN users u ON o.uid = u.uid 
+            WHERE o.status = 1 
+            AND o.uid = ?
+            AND DATE(STR_TO_DATE(o.placed_on, '%m-%d-%Y %H:%i:%s')) = CURDATE() 
+            GROUP BY DATE(STR_TO_DATE(o.placed_on, '%m-%d-%Y %H:%i:%s')) 
+            ORDER BY order_date DESC 
+            LIMIT 1;");
         $get_total->execute([$uid]);
         $get_total_amount = $get_total->fetch(PDO::FETCH_ASSOC);
-        $total_amount = $get_total_amount['total_amount'];
-    ?>
+        $total_amount = $get_total_amount ? $get_total_amount['total_amount'] : 0;
+        }
+    ?> 
     <div class="rounded-lg shadow-lg bg-dark-brown text-center flex flex-col justify-around h-52">
         <p class="text-white text-5xl line-clamp-1 hover:line-clamp-1">₱<?= $total_amount ? $total_amount : 0 ?></p>
-        <span class="text-gray text-2xl">Total Sales</span>        
+        <span class="text-gray text-2xl">Today Sales</span>        
     </div>
 </div>
 <div class="text-3xl text-center text-white rosarivo">Orders</div>
@@ -49,8 +79,13 @@
         </thead>
         <tbody>
             <?php
-            $get_orders = $conn->prepare("SELECT * FROM `orders` WHERE uid = ? ORDER BY CASE WHEN status = 2 THEN 0 WHEN status = 1 THEN 1 END, CASE WHEN status = 1 THEN id END DESC;");
-            $get_orders->execute([$uid]);
+            if ($fetch_profile['user_type'] == 1){
+                $get_orders = $conn->prepare("SELECT * FROM `orders` ORDER BY CASE WHEN status = 2 THEN 0 WHEN status = 1 THEN 1 END, CASE WHEN status = 1 THEN id END DESC LIMIT 20;");
+                $get_orders->execute();
+            } else {
+                $get_orders = $conn->prepare("SELECT * FROM `orders` WHERE uid = ? ORDER BY CASE WHEN status = 2 THEN 0 WHEN status = 1 THEN 1 END, CASE WHEN status = 1 THEN id END DESC LIMIT 20;");
+                $get_orders->execute([$uid]);
+            }
             $orders = $get_orders->fetchAll(PDO::FETCH_ASSOC);
             if (count($orders) > 0){
                 foreach($orders as $order){ ?>

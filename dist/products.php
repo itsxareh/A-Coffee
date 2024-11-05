@@ -42,14 +42,14 @@
     }
     ?>
 </div>
-<div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="add-modal">
+<div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden" id="add-modal">
    	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
-    <div role="alert" class="container mx-auto w-11/12 md:w-2/3 max-w-3xl">
+    <div role="alert" class="container my-auto mx-auto w-11/12 md:w-2/3 max-w-3xl">
         <div class="relative py-8 px-5 md:px-10 bg-white shadow-md rounded border border-gray-400">
-            <h1 class="text-gray-800 font-lg font-medium tracking-normal leading-tight mb-4">Enter Product Details</h1>
+            <h1 class="text-gray-800 font-lg font-medium tracking-normal leading-tight">Enter Product Details</h1>
             <form id="add_product" action="add_product.php" method="POST" enctype="multipart/form-data">
                 <input type="text" class="hidden" name="id" id="id">
-                <div class="mt-10 grid cols-grid-1 cols-grid-2 gap-x-2">
+                <div class=" grid cols-grid-1 cols-grid-2 gap-x-2">
                     <div class="col-span-full flex justify-center">
                         <div class="text-center">
                             <img id="previewImage" class="w-48 h-48 rounded-full bg-center object-cover" src="../images/image-svgrepo-com.svg">
@@ -81,7 +81,7 @@
                     </div>
                     <div class="col-span-full">
                         <label title="Ingredients" class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="ingredients">Ingredients</label>
-                        <textarea id="ingredients" name="ingredients" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" rows="3"  placeholder="Milk, Brewed Coffee, Vanilla Syrup" required></textarea>
+                        <textarea id="ingredients" name="ingredients" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" rows="3"  placeholder="8.4g Instant coffee, 100ml whole milk..." required></textarea>
                     </div>
                     <div class="col-span-full">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa"class="text-gray-800 text-sm font-semibold leading-tight tracking-normal salsa" for="description">Description</label>
