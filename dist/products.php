@@ -1,8 +1,14 @@
+<div class="hide-message hidden">
+    <div class="message rounded-lg p-4 flex items-start">
+        <span id="message" class="text-sm text-white"></span>
+        <button class="-m-1" onclick="this.parentElement.remove();"><img class="w-5 h-5" src="../images/close-svgrepo-com.svg"></button>
+    </div>
+</div>
 <div class="upper flex justify-between mb-4">
-    <span class="text-gray text-2xl salsa ">Products</span>
+    <span class="text-gray text-2xl salsa title">Products</span>
     <div class="button-input flex">
-        <button class="focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-amber-400 focus:ring-amber-400 mx-auto transition duration-150 ease-in-out bg-light-brown rounded text-white px-4 sm:px-8 py-2 text-xs sm:text-sm salsa" onclick="modalHandler(true)" id="openModalBtn">Add new</button>
-        <input id="search" name="search" class="search ml-4 px-4 py-2 w-48 rounded-md salsa text-black" type="text">
+        <button title="Add product" class="focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-amber-400 focus:ring-amber-400 mx-auto transition duration-150 ease-in-out bg-light-brown rounded text-white px-4 sm:px-8 py-2 text-xs sm:text-sm salsa" onclick="modalHandler(true)" id="openModalBtn">Add product</button>
+        <input placeholder="Search" title="Search" id="search" name="search" class="search ml-4 px-4 py-2 w-48 rounded-md salsa text-black" type="text">
     </div>
 </div>
 <div id="productsList" class="grid autofit-grid gap-6 justify-start items-start">
@@ -12,21 +18,21 @@
     $products = $select_products->fetchAll(PDO::FETCH_ASSOC);
     if (count($products) > 0){
         foreach ($products as $product){ ?>
-    <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-90" data-id="<?= $product['id'] ?>" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">
+    <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-96 max-w-lg" title="<?= ucwords($product['name']) ?>" data-id="<?= $product['id'] ?>" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">
         <div class="relative flex w-full h-full flex-col items-center justify-center">
             <div class="blur-bg absolute w-full h-full hidden rounded-md" style="background-color: rgba(0,0,0,0.5);"></div>
-            <div class="absolute flex flex-col items-center top-0 right-0 z-10">
-                <button class="edit-btn rounded-md p-2 cursor-pointer hover:block hidden" onclick="showEditModal(<?= $product['id'] ?>)">
-                    <img class="w-5 h-5 rounded-md" src="../images/edit-svgrepo-com.svg">
+            <div class="absolute flex flex-col items-center top-4 right-4 z-10">
+                <button title="Edit" class="edit-btn rounded-md p-2 cursor-pointer hover:block hidden" onclick="showEditModal(<?= $product['id'] ?>)">
+                    <img class="w-8 h-8 rounded-md" src="../images/edit-svgrepo-com.svg">
                 </button>
-                <button class="delete-btn rounded-md p-2 cursor-pointer hover:block hidden" onclick="showDeleteModal(<?= $product['id'] ?>)">
-                    <img class="w-5 h-5 rounded-md" src="../images/delete-svgrepo-com.svg">
+                <button title="Delete" class="delete-btn rounded-md p-2 cursor-pointer hover:block hidden" onclick="showDeleteModal(<?= $product['id'] ?>)">
+                    <img class="w-8 h-8 rounded-md" src="../images/delete-svgrepo-com.svg">
                 </button>
             </div>
             <button type="button" id="view-btn" class="view-btn w-full h-full absolute cart-btn rounded-md cursor-pointer hidden" onclick="showViewModal(<?= $product['id'] ?>)">
-                <center><img class="rounded-md w-1/3 h-1/3 text-center" src="../images/details-more-svgrepo-com.svg"></center>
+                <center><img title="View" class="rounded-md w-12 h-12 text-center" src="../images/details-more-svgrepo-com.svg"></center>
             </button>
-            <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= $product['image'] ?>">
+            <img class="productImg w-full h-full object-cover rounded-md" src="../uploaded_img/<?= $product['image'] ?>">
         </div>
     </div>
         <?php 
@@ -36,27 +42,27 @@
     }
     ?>
 </div>
-<div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="add-modal">
+<div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden" id="add-modal">
    	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
-    <div role="alert" class="container mx-auto w-11/12 md:w-2/3 max-w-3xl">
+    <div role="alert" class="container my-auto mx-auto w-11/12 md:w-2/3 max-w-3xl">
         <div class="relative py-8 px-5 md:px-10 bg-white shadow-md rounded border border-gray-400">
-            <h1 class="text-gray-800 font-lg font-medium tracking-normal leading-tight mb-4">Enter Product Details</h1>
+            <h1 class="text-gray-800 font-lg font-medium tracking-normal leading-tight">Enter Product Details</h1>
             <form id="add_product" action="add_product.php" method="POST" enctype="multipart/form-data">
                 <input type="text" class="hidden" name="id" id="id">
-                <div class="mt-10 grid cols-grid-1 cols-grid-2 gap-x-2">
+                <div class=" grid cols-grid-1 cols-grid-2 gap-x-2">
                     <div class="col-span-full flex justify-center">
                         <div class="text-center">
                             <img id="previewImage" class="w-48 h-48 rounded-full bg-center object-cover" src="../images/image-svgrepo-com.svg">
                             <label class="relative cursor-pointer rounded-lg float-end" for="image">
                                 <img class="w-6 h-6" src="../images/upload-minimalistic-svgrepo-com.svg">
-                                <input id="image" name="image" class="sr-only" type="file" accept="image/jpg, image/jpeg, image/png" onchange="previewFile()">
+                                <input id="image" name="image" class="sr-only" type="file" accept="image/jpg, image/jpeg, image/png" onchange="previewFile()" >
                                 <input type="hidden" name="old_image" id="old_image">
                             </label>
                         </div>
                     </div>
                     <div class="col-span-1">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="name">Name</label>
-                        <input id="name" name="name" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" autocomplete="off" placeholder="Cappuccino" type="text" required>
+                        <input title="Name" id="name" name="name" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" autocomplete="off" placeholder="Cappuccino" type="text" required>
                     </div>
                     <div class="col-span-1">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="price">Price</label>
@@ -64,37 +70,29 @@
                             <div class="absolute text-gray-600 flex items-center px-2 border-r h-full">
                                 <img width="16px"  src="../images/peso-svgrepo-com.svg" alt="">
                             </div>
-                            <input name="price" id="price" class="text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-12 text-sm border-gray-300 rounded border" placeholder="150" />
+                            <input title="Price" name="price" id="price" class="text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-12 text-sm border-gray-300 rounded border" placeholder="150" required/>
                         </div>
                         <div id="priceError" class="text-red-500 salsa"></div>
                     </div>
 
                     <div class="col-span-1">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="category">Category</label>
-                        <select name="category" id="category" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border">
-                            <?php
-                                $select_category = $conn->prepare('SELECT * FROM category WHERE delete_flag = ?');
-                                $select_category->execute([0]);
-                                while ($category = $select_category->fetch(PDO::FETCH_ASSOC)) {?>
-                                    <option value="<?php echo $category['id']?>"><?php echo ucwords($category['category_name'])?></option>
-                                <?php }?>
-                            ?>
-                        </select>
+                        <input title="Category" id="category" name="category"class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="Iced Coffee" type="text" required>
                     </div>
                     <div class="col-span-full">
-                        <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="ingredients">Ingredients</label>
-                        <textarea id="ingredients" name="ingredients" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" rows="3"  placeholder="Milk, Brewed Coffee, Vanilla Syrup" required></textarea>
+                        <label title="Ingredients" class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="ingredients">Ingredients</label>
+                        <textarea id="ingredients" name="ingredients" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" rows="3"  placeholder="8.4g Instant coffee, 100ml whole milk..." required></textarea>
                     </div>
                     <div class="col-span-full">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa"class="text-gray-800 text-sm font-semibold leading-tight tracking-normal salsa" for="description">Description</label>
-                        <textarea id="description" name="description" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" rows="3" required></textarea>
+                        <textarea title="Description" id="description" name="description" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" rows="3" required></textarea>
                     </div>
                 </div>
                 <div class="flex items-center justify-start w-full">
-                    <button type="submit" name="submit" id="submitBtn" class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-600 transition duration-150 ease-in-out bg-light-brown rounded text-white px-8 py-2 text-sm">Submit</button>
-                    <button type="button" class="focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-gray-400 ml-3 bg-gray-100 transition duration-150 text-gray-600 ease-in-out hover:border-gray-400 hover:bg-gray-300 border rounded px-8 py-2 text-sm" onclick="modalHandler()">Cancel</button>
+                    <button title="Submit" type="submit" name="submit" id="submitBtn" class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-600 transition duration-150 ease-in-out bg-light-brown rounded text-white px-8 py-2 text-sm">Submit</button>
+                    <button title="Cancel" type="button" class="focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-gray-400 ml-3 bg-gray-100 transition duration-150 text-gray-600 ease-in-out hover:border-gray-400 hover:bg-gray-300 border rounded px-8 py-2 text-sm" onclick="modalHandler()">Cancel</button>
                 </div>
-                <button type="button" class="cursor-pointer absolute top-0 right-0 mt-4 mr-5 text-gray-400 hover:text-gray-600 transition duration-150 ease-in-out rounded focus:ring-2 focus:outline-none focus:ring-gray-600" onclick="modalHandler()" aria-label="close modal" role="button">
+                <button title="Close" type="button" class="cursor-pointer absolute top-0 right-0 mt-4 mr-5 text-gray-400 hover:text-gray-600 transition duration-150 ease-in-out rounded focus:ring-2 focus:outline-none focus:ring-gray-600" onclick="modalHandler()" aria-label="close modal" role="button">
                     <img class="w-5 h-5" src="../images/close-svgrepo-com.svg" alt="">
                 </button>
             </form>
@@ -140,8 +138,8 @@
                 <p class="text-sm text-gray-500 px-8">Do you really want to this delete this product? This process cannot be undone</p>    
             </div>
             <div class="p-3  mt-2 text-center space-x-4 md:block">
-                <button class="deleteProduct mb-2 md:mb-0 bg-red-500 border border-red-500 px-5 py-2 text-sm shadow-sm font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-red-600" data-id=<?= $product['id']; ?> >Delete</button>
-                <button class="mb-2 md:mb-0 bg-white px-5 py-2 text-sm shadow-sm font-medium tracking-wider border text-gray-600 rounded-full hover:shadow-lg hover:bg-gray-100" onclick="deleteModalHandler()">Cancel</button>
+                <button title="Delete" class="deleteProduct mb-2 md:mb-0 bg-red-500 border border-red-500 px-5 py-2 text-sm shadow-sm font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-red-600" data-id=<?= $product['id']; ?> >Delete</button>
+                <button title="Cancel" class="mb-2 md:mb-0 bg-white px-5 py-2 text-sm shadow-sm font-medium tracking-wider border text-gray-600 rounded-full hover:shadow-lg hover:bg-gray-100" onclick="deleteModalHandler()">Cancel</button>
             </div>
         </div>
     </div>
@@ -219,29 +217,75 @@ function fadeIn(el, display) {
     });
 </script>
 <script>
+    const messages = document.getElementById("message");
+    const divMessage = document.getElementsByClassName('hide-message')[0];
     const submitBtn = document.getElementById('submitBtn');
     const formElement = document.getElementById('add_product'); 
     submitBtn.addEventListener('click', submitForm);
 
     function submitForm(event) {
-        event.preventDefault();
-        const formData = new FormData(formElement); 
+    event.preventDefault();
+    const formData = new FormData(formElement);
 
-        fetch('add_product.php', {
+    fetch('add_product.php', {
             method: 'POST',
             body: formData
         })
-        .then(response => response.text())
+        .then(response => response.json())
         .then(data => {
-            console.log('Response data:', data);
-            productsList.innerHTML += data;
-            formElement.reset(); 
+            if (data.insert === true) {
+                const productsList = document.getElementById('productsList');
+                const newProduct = document.createElement('div');
+                newProduct.setAttribute('class', 'products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-96 max-w-lg');
+                newProduct.setAttribute('data-id', data.id);
+                newProduct.setAttribute('title', data.name);
+                newProduct.setAttribute('onmouseover', 'showButtons(this)');
+                newProduct.setAttribute('onmouseout', 'hideButtons(this)');
+                newProduct.innerHTML = `
+                    <div class="relative flex w-full h-full flex-col items-center justify-center">
+                        <div class="blur-bg absolute w-full h-full hidden rounded-md" style="background-color: rgba(0,0,0,0.5);"></div>
+                        <div class="absolute flex flex-col items-center top-4 right-4 z-10">
+                            <button title="Edit" class="edit-btn rounded-md p-2 cursor-pointer hover:block hidden" onclick="showEditModal(${data.id})">
+                                <img class="w-8 h-8 rounded-md" src="../images/edit-svgrepo-com.svg">
+                            </button>
+                            <button title="Delete" class="delete-btn rounded-md p-2 cursor-pointer hover:block hidden" onclick="showDeleteModal(${data.id})">
+                                <img class="w-8 h-8 rounded-md" src="../images/delete-svgrepo-com.svg">
+                            </button>
+                        </div>
+                        <button type="button" id="view-btn" class="view-btn w-full h-full absolute cart-btn rounded-md cursor-pointer hidden" onclick="showViewModal(${data.id})">
+                            <center><img title="View" class="rounded-md w-12 h-12 text-center" src="../images/details-more-svgrepo-com.svg"></center>
+                        </button>
+                        <img class="productImg w-full h-full object-cover rounded-md" src="../uploaded_img/${data.image}">
+                    </div>
+                `;
+                productsList.appendChild(newProduct);
+                if (divMessage) {
+                    divMessage.classList.remove('hidden');
+                }
+                messages.textContent = data.message;
+            } else if (data.update === true) {
+                const updatedRow = document.querySelector(`div[data-id="${data.id}"]`);
+                updatedRow.querySelector('.productImg').src = '../uploaded_img/' + data.image;  
+                updatedRow.querySelector('button.edit-btn').setAttribute('onclick', `showEditModal(${data.id})`);
+                updatedRow.querySelector('button.delete-btn').setAttribute('onclick', `showDeleteModal(${data.id})`);
+                updatedRow.querySelector('button.view-btn').setAttribute('onclick', `showViewModal(${data.id})`);
+                if (divMessage) {
+                    divMessage.classList.remove('hidden');
+                }
+                messages.textContent = data.message;
+            }
+            setTimeout(function () {
+                if (divMessage) {
+                    divMessage.classList.add('hidden');
+                }
+            }, 1000);
             modalHandler(false);
         })
         .catch(error => {
             console.error('Error submitting form:', error);
         });
-    }
+}
+
 </script>
 <script>
     const priceInput = document.getElementById('price');
@@ -297,6 +341,7 @@ function fadeIn(el, display) {
     const confirmDeleteBtn = deleteModal.querySelector(".deleteProduct");
     confirmDeleteBtn.addEventListener("click", () => {
         const productId = confirmDeleteBtn.getAttribute("data-id");
+    
         fetch(`delete_product.php?id=${productId}`, {
             method: "DELETE",
         })

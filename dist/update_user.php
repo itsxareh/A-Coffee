@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST"){
     $image = $_FILES['image']['name'];
     $image_size = $_FILES['image']['size'];
     $image_tmp_name = $_FILES['image']['tmp_name'];
-    $image_folder = '../uploaded_img/' . $image;
+    $image_folder = '../uploaded_img/' .uniqid().'-'.$image;
     $old_image = $_POST['old_image'];
 
     $select_staff = $conn->prepare("SELECT * FROM users WHERE uid = ?");
@@ -30,16 +30,22 @@ if ($_SERVER['REQUEST_METHOD'] == "POST"){
             } else {
                 if (move_uploaded_file($image_tmp_name, $image_folder)) {
                     $update_image = $conn->prepare("UPDATE `users` SET image = ? WHERE uid = ?");
-                    $update_image->bindParam(1, $image);
+                    $update_image->bindParam(1, $image_folder);
                     $update_image->bindParam(2, $staff['uid']);
                     $update_image->execute();
 
-                    if (!empty($old_image) && file_exists('../uploaded_img/' . $old_image)) {
-                        unlink('../uploaded_img/' . $old_image);
+                    if (!empty($old_image) && file_exists($old_image)) {
+                        unlink($old_image);
                     }
-                    $message[] = 'Image updated successfully!';
+                    $select_staff = $conn->prepare("SELECT *, DATE_FORMAT(STR_TO_DATE(birthdate, '%m-%d-%Y'), '%Y-%m-%d') AS bdate FROM users WHERE uid = ?");
+                    $select_staff->bindParam(1, $uid);
+                    $select_staff->execute();
+                    $data = $select_staff->fetch(PDO::FETCH_ASSOC);
+                    $data['message'] = 'Image updated successfully!';
+                    $data['update'] = true;
                 } else {
-                    $message[] = 'Failed to move uploaded image!';
+                    $data['message'] = 'Failed to move uploaded image!';
+                    $data['update'] = false;
                 }
             }
         }

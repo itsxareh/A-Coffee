@@ -13,21 +13,21 @@ if ($searchTerm !== '') {
 
     if (count($products) > 0) {
         foreach ($products as $product) { ?>
-        <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown" style="height: 264px;" data-id="<?= $product['id'] ?>" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">
+        <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-96 max-w-lg" title="<?= ucwords($product['name']) ?>" data-id="<?= $product['id'] ?>" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">
             <div class="relative flex w-full h-full flex-col items-center justify-center">
                 <div class="blur-bg absolute w-full h-full hidden rounded-md" style="background-color: rgba(0,0,0,0.5);"></div>
                 <div class="absolute flex flex-col items-center top-4 right-4 z-10">
-                    <button class="edit-btn rounded-md p-2 cursor-pointer hover:block hidden" onclick="showEditModal(<?= $product['id'] ?>)">
+                    <button title="Edit" class="edit-btn rounded-md p-2 cursor-pointer hover:block hidden" onclick="showEditModal(<?= $product['id'] ?>)">
                         <img class="w-8 h-8 rounded-md" src="../images/edit-svgrepo-com.svg">
                     </button>
-                    <button class="delete-btn rounded-md p-2 cursor-pointer hover:block hidden" onclick="showDeleteModal(<?= $product['id'] ?>)">
+                    <button title="Delete" class="delete-btn rounded-md p-2 cursor-pointer hover:block hidden" onclick="showDeleteModal(<?= $product['id'] ?>)">
                         <img class="w-8 h-8 rounded-md" src="../images/delete-svgrepo-com.svg">
                     </button>
                 </div>
                 <button type="button" id="view-btn" class="view-btn w-full h-full absolute cart-btn rounded-md cursor-pointer hidden" onclick="showViewModal(<?= $product['id'] ?>)">
-                    <center><img class="rounded-md w-1/3 h-1/3 text-center" src="../images/view-svgrepo-com.svg"></center>
+                    <center><img title="View" class="rounded-md w-12 h-12 text-center" src="../images/details-more-svgrepo-com.svg"></center>
                 </button>
-                <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= $product['image'] ?>">
+                <img class="productImg w-full h-full object-cover rounded-md" src="../uploaded_img/<?= $product['image'] ?>">
             </div>
         </div>
         <?php
