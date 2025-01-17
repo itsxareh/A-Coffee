@@ -168,11 +168,12 @@ document.querySelectorAll('.statusBtn').forEach(button => {
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 const response = JSON.parse(xhr.responseText);
+                console.log(response);
                 if (response.success === true) {
                         const row = button.closest('tr');
                         const tbody = row.parentNode;
                         tbody.appendChild(row);
-
+                        
                         if (divMessage) {
                             divMessage.classList.remove('hidden');
                             messages.textContent = response.message;

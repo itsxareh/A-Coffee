@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $cart_total = 0;
     $cart_products = [];
 
-    $select_cart = $conn->prepare("SELECT c.*, p.ingredients, p.name AS product_name FROM `cart` c LEFT JOIN  products p ON p.id = c.product_id WHERE uid = ?");
+    $select_cart = $conn->prepare("SELECT c.*, pv.size as variation, pv.ingredients, p.name AS product_name FROM `cart` c LEFT JOIN product_variations pv ON pv.id = c.variation_id LEFT JOIN products p ON p.id = c.product_id WHERE uid = ?");
     $select_cart->bindParam(1, $uid);
     $select_cart->execute();
 
@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($should_process_order) {
             $products_string = '';
             foreach ($cart_products as $index => $product) {
-                $product_info = $product['quantity'] . ' ' . $product['product_name'] . '';
+                $product_info = $product['quantity'] . ' ' . $product['product_name'] . ' ' . '('.$product['variation'].')';
                 $products_string .= $product_info;
                 if ($index < count($cart_products) - 1) {
                     $products_string .= ', ';

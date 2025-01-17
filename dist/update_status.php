@@ -28,9 +28,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["orderId"]) && isset($_
             foreach ($products as $product) { 
                 $productParts = explode(" ", $product, 2);
                 $productQuantity = $productParts[0];
-                $productName = $productParts[1]; 
-                $select_ingredients = $conn->prepare("SELECT ingredients FROM products WHERE name = ?");
-                $select_ingredients->execute([$productName]);
+                if (preg_match('/(.+?)\s*\((.+?)\)/', $productParts[1], $matches)) {
+                    $productName = trim($matches[1]);
+                    $productVar = trim($matches[2]);
+                } else {
+                    $productName = trim($productParts[1]);
+                    $productVar = "normal"; 
+                }
+                $select_ingredients = $conn->prepare("SELECT product_variations.ingredients FROM product_variations LEFT JOIN products ON product_variations.product_id = products.id WHERE product_variations.size = ? AND name = ?");
+                $select_ingredients->execute([$productVar, $productName]);
                 $ingredientRow = $select_ingredients->fetch(PDO::FETCH_ASSOC);
                 $ingredientsString = $ingredientRow['ingredients'];
                 $ingredients = explode(", ", $ingredientsString);

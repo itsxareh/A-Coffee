@@ -18,15 +18,15 @@
     $products = $select_products->fetchAll(PDO::FETCH_ASSOC);
     if (count($products) > 0){
         foreach ($products as $product){ ?>
-    <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-96 max-w-lg" title="<?= ucwords($product['name']) ?>" data-id="<?= $product['id'] ?>" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">
+    <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-40 max-w-lg" title="<?= ucwords($product['name']) ?>" data-id="<?= $product['id'] ?>" onmouseover="showButtons(this)" onmouseout="hideButtons(this)">
         <div class="relative flex w-full h-full flex-col items-center justify-center">
             <div class="blur-bg absolute w-full h-full hidden rounded-md" style="background-color: rgba(0,0,0,0.5);"></div>
-            <div class="absolute flex flex-col items-center top-4 right-4 z-10">
+            <div class="absolute flex flex-col items-center top-0 right-0 z-10">
                 <button title="Edit" class="edit-btn rounded-md p-2 cursor-pointer hover:block hidden" onclick="showEditModal(<?= $product['id'] ?>)">
-                    <img class="w-8 h-8 rounded-md" src="../images/edit-svgrepo-com.svg">
+                    <img class="w-5 h-5 rounded-md" src="../images/edit-svgrepo-com.svg">
                 </button>
                 <button title="Delete" class="delete-btn rounded-md p-2 cursor-pointer hover:block hidden" onclick="showDeleteModal(<?= $product['id'] ?>)">
-                    <img class="w-8 h-8 rounded-md" src="../images/delete-svgrepo-com.svg">
+                    <img class="w-5 h-5 rounded-md" src="../images/delete-svgrepo-com.svg">
                 </button>
             </div>
             <button type="button" id="view-btn" class="view-btn w-full h-full absolute cart-btn rounded-md cursor-pointer hidden" onclick="showViewModal(<?= $product['id'] ?>)">
@@ -65,6 +65,18 @@
                         <input title="Name" id="name" name="name" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" autocomplete="off" placeholder="Cappuccino" type="text" required>
                     </div>
                     <div class="col-span-1">
+                        <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="category">Category</label>
+                        <select title="Category" id="category" name="category"class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" required>
+                            <?php 
+                                $select_category = $conn->prepare("SELECT * FROM category WHERE delete_flag = 0");
+                                $select_category->execute();
+                                $categories = $select_category->fetchAll(PDO::FETCH_ASSOC);
+                                foreach ($categories as $category){?>
+                                    <option value="<?php echo $category['id'];?>"><?php echo ucwords($category['category_name']);?></option>
+                            <?php }?>
+                        </select>
+                    </div>
+                    <div class="col-span-1">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="price">Price</label>
                         <div class="relative mb-5 mt-2">
                             <div class="absolute text-gray-600 flex items-center px-2 border-r h-full">
@@ -73,11 +85,6 @@
                             <input title="Price" name="price" id="price" class="text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-12 text-sm border-gray-300 rounded border" placeholder="150" required/>
                         </div>
                         <div id="priceError" class="text-red-500 salsa"></div>
-                    </div>
-
-                    <div class="col-span-1">
-                        <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="category">Category</label>
-                        <input title="Category" id="category" name="category"class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="Iced Coffee" type="text" required>
                     </div>
                     <div class="col-span-full">
                         <label title="Ingredients" class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="ingredients">Ingredients</label>
@@ -111,7 +118,7 @@
                     <div>
                         <h3 id="viewName" class="text-2xl font-semibold text-gray-800  capitalize rosarivo"></h3>
                         <p id="viewCategory" class="mb-2 text-gray-800 capitalize rosarivo"></p>
-                        <p id="viewPrice" class="mb-2 rosarivo"></p>
+                        <p id="viewPrice" class="mb-2 text-gray-800 rosarivo"></p>
                         <p id="viewIngredients" class="mb-2 text-sm text-gray-700 capitalize rosarivo"></p>
                         <p id="viewDescription" class="mb-2 text-sm text-gray-700 normal-case rosarivo"></p>
                     </div>
@@ -309,7 +316,7 @@ function fadeIn(el, display) {
             .then(data => {
                 document.getElementById('viewName').innerHTML = data.name;
                 document.getElementById('viewPrice').innerHTML = '₱' + data.price;
-                document.getElementById('viewCategory').innerHTML = data.category;
+                document.getElementById('viewCategory').innerHTML = data.category_name;
                 document.getElementById('viewIngredients').innerHTML = data.ingredients;
                 document.getElementById('viewDescription').innerHTML = data.description;
                 document.getElementById('viewImage').src = '../uploaded_img/'+ data.image;

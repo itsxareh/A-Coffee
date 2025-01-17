@@ -3,7 +3,7 @@ include 'config.php';
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
-    $stmt = $conn->prepare("SELECT id, name, price, category, ingredients, description, image FROM products WHERE id = ?");
+    $stmt = $conn->prepare("SELECT p.id, p.name, p.price, c.category_name, p.ingredients, p.description, p.image FROM products p LEFT JOIN category c ON c.id = p.category WHERE p.id = ?");
     $stmt->execute([$id]);
     $data = $stmt->fetch(PDO::FETCH_ASSOC);
     

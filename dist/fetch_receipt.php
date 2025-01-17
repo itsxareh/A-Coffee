@@ -19,14 +19,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $total_amount = 0;
 
             foreach ($products as $product) {
-                // Extract quantity and name from the product string
-                preg_match('/^(\\d+)\\s(.+)$/', $product, $matches);
-                $quantity = (int) $matches[1];
-                $name = $matches[2];
-
+                $productParts = explode(" ", $product, 2);
+                $quantity = $productParts[0];
+                if (preg_match('/(.+?)\s*\((.+?)\)/', $productParts[1], $matches)) {
+                    $name = trim($matches[1]);
+                    $var = trim($matches[2]);
+                } else {
+                    $name = trim($productParts[1]);
+                    $var = "normal"; 
+                }
+                
                 // Fetch the product price
-                $get_price = $conn->prepare("SELECT price FROM products WHERE name = ?");
-                $get_price->execute([$name]);
+                $get_price = $conn->prepare("SELECT product_variations.price as price FROM product_variations LEFT JOIN products ON product_variations.product_id = products.id WHERE product_variations.size = ? AND name = ?");
+                $get_price->execute([$var, $name]);
                 $product_data = $get_price->fetch(PDO::FETCH_ASSOC);
 
                 if ($product_data) {
@@ -35,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $total_amount += $subtotal;
 
                     $product_details[] = [
-                        'name' => $name,
+                        'name' => $name . ' (' . $var . ')',
                         'price' => $price,
                         'quantity' => $quantity,
                         'subtotal' => $subtotal

@@ -104,6 +104,7 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
                               </a>
                             </div>
                           </li>
+                          <?php if ($fetch_profile['user_type'] == 0) : ?>
                           <li class="relative h-auto opacity-100">
                             <div class="relative rounded-lg active:opacity-90 hover:opacity-90 nav-order">
                               <a class="flex items-center gap-2 p-2" href="index.php?page=order">
@@ -113,6 +114,8 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
                               </a>
                             </div>
                           </li>
+                          <?php endif; ?>
+                          <?php if ($fetch_profile['user_type'] == 1) : ?>
                           <li class="relative h-auto opacity-100">
                             <div class="relative rounded-lg active:opacity-90 hover:opacity-90 nav-sales">
                               <a class="flex items-center gap-2 p-2" href="index.php?page=sales">
@@ -131,17 +134,20 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
                               </a>
                             </div>
                           </li>
+                          <?php endif; ?>
                         </ol>
                       </div>
                     </span>
                   </div>
                 </div>
               </div>
+              <?php if ($fetch_profile['user_type'] == 1) : ?>
               <div class="flex flex-col pt-2">
                 <div class="flex w-full justify-end">
                   <a title="Inventory Log" href="index.php?page=inventory_log"><img class="w-6 h-6" src="../images/time-past-svgrepo-com.svg" alt=""></a>
                 </div>
               </div>
+              <?php endif; ?>
             </nav>
           </div>
         </div>
@@ -236,7 +242,7 @@ svpClose.addEventListener('click', function(){
   sidebar.classList.remove('sidebar-open');
 })
 $(function() {
-   $('.nav-<?php echo isset($_GET['page']) ? $_GET['page'] : '' ?>').addClass('active');
+   $('.nav-<?php echo isset($_GET['page']) ? $_GET['page'] : 'dashboard' ?>').addClass('active');
 });
 function displayPhilippinesTime() {
     const now = new Date().toLocaleString("en-US", { timeZone: "Asia/Manila" });
