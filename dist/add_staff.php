@@ -75,8 +75,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
     } else {
-        $update_staff = $conn->prepare("UPDATE `users` SET name = :name, pnumber = :pnumber, password = :password, email = :email, gender = :gender, birthdate = :birthdate, user_type = :user_type, address = :address, joined_at = :current_time WHERE uid = :uid");
-        $params = array(':name' => $name, ':pnumber' => $pnumber,':password' => password_hash($password, PASSWORD_DEFAULT), ':email' => $email, ':gender' => $gender, ':birthdate' => $birthdate, ':user_type' => $user_type, ':address' => $address, ':current_time' => $current_time, ':uid' => $uid);
+        $update_staff = $conn->prepare("UPDATE `users` SET name = :name, pnumber = :pnumber, email = :email, gender = :gender, birthdate = :birthdate, user_type = :user_type, address = :address, joined_at = :current_time WHERE uid = :uid");
+        $params = array(':name' => $name, ':pnumber' => $pnumber, ':email' => $email, ':gender' => $gender, ':birthdate' => $birthdate, ':user_type' => $user_type, ':address' => $address, ':current_time' => $current_time, ':uid' => $uid);
         foreach ($params as $key => &$value) {
             $update_staff->bindParam($key, $value);
         }
