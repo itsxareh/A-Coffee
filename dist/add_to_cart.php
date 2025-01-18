@@ -9,19 +9,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $quantity = $_POST['quantity'];
     $image = $_POST['image'];
 
-    $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE product_id = ? AND variation_id = ? AND uid = ?");
-    $check_cart->execute([$pid, $vid, $uid]);
- 
-    if($check_cart->rowCount() > 0){
-        $response['success'] = false;
-        $response['message'] = 'Already added to cart!';
-    }else{
-       $insert_cart = $conn->prepare("INSERT INTO `cart`(uid, product_id, variation_id, name, price, quantity, image) VALUES(?,?,?,?,?,?,?)");
-       $insert_cart->execute([$uid, $pid, $vid, $name, $price, $quantity, $image]);
-       $response['success'] = true;
-       $response['message'] = 'Added to cart!';
-    }
-    $check_cart_numbers = $conn->prepare("SELECT *, product_variations.size as variation FROM `cart` LEFT JOIN product_variations ON cart.variation_id = product_variations.id WHERE uid = ?");
+    // $check_cart = $conn->prepare("SELECT * FROM `cart` WHERE product_id = ? AND variation_id = ? AND uid = ?");
+    // $check_cart->execute([$pid, $vid, $uid]);
+
+    $insert_cart = $conn->prepare("INSERT INTO `cart`(uid, product_id, variation_id, name, price, quantity, image) VALUES(?,?,?,?,?,?,?)");
+    $insert_cart->execute([$uid, $pid, $vid, $name, $price, $quantity, $image]);
+    $response['success'] = true;
+    
+    $response['message'] = 'Added to cart!';
+    $check_cart_numbers = $conn->prepare("SELECT *, cart.id as id, product_variations.size as variation FROM `cart` LEFT JOIN product_variations ON cart.variation_id = product_variations.id WHERE uid = ?");
     $check_cart_numbers->execute([$uid]);
 
     $total = $check_cart_numbers->rowCount();

@@ -1,26 +1,41 @@
 <?php
 include 'config.php';
 
-if (isset($_GET['id'])) {
-    $id = $_GET['id'];
-    $stmt = $conn->prepare("SELECT p.id, p.name, p.price, c.category_name, p.ingredients, p.description, p.image FROM products p LEFT JOIN category c ON c.id = p.category WHERE p.id = ?");
-    $stmt->execute([$id]);
-    $data = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    $ingredientsArray = explode(", ", $data['ingredients']);
-
-    $formattedIngredients = "<ul>";
-    foreach ($ingredientsArray as $ingredient) {
-        $formattedIngredients .=    "<li class='relative pl-3'><span class='absolute left-0 top-0 h-full flex items-center'>•</span>
-                                        <p class=''>$ingredient</p>
-                                    </li>";
+try {
+    if (isset($_GET['id'])) {
+        $id = $_GET['id'];
+        
+        $stmt = $conn->prepare("
+            SELECT p.*, c.category_name, c.id as category_id 
+            FROM products p 
+            LEFT JOIN category c ON p.category = c.id 
+            WHERE p.id = ?
+        ");
+        $stmt->execute([$id]);
+        $product = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        $stmt_variations = $conn->prepare("
+            SELECT size, price, ingredients 
+            FROM product_variations 
+            WHERE product_id = ? 
+            ORDER BY CAST(price AS DECIMAL(10,2))
+        ");
+        $stmt_variations->execute([$id]);
+        $variations = $stmt_variations->fetchAll(PDO::FETCH_ASSOC);
+        
+        $response = [
+            'id' => $product['id'],
+            'name' => $product['name'],
+            'category' => $product['category_id'],
+            'category_name' => $product['category_name'],
+            'description' => $product['description'],
+            'image' => $product['image'],
+            'variations' => $variations
+        ];
+        
+        echo json_encode($response);
     }
-    $formattedIngredients .= "</ul>";
-
-    $data['ingredients'] = $formattedIngredients;
-
-    echo json_encode($data);
-} else {
-    echo json_encode(array('error' => 'ID parameter is missing'));
+} catch(PDOException $e) {
+    echo json_encode(['error' => $e->getMessage()]);
 }
 ?>

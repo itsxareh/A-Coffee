@@ -264,10 +264,10 @@ document.querySelectorAll('.statusBtn').forEach(button => {
             console.log(data);
             if (data.success) {
                 receiptDetails.innerHTML = `
-                    <hr class="my-4 border-gray-300 mb-2">
+                    <hr class="my-4 border-gray-300 mb-4">
                     <div class="flex justify-between">
                         <p class="text-md font-medium text-gray-900"><strong>Order ID:</strong> ${data.order_id}</p>
-                        <p class="mb-2 text-md font-medium text-gray-900">${data.placed_on}</p>
+                        <p class="text-md font-medium text-gray-900">${data.placed_on}</p>
                     </div>
                     <hr class="my-4 border-gray-300 mb-4">  
                     <div class="overflow-x-auto">

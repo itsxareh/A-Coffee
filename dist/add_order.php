@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($should_process_order) {
             $products_string = '';
             foreach ($cart_products as $index => $product) {
-                $product_info = $product['quantity'] . ' ' . $product['product_name'] . ' ' . '('.$product['variation'].')';
+                $product_info = $product['quantity'] . ' ' . $product['product_name'] . ' ' . '('.$product['variation'].')' . ' ' . '('.$product['temperature'].')';
                 $products_string .= $product_info;
                 if ($index < count($cart_products) - 1) {
                     $products_string .= ', ';

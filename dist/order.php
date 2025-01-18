@@ -73,26 +73,15 @@ ini_set('display_errors', 1);
                         $products = $select_products->fetchAll(PDO::FETCH_ASSOC);
                         if (count($products) > 0){ 
                             foreach($products as $product){
-                                $check_product_variation = $conn->prepare("SELECT * FROM product_variations WHERE product_id = ?");
+                                $check_product_variation = $conn->prepare("SELECT *, pv.id as vid, pv.price as price, p.image FROM product_variations pv LEFT JOIN products p ON pv.product_id = p.id WHERE pv.product_id = ?");
                                 $check_product_variation->execute([$product['id']]);
                                 $product_variations = $check_product_variation->fetchAll(PDO::FETCH_ASSOC);
-                                if (count($product_variations) > 0){ ?>
+                                if (count($product_variations) > 1){ ?>
                                     <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-56" data-id="<?= $product['id'] ?>">
                                         <div class="flex flex-col justify-center">
-                                            <div class="rounded-md relative w-full h-40 flex flex-col items-center justify-center">
+                                            <div class="rounded-md relative w-full h-36 flex flex-col items-center justify-center">
                                                 <div class="blur-bg absolute w-full h-full hidden rounded-md" style="background-color: rgba(0,0,0,0.5);"></div>
                                                 <div class="absolute w-1/2">
-                                                    <!-- <form id="add_to_cart" action="add_to_cart.php" method="POST" enctype="multipart/form-data">
-                                                        <input type="text" class="hidden" id="uid" name="uid" value="<?= $uid ?>">
-                                                        <input type="text" class="hidden" id="pid" name="pid" value="<?= $product['id']?>">
-                                                        <input type="text" class="hidden" id="name" name="name" value="<?= $product['name']?>" autocomplete="off">
-                                                        <input type="text" class="hidden" id="price" name="price" value="<?= $product['price']?>">
-                                                        <input type="text" class="hidden" id="quantity" name="quantity" value="1">
-                                                        <input type="text" class="hidden" id="image" name="image" value="<?= $product['image']?>">
-                                                        <button type="submit" id="cartBtn" class="cart-btn rounded-md p-2 cursor-pointer hidden">
-                                                            <img class="rounded-md" src="../images/cart-arrow-down-svgrepo-com.svg">
-                                                        </button>
-                                                    </form> -->
                                                     <button id="variationBtn" class="cart-btn rounded-md p-2 cursor-pointer hidden" onclick="showVariationModal(<?= $product['id'] ?>)">
                                                         <img class="rounded-md" src="../images/cart-arrow-down-svgrepo-com.svg">
                                                     </button>
@@ -100,21 +89,21 @@ ini_set('display_errors', 1);
                                                 <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= $product['image'] ?>"/>
                                             </div>
                                             <div class="flex justify-center items-center">
-                                                <p style="padding: 0.25rem;" class="text-white salsa text-md p-1"><?= ucwords($product['name']) ?></p>
+                                                <p style="padding: 0.25rem;" class="text-center text-white salsa text-md p-1"><?= ucwords($product['name']) ?></p>
                                             </div>
                                         </div>
                                     </div>
                                 <?php } else { ?>
-                                <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-56 " data-id="<?= $product['id'] ?>">
+                                <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-56" data-id="<?= $product_variations[0]['id'] ?>">
                                     <div class="flex flex-col justify-center">
-                                        <div class="rounded-md relative w-full h-40 flex flex-col items-center justify-center">
+                                        <div class="rounded-md relative w-full h-36 flex flex-col items-center justify-center">
                                             <div class="blur-bg absolute w-full h-full hidden rounded-md" style="background-color: rgba(0,0,0,0.5);"></div>
                                             <div class="absolute w-1/2">
                                                 <form id="add_to_cart" action="add_to_cart.php" method="POST" enctype="multipart/form-data">
-                                                    <input type="text" class="hidden" id="uid" name="uid" value="<?= $uid ?>">
-                                                    <input type="text" class="hidden" id="pid" name="pid" value="<?= $product['id']?>">
+                                                    <input type="text" class="hidden" id="pid" name="pid" value="<?= $product_variations[0]['product_id']?>">
+                                                    <input type="text" class="hidden" id="vid" name="vid" value="<?= $product_variations[0]['vid'] ?>">
                                                     <input type="text" class="hidden" id="name" name="name" value="<?= $product['name']?>" autocomplete="off">
-                                                    <input type="text" class="hidden" id="price" name="price" value="<?= $product['price']?>">
+                                                    <input type="text" class="hidden" id="price" name="price" value="<?= $product_variations[0]['price']?>">
                                                     <input type="text" class="hidden" id="quantity" name="quantity" value="1">
                                                     <input type="text" class="hidden" id="image" name="image" value="<?= $product['image']?>">
                                                     <button type="submit" id="cartBtn" class="cart-btn rounded-md p-2 cursor-pointer hidden">
@@ -158,20 +147,8 @@ ini_set('display_errors', 1);
                 </button>
             </div>
             <div id="variationLists" class="p-4 md:p-5">
-                <!-- Variation lists will be dynamically generated here -->
                 <div id="variation-modal-content"></div>
                 <div id="variationModal" class="flex justify-end items-center">
-                    <form id="add_to_cart" action="add_to_cart.php" method="POST" enctype="multipart/form-data">
-                        <input type="text" class="hidden" id="uid" name="uid" value="<?= $uid ?>">
-                        <input type="text" class="hidden" id="pid" name="pid" value="<?= $product['id']?>">
-                        <input type="text" class="hidden" id="name" name="name" value="<?= $product['name']?>" autocomplete="off">
-                        <input type="text" class="hidden" id="price" name="price" value="<?= $product['price']?>">
-                        <input type="text" class="hidden" id="quantity" name="quantity" value="1">
-                        <input type="text" class="hidden" id="image" name="image" value="<?= $product['image']?>">
-                        <button type="submit" id="cartBtn" class="cart-btn rounded-md p-2 cursor-pointer hidden">
-                            <img class="rounded-md" src="../images/cart-arrow-down-svgrepo-com.svg">
-                        </button>
-                    </form>
                 </div>
             </div>
         </div>
@@ -207,13 +184,35 @@ ini_set('display_errors', 1);
                                                 <img class="rounded-tl-md rounded-bl-md w-full h-full object-cover" src="../uploaded_img/<?=$cart['image']?>">
                                             </div>
                                             <div class="flex-1 ml-2 p-2">
-                                                <h3 class="text-white font-normal text-sm capitalize rosarivo leading-3"><?= $cart['name']?> <?= isset($cart['variation']) ? '('.$cart['variation'].')' : '' ?></h3>
+                                                <h3 class="text-white font-normal text-sm capitalize rosarivo leading-3">
+                                                    <?= $cart['name']?> <?= isset($cart['variation']) ? '('.$cart['variation'].')' : '' ?>
+                                                </h3>
                                                 <p class="text-gray-400 rosarivo">₱<span class="price"><?= $cart['price'] * $cart['quantity']?></span></p>
-                                                <p class="text-white rosarivo my-1">Quantity</p>
-                                                <div class="flex items-center">
-                                                <button title="Plus" type="button" class="quantity-btn rounded-tl-md rounded-bl-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="<?= $cart['id'] ?>" onclick="addQuantity(<?= $cart['id'] ?>)"><span>+</span></button>
-                                                <p class="text-white rosarivo mx-2"><span class="quantity"><?= $cart['quantity']?></span></p>
-                                                <button title="Minus" type="button" class="quantity-btn rounded-tr-md rounded-br-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="<?= $cart['id'] ?>" onclick="minusQuantity(<?= $cart['id'] ?>)"><span>-</span></button>
+                                                
+                                                <div class="flex items-center gap-2 my-1">
+                                                    <div class="flex bg-light-brown rounded-md">
+                                                        <button 
+                                                            type="button" 
+                                                            class="temperature-btn px-2 py-1 text-sm rosarivo rounded-l-md <?= $cart['temperature'] === 'Hot' ? 'bg-amber-600 text-white' : 'text-white' ?>"
+                                                            onclick="updateTemperature(<?= $cart['id'] ?>, 'Hot')"
+                                                        >
+                                                            Hot
+                                                        </button>
+                                                        <button 
+                                                            type="button" 
+                                                            class="temperature-btn px-2 py-1 text-sm rosarivo rounded-r-md <?= $cart['temperature'] === 'Ice' ? 'bg-amber-600 text-white' : 'text-white' ?>"
+                                                            onclick="updateTemperature(<?= $cart['id'] ?>, 'Ice')"
+                                                        >
+                                                            Ice
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex items-center mt-1">
+                                                    <span class="text-white rosarivo mr-2">Quantity:</span>
+                                                    <button title="Plus" type="button" class="quantity-btn rounded-tl-md rounded-bl-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" onclick="addQuantity(<?= $cart['id'] ?>)"><span>+</span></button>
+                                                    <p class="text-white rosarivo mx-2"><span class="quantity"><?= $cart['quantity']?></span></p>
+                                                    <button title="Minus" type="button" class="quantity-btn rounded-tr-md rounded-br-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" onclick="minusQuantity(<?= $cart['id'] ?>)"><span>-</span></button>
                                                 </div>
                                             </div>
                                             <div class="absolute bottom-2 right-2">
@@ -270,8 +269,12 @@ ini_set('display_errors', 1);
                     <div class="mb-4 ms-4">            
                         <div class="flex items-center">
                             <img class="w-14 h-14 rounded-md mr-5" src="../uploaded_img/<?= $cart['image']?>" alt="">
-                            <div class="flex-1" data-id="<?= $cart['id'] ?>">
-                                <h3 class="flex items-start mb-1 text-lg font-medium text-gray-900"><?= ucwords($cart['name']) ?> <?= isset($cart['variation']) ? '('.$cart['variation'].')' : '' ?><p class="salsa bg-blue-100 text-black text-sm font-medium mr-2 px-2.5 py-0.5 rounded ms-3">x<span  id="confirm-quantity" ><?= $cart['quantity'] ?></span></p></h3>
+                            <div class="flex-1 cart-item" data-id="<?= $cart['id'] ?>">
+                                <h3 class="flex items-start mb-1 text-lg font-medium text-gray-900"><?= ucwords($cart['name']) ?> <?= !empty($cart['variation']) ? '('.$cart['variation'].')' : '' ?> 
+                                <p class="ml-1" id="confirm-temperature">
+                                    <?= !empty($cart['temperature']) ? '('.$cart['temperature'].')' : '' ?>
+                                </p>
+                                <p class="salsa bg-blue-100 text-black text-sm font-medium mr-2 px-2.5 py-0.5 rounded ms-3">x<span  id="confirm-quantity" ><?= $cart['quantity'] ?></span></p></h3>
                                 <p class="block mb-3 text-sm font-normal leading-none text-gray-500">₱<span id="confirm-price" class="salsa"><?= $cart['price'] * $cart['quantity'] ?></span></p>
                             </div>               
                         </div>
@@ -331,243 +334,459 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+function updateTemperature(cartId, temperature) {
+    fetch('update_temperature.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `cart_id=${cartId}&temperature=${temperature}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update temperature in the confirmation modal
+            const confirmOrderModal = document.getElementById('confirm-modal');
+            const cartItemInModal = confirmOrderModal.querySelector(`[data-id="${cartId}"]`);
+            if (cartItemInModal) {
+                const temperatureElement = cartItemInModal.querySelector('#confirm-temperature');
+                if (temperatureElement) {
+                    temperatureElement.textContent = ` (${temperature}) `;
+                }
+            } else {
+                console.warn(`Cart item with ID ${cartId} not found in the confirmation modal.`);
+            }
 
+            // Update temperature buttons in the main cart UI
+            const cartItemInCart = document.querySelector(`.cart[data-id="${cartId}"]`);
+            if (cartItemInCart) {
+                const buttons = cartItemInCart.querySelectorAll('.temperature-btn');
+                buttons.forEach(btn => {
+                    if (btn.textContent.trim() === temperature) {
+                        btn.classList.add('bg-amber-600', 'text-white');
+                    } else {
+                        btn.classList.remove('bg-amber-600', 'text-white');
+                    }
+                });
+            } else {
+                console.warn(`Cart item with ID ${cartId} not found in the main cart.`);
+            }
+        } else {
+            console.error('Failed to update temperature on the server:', data.message);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
 </script>
 <script>
-    const searchInput = document.getElementById('search');
-    const productsList = document.getElementById('productsList');
+const searchInput = document.getElementById('search');
+const productsList = document.getElementById('productsList');
+let searchTimeout;
 
-    searchInput.addEventListener('input', function(){
-        const searchTerm = this.value.trim();
-
-        fetch(`search_order.php?search=${searchTerm}`)
+searchInput.addEventListener('input', function() {
+    const searchTerm = this.value.trim();
+    
+    clearTimeout(searchTimeout);
+    
+    searchTimeout = setTimeout(() => {
+        fetch(`search_order.php?search=${encodeURIComponent(searchTerm)}`)
         .then(response => response.text())
         .then(data => {
             productsList.innerHTML = data;
+            
+            initializeProductEventListeners();
         })
         .catch(error => {
             console.error('Error fetching products:', error);
         });
-    });
-</script>
-<script>
-    const confirmModal = document.getElementById("confirm-modal");
-    function showConfirmModal() {
-            fadeIn(confirmModal);
-        }
-    function confirmModalHandler(val) {
-        if (val) {
-            fadeIn(confirmModal);
-        } else {
-            fadeOut(confirmModal);
-        }
-    }
-    const variationModal = document.getElementById("variation-modal");
-    function showVariationModal(productId) {
-        fadeIn(variationModal);
-        console.log(productId);
-        fetchProductVariation(productId);
-    }
-    function variationModalHandler(val) {
-        if (val) {
-            fadeIn(variationModal);
-        } else {
-            fadeOut(variationModal);
-        }
-    }
-    function deleteModalHandler(val) {
-        if (val) {
-            fadeIn(deleteModal);
-        } else {
-            fadeOut(deleteModal);
-        }
-    }
-    function fadeOut(el) {
-        el.style.opacity = 1;
-        (function fade() {
-            if ((el.style.opacity -= 0.1) <= 0) {
-                el.style.display = "none";
-            } else {
-                requestAnimationFrame(fade);
-            }
-        })();
-    }
+    }, 300); 
+});
 
-    function fadeIn(el, display) {
-        el.style.opacity = 0;
-        el.style.display = display || "flex";
-        (function fade() {
-            let val = parseFloat(el.style.opacity);
-            if (!((val += 0.2) > 1)) {
-                el.style.opacity = val;
-                requestAnimationFrame(fade);
-            }
-        })();
-    }
-    function fetchProductVariation(productId) {
-        if (productId) {
-            fetch('get_product_variation.php', {
+function initializeProductEventListeners() {
+    document.querySelectorAll('.category-header').forEach(header => {
+        header.addEventListener('click', function() {
+            const categoryId = this.dataset.category;
+            const container = document.querySelector(`.products-container[data-category="${categoryId}"]`);
+            container.classList.toggle('hidden');
+            this.querySelector('svg').classList.toggle('rotate-180');
+        });
+    });
+
+    document.querySelectorAll('.products').forEach(product => {
+        product.addEventListener('mouseenter', function() {
+            this.querySelector('.blur-bg').classList.remove('hidden');
+            this.querySelector('.cart-btn').classList.remove('hidden');
+        });
+
+        product.addEventListener('mouseleave', function() {
+            this.querySelector('.blur-bg').classList.add('hidden');
+            this.querySelector('.cart-btn').classList.add('hidden');
+        });
+    });
+
+    document.querySelectorAll('#add_to_cart').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('add_to_cart.php', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `id=${productId}`
+                body: formData
             })
             .then(response => response.json())
             .then(data => {
-                console.log(data);
-                if (data.error) {
-                    console.error(data.error);
-                    return;
+                if(variationModalHandler){
+                    variationModalHandler(false);
                 }
-                
-                const variationModalContent = document.getElementById('variation-modal-content');
-                variationModalContent.innerHTML = '';
-                
-                if (data.variations && data.variations.length > 0) {
-                    variationModalContent.innerHTML = `
-                        <form id="add_to_cart_variation">
-                            <input type="hidden" name="pid" value="${productId}">
-                            <input type="hidden" name="vid" id="selected_variation_id">
-                            <input type="hidden" name="name" id="selected_variation_name" value="${data.variations[0].name}">
-                            <input type="hidden" name="quantity" value="1">
-                            <input type="hidden" name="image" id="selected_variation_image" value="${data.variations[0].image}">
-                            <input type="hidden" name="price" id="selected_variation_price">
-                            
-                            <div id="variations-container">
-                                ${data.variations.map(variation => `
-                                    <div class="flex items-center mb-4">
-                                        <input type="radio" name="variation" 
-                                            id="variation-${variation.id}" 
-                                            value="${variation.id}"
-                                            data-price="${variation.price}"
-                                            data-image="${variation.image}"
-                                            data-name="${variation.name}"
-                                            onchange="handleVariationSelect(this)">
-                                        <label for="variation-${variation.id}" class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-700">
-                                            ${variation.size} - ₱${variation.price}
-                                        </label>
+                if (data.success === true) {
+                    orderCart.classList.toggle('visible');
+                    if (divMessage) {
+                        divMessage.classList.remove('hidden');
+                    }
+                    messages.textContent = data.message;
+                    ordersNo.innerHTML = data.total; 
+
+                    // Update cart UI
+                    const cartList = document.getElementById('list-cart');
+                    if (cartList) {
+                        cartList.innerHTML = '';
+
+                        if (data.cart.length > 0) {
+                            data.cart.forEach(cartItem => {
+                                const cartHTML = `
+                                <div class="cart relative rounded-md bg-dark-brown flex flex-start items-center h-28" data-id="${cartItem.id}">
+                                    <div class="w-28 h-full">
+                                        <img class="rounded-tl-md rounded-bl-md w-full h-full object-cover" src="../uploaded_img/${cartItem.image}" />
                                     </div>
-                                `).join('')}
+                                    <div class="flex-1 ml-2 p-2">
+                                        <h3 class="text-white font-normal text-sm capitalize rosarivo leading-3">${cartItem.name} ${cartItem.variation ? '(' + cartItem.variation + ')' : ''}</h3>
+                                        <p class="text-gray-400 rosarivo">₱<span class="price">${cartItem.price * cartItem.quantity}</span></p>
+
+                                        <div class="flex items-center gap-2 my-1">
+                                            <div class="flex bg-light-brown rounded-md">
+                                                <button 
+                                                    type="button" 
+                                                    class="temperature-btn px-2 py-1 text-sm rosarivo rounded-l-md ${cartItem.temperature === 'Hot' ? 'bg-amber-600 text-white' : 'text-white' }"
+                                                    onclick="updateTemperature(${cartItem.id}, 'Hot')"
+                                                >
+                                                    Hot
+                                                </button>
+                                                <button 
+                                                    type="button" 
+                                                    class="temperature-btn px-2 py-1 text-sm rosarivo rounded-r-md ${cartItem.temperature === 'Ice' ? 'bg-amber-600 text-white' : 'text-white' }"
+                                                    onclick="updateTemperature(${cartItem.id}, 'Ice')"
+                                                >
+                                                    Ice
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-center mt-1">
+                                            <span class="text-white rosarivo mr-2">Quantity</span>
+                                            <button title="Plus" type="button" class="quantity-btn rounded-tl-md rounded-bl-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="${cartItem.id}" onclick="addQuantity(${cartItem.id})"><span>+</span></button>
+                                            <p class="text-white rosarivo mx-2"><span class="quantity">${cartItem.quantity}</span></p>
+                                            <button title="Minus" type="button" class="quantity-btn rounded-tr-md rounded-br-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="${cartItem.id}" onclick="minusQuantity(${cartItem.id})"><span>-</span></button>
+                                        </div>
+                                    </div> 
+                                    <div class="absolute bottom-2 right-2">
+                                        <button title="Delete" type="button" class="delete-btn deleteCart rounded-md p-2 cursor-pointer" data-id="${cartItem.id}">
+                                            <img class="w-6 h-6 rounded-md" src="../images/delete-svgrepo-com.svg">
+                                        </button>
+                                    </div>
+                                </div>
+                                `;
+                                cartList.insertAdjacentHTML('beforeend', cartHTML);
+                            });
+                        } else {
+                            cartList.innerHTML = '<p class="text-center text-gray-400">Your cart is empty.</p>';
+                        }
+                    } else {
+                        console.error('Element with ID "list-cart" not found.');
+                    }
+                    const placeOrderButtonHTML = `
+                    <div class="text-end mt-4">
+                        <button title="Place Order" id="placeOrder" type="button" class="px-8 py-2 rounded-3xl bg-light-brown focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-amber-400 focus:ring-amber-400 transition duration-150 ease-in-out salsa text-xl text-white" onclick="confirmModalHandler(true)">Place order</button>
+                    </div>`;
+                    cartList.insertAdjacentHTML('beforeend', placeOrderButtonHTML);
+
+                    console.log(cartList);
+
+                    const cartListConfirmModal = document.getElementById('cartListConfirmModal');
+                    cartListConfirmModal.innerHTML = '';
+                    let total = 0;
+
+                    data.cart.forEach(cartItem => {
+                        total += cartItem.price * cartItem.quantity;
+                        const confirmHTML = `
+                        <div class="mb-4 ms-4">            
+                            <div class="flex items-center">
+                                <img class="w-14 h-14 rounded-md mr-5" src="../uploaded_img/${cartItem.image}" alt=""/>
+                                <div class="flex-1" data-id="${cartItem.id}">
+                                    <h3 class="flex items-start mb-1 text-lg font-medium text-gray-900">${cartItem.name} ${cartItem.variation ? '(' + cartItem.variation + ')' : ''}<p class="salsa bg-blue-100 text-black text-sm font-medium mr-2 px-2.5 py-0.5 rounded ms-3">x<span id="confirm-quantity">${cartItem.quantity}</span></p></h3>
+                                    <p class="block mb-3 text-sm font-normal leading-none text-gray-500">₱<span id="confirm-price" class="salsa">${cartItem.price * cartItem.quantity}</span></p>
+                                </div>               
                             </div>
-                        </form>
+                        </div>`;
+                        cartListConfirmModal.insertAdjacentHTML('beforeend', confirmHTML);
+                    });
+                    console.log(cartListConfirmModal);
+
+                    const totalConfirmModal = document.getElementById('totalConfirmModal');
+                    totalConfirmModal.innerHTML = '';
+                    const confirmTotalHTML = `
+                        <div class="flex justify-end items-center">
+                            <div class="pr-5">
+                                <p class="text-gray-500 text-sm font-medium leading-tight tracking-normal salsa" for="total">Total</p>
+                                <p id="total" class="salsa block mb-3 text-md font-normal leading-none text-gray-800 dark:text-gray-700">
+                                    ₱<span id="confirm-total" class="text-gray-800 salsa mb-3 text-md font-normal leading-none">${total.toFixed(2)}</span>
+                                </p>
+                            </div>
+                            <form id="add_order" action="" method="POST">
+                                <input type="text" class="hidden" name="uid" id="uid" value="<?= $_SESSION['uid'] ?>" title="uid" placeholder="">
+                                <button title="Confirm" type="submit" id="submitBtn" class="addToOrder bg-light-brown border border-light-brown px-5 py-2 text-sm font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-amber-400" data-id="${data.cart[0].id}">Confirm</button>
+                            </form>
+                        </div>
                     `;
+                    totalConfirmModal.insertAdjacentHTML('beforeend', confirmTotalHTML);
+                    const formOrder = totalConfirmModal.querySelector('#add_order');
+                    formOrder.addEventListener('submit', addOrder);
+
+                    attachDeleteEventListeners();
+
+                } else {
+                    if (divMessage) {
+                        divMessage.classList.remove('hidden');
+                    }
+                    messages.textContent = data.message;
                 }
+                setTimeout(function() {
+                    if (divMessage) {
+                        divMessage.classList.add('hidden');
+                    }
+                }, 2000);
             })
             .catch(error => {
-                console.error('Error fetching product variation:', error);
-            });
-        }
-    }
-    function handleVariationSelect(radio) {
-        document.getElementById('selected_variation_name').value = radio.dataset.name;
-        document.getElementById('selected_variation_image').value = radio.dataset.image;
-        document.getElementById('selected_variation_id').value = radio.value;
-        document.getElementById('selected_variation_price').value = radio.dataset.price;
-
-        const form = document.getElementById('add_to_cart_variation');
-        addToCart(form);
-    }
-    function attachDeleteEventListeners() {
-        const deleteButtons = document.querySelectorAll(".deleteCart");
-        deleteButtons.forEach((button) => {
-            button.addEventListener("click", function() {
-                const cartId = this.getAttribute("data-id");
-                console.log(cartId);    
-                if (cartId) {
-                    fetch(`delete_cart.php?id=${cartId}`, {
-                        method: "DELETE",
-                    })
-                    .then((response) => {
-                        if (!response.ok) {
-                            throw new Error(
-                                `Failed to delete product from cart (Status ${response.status})`
-                            );
-                        }
-
-                        // Remove item from cart display
-                        const cartItem = this.closest('.cart');
-                        if (cartItem) {
-                            cartItem.remove();
-                        }
-
-                        // Remove item from confirm modal
-                        const deletedConfirmItem = document
-                            .querySelector(
-                                `#cartListConfirmModal [data-id="${cartId}"]`
-                            )
-                            ?.closest(".mb-4");
-                        if (deletedConfirmItem) {
-                            deletedConfirmItem.remove();
-                        }
-
-                        // Fetch updated cart data
-                        fetch('get_cart.php')
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log(data);
-                            const ordersNoElement = document.querySelector('#ordersNo');
-                            const listCart = document.querySelector('#list-cart');
-                            const cartListConfirmModal = document.querySelector('#cartListConfirmModal');
-                            const totalConfirmModal = document.querySelector('#totalConfirmModal');
-
-                            // Update order count
-                            if (ordersNoElement) {
-                                ordersNoElement.textContent = data.ordersNo;
-                            }
-
-                            // Check if cart is empty
-                            const remainingCarts = listCart.querySelectorAll('.cart');
-                            if (remainingCarts.length === 0) {
-                                listCart.innerHTML = '<p class="text-black text-medium font-semibold p-3 py-4 text-center">Your cart is empty.</p>';
-                                cartListConfirmModal.innerHTML = '';
-                                totalConfirmModal.innerHTML = '';
-                            } else {
-                                // Update total in confirm modal
-                                if (data.total !== undefined && totalConfirmModal) {
-                                    const totalHTML = `
-                                        <div class="flex justify-end items-center">
-                                            <div class="pr-5">
-                                                <p class="text-gray-500 text-sm font-medium leading-tight tracking-normal salsa" for="total">Total</p>
-                                                <p id="total" class="salsa block mb-3 text-md font-normal leading-none text-gray-800 dark:text-gray-700">
-                                                    ₱<span id="confirm-total" class="text-gray-800 salsa mb-3 text-md font-normal leading-none">${parseFloat(data.total).toFixed(2)}</span>
-                                                </p>
-                                            </div>
-                                            <form id="add_order" action="" method="POST">
-                                                <input type="text" class="hidden" name="uid" id="uid" value="${data.uid}" title="uid">
-                                                <button title="Confirm" type="submit" id="submitBtn" class="addToOrder bg-light-brown border border-light-brown px-5 py-2 text-sm font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-amber-400">Confirm</button>
-                                            </form>
-                                        </div>
-                                    `;
-                                    totalConfirmModal.innerHTML = totalHTML;
-                                    const formOrder = totalConfirmModal.querySelector('#add_order');
-                                    formOrder.addEventListener('submit', addOrder);
-                                }
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error fetching updated cart information:', error);
-                        });
-                    })
-                    .catch((error) => {
-                        console.error("Error deleting product from cart:", error);
-                    });
-                }
+                console.error('Error adding to cart:', error);
             });
         });
+    });
+}
+
+// Initial event listeners setup
+</script>
+<script>
+const confirmModal = document.getElementById("confirm-modal");
+function showConfirmModal() {
+    fadeIn(confirmModal);
+}
+function confirmModalHandler(val) {
+    if (val) {
+        fadeIn(confirmModal);
+    } else {
+        fadeOut(confirmModal);
     }
+}
+const variationModal = document.getElementById("variation-modal");
+function showVariationModal(productId) {
+    fadeIn(variationModal);
+    console.log(productId);
+    fetchProductVariation(productId);
+}
+function variationModalHandler(val) {
+    if (val) {
+        fadeIn(variationModal);
+    } else {
+        fadeOut(variationModal);
+    }
+}
+function deleteModalHandler(val) {
+    if (val) {
+        fadeIn(deleteModal);
+    } else {
+        fadeOut(deleteModal);
+    }
+}
+function fadeOut(el) {
+    el.style.opacity = 1;
+    (function fade() {
+        if ((el.style.opacity -= 0.1) <= 0) {
+            el.style.display = "none";
+        } else {
+            requestAnimationFrame(fade);
+        }
+    })();
+}
+function fadeIn(el, display) {
+    el.style.opacity = 0;
+    el.style.display = display || "flex";
+    (function fade() {
+        let val = parseFloat(el.style.opacity);
+        if (!((val += 0.2) > 1)) {
+            el.style.opacity = val;
+            requestAnimationFrame(fade);
+        }
+    })();
+}
+function fetchProductVariation(productId) {
+    if (productId) {
+        fetch('get_product_variation.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `id=${productId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+            
+            const variationModalContent = document.getElementById('variation-modal-content');
+            variationModalContent.innerHTML = '';
+            
+            if (data.variations && data.variations.length > 0) {
+                variationModalContent.innerHTML = `
+                    <form id="add_to_cart_variation">
+                        <input type="hidden" name="pid" value="${productId}">
+                        <input type="hidden" name="vid" id="selected_variation_id">
+                        <input type="hidden" name="name" id="selected_variation_name" value="${data.variations[0].name}">
+                        <input type="hidden" name="quantity" value="1">
+                        <input type="hidden" name="image" id="selected_variation_image" value="${data.variations[0].image}">
+                        <input type="hidden" name="price" id="selected_variation_price">
+                        
+                        <div id="variations-container">
+                            ${data.variations.map(variation => `
+                                <div class="flex items-center mb-4">
+                                    <input type="radio" name="variation" 
+                                        id="variation-${variation.id}" 
+                                        value="${variation.id}"
+                                        data-price="${variation.price}"
+                                        data-image="${variation.image}"
+                                        data-name="${variation.name}"
+                                        onchange="handleVariationSelect(this)">
+                                    <label for="variation-${variation.id}" class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-700">
+                                        ${variation.size} - ₱${variation.price}
+                                    </label>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </form>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching product variation:', error);
+        });
+    }
+}
+function handleVariationSelect(radio) {
+    document.getElementById('selected_variation_name').value = radio.dataset.name;
+    document.getElementById('selected_variation_image').value = radio.dataset.image;
+    document.getElementById('selected_variation_id').value = radio.value;
+    document.getElementById('selected_variation_price').value = radio.dataset.price;
 
-// Call the function when the page loads
+    const form = document.getElementById('add_to_cart_variation');
+    addToCart(form);
+}
+function attachDeleteEventListeners() {
+    const deleteButtons = document.querySelectorAll(".deleteCart");
+    deleteButtons.forEach((button) => {
+        button.addEventListener("click", function() {
+            const cartId = this.getAttribute("data-id");
+            console.log(cartId);    
+            if (cartId) {
+                fetch(`delete_cart.php?id=${cartId}`, {
+                    method: "DELETE",
+                })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(
+                            `Failed to delete product from cart (Status ${response.status})`
+                        );
+                    }
+
+                    // Remove item from cart display
+                    const cartItem = this.closest('.cart');
+                    if (cartItem) {
+                        cartItem.remove();
+                    }
+
+                    // Remove item from confirm modal
+                    const deletedConfirmItem = document
+                        .querySelector(
+                            `#cartListConfirmModal [data-id="${cartId}"]`
+                        )
+                        ?.closest(".mb-4");
+                    if (deletedConfirmItem) {
+                        deletedConfirmItem.remove();
+                    }
+
+                    // Fetch updated cart data
+                    fetch('get_cart.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        const ordersNoElement = document.querySelector('#ordersNo');
+                        const listCart = document.querySelector('#list-cart');
+                        const cartListConfirmModal = document.querySelector('#cartListConfirmModal');
+                        const totalConfirmModal = document.querySelector('#totalConfirmModal');
+
+                        // Update order count
+                        if (ordersNoElement) {
+                            ordersNoElement.textContent = data.ordersNo;
+                        }
+
+                        // Check if cart is empty
+                        const remainingCarts = listCart.querySelectorAll('.cart');
+                        if (remainingCarts.length === 0) {
+                            listCart.innerHTML = '<p class="text-black text-medium font-semibold p-3 py-4 text-center">Your cart is empty.</p>';
+                            cartListConfirmModal.innerHTML = '';
+                            totalConfirmModal.innerHTML = '';
+                        } else {
+                            // Update total in confirm modal
+                            if (data.total !== undefined && totalConfirmModal) {
+                                const totalHTML = `
+                                    <div class="flex justify-end items-center">
+                                        <div class="pr-5">
+                                            <p class="text-gray-500 text-sm font-medium leading-tight tracking-normal salsa" for="total">Total</p>
+                                            <p id="total" class="salsa block mb-3 text-md font-normal leading-none text-gray-800 dark:text-gray-700">
+                                                ₱<span id="confirm-total" class="text-gray-800 salsa mb-3 text-md font-normal leading-none">${parseFloat(data.total).toFixed(2)}</span>
+                                            </p>
+                                        </div>
+                                        <form id="add_order" action="" method="POST">
+                                            <input type="text" class="hidden" name="uid" id="uid" value="${data.uid}" title="uid">
+                                            <button title="Confirm" type="submit" id="submitBtn" class="addToOrder bg-light-brown border border-light-brown px-5 py-2 text-sm font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-amber-400">Confirm</button>
+                                        </form>
+                                    </div>
+                                `;
+                                totalConfirmModal.innerHTML = totalHTML;
+                                const formOrder = totalConfirmModal.querySelector('#add_order');
+                                formOrder.addEventListener('submit', addOrder);
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching updated cart information:', error);
+                    });
+                })
+                .catch((error) => {
+                    console.error("Error deleting product from cart:", error);
+                });
+            }
+        });
+    });
+}
 document.addEventListener('DOMContentLoaded', attachDeleteEventListeners);
-
 function addQuantity(cartId) {
     updateQuantity(cartId, 'add');
 }
-
 function minusQuantity(cartId) {
     updateQuantity(cartId, 'minus');
 }
-
 function updateQuantity(cartId, action) {
     const formData = new FormData();
     formData.append('cartId', cartId);
@@ -584,8 +803,6 @@ function updateQuantity(cartId, action) {
         return response.json();
     })
     .then(data => {
-        console.log('Received data:', data);
-        
         const price = parseFloat(data.price) || 0;
         const quantity = parseInt(data.quantity) || 0;
         const total = parseFloat(data.total) || 0;
@@ -652,202 +869,220 @@ document.querySelectorAll('.products').forEach(product => {
         hideButtons(this);
     });
 });
-    const messages = document.getElementById("message");
-    const divMessage = document.getElementsByClassName('hide-message')[0];
-    const totalConfirmModal = document.getElementById('totalConfirmModal');
-    const formOrder = totalConfirmModal.querySelector('#add_order'); 
-    formOrder.addEventListener('submit', addOrder);
 
-    function addOrder() {
+const messages = document.getElementById("message");
+const divMessage = document.getElementsByClassName('hide-message')[0];
+const totalConfirmModal = document.getElementById('totalConfirmModal');
+const formOrder = totalConfirmModal.querySelector('#add_order'); 
+formOrder.addEventListener('submit', addOrder);
+
+function addOrder() {
+    event.preventDefault();
+    const formData = new FormData(formOrder); 
+
+    fetch('add_order.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Received data:', data);
+        if (data.success === true){
+            setTimeout(function () {
+                window.location.href = 'index.php?page=dashboard';
+            }, 1500);
+        }
+        if (data.message) {
+            divMessage.classList.remove('hidden');
+            messages.textContent = data.message;
+
+            setTimeout(()=> {
+                divMessage.classList.add('hidden');
+            }, 1500);
+        }
+        
+    })
+    .catch(error => {
+        console.error('Error adding order:', error);
+    });
+}
+const forms = document.querySelectorAll('#add_to_cart');
+forms.forEach((form) => {
+    form.addEventListener('submit', function (event) {
         event.preventDefault();
-        const formData = new FormData(formOrder); 
+        addToCart(form);
+    });
+});
 
-        fetch('add_order.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Received data:', data);
-            if (data.success === true){
-                setTimeout(function () {
-                    window.location.href = 'index.php?page=dashboard';
-                }, 1500);
-            }
-            if (data.message) {
+function addToCart(form) {
+    const formData = new FormData(form); 
+
+    for (let pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+    }
+    fetch('add_to_cart.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(variationModalHandler){
+            variationModalHandler(false);
+        }
+        if (data.success === true) {
+            orderCart.classList.toggle('visible');
+            if (divMessage) {
                 divMessage.classList.remove('hidden');
-                messages.textContent = data.message;
-
-                setTimeout(()=> {
-                    divMessage.classList.add('hidden');
-                }, 1500);
             }
-            
-        })
-        .catch(error => {
-            console.error('Error adding order:', error);
-        });
-    }
-    const forms = document.querySelectorAll('#add_to_cart');
+            messages.textContent = data.message;
+            ordersNo.innerHTML = data.total; 
 
-    // Add event listeners to each form
-    forms.forEach((form) => {
-        form.addEventListener('submit', function (event) {
-            event.preventDefault();
-            addToCart(form);
-        });
-    });
+            // Update cart UI
+            const cartList = document.getElementById('list-cart');
+            if (cartList) {
+                cartList.innerHTML = '';
 
-    function addToCart(form) {
-        const formData = new FormData(form); 
-
-        for (let pair of formData.entries()) {
-            console.log(pair[0] + ': ' + pair[1]);
-        }
-        fetch('add_to_cart.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if(variationModalHandler){
-                variationModalHandler(false);
-            }
-            if (data.success === true) {
-                orderCart.classList.toggle('visible');
-                if (divMessage) {
-                    divMessage.classList.remove('hidden');
-                }
-                messages.textContent = data.message;
-                ordersNo.innerHTML = data.total; 
-
-                // Update cart UI
-                const cartList = document.getElementById('list-cart');
-                if (cartList) {
-                    cartList.innerHTML = ''; // Clear the cart content
-
-                    if (data.cart.length > 0) {
-                        data.cart.forEach(cartItem => {
-                            const cartHTML = `
-                            <div class="cart relative rounded-md bg-dark-brown flex flex-start items-center h-28" data-id="${cartItem.id}">
-                                <div class="w-28 h-full">
-                                    <img class="rounded-tl-md rounded-bl-md w-full h-full object-cover" src="../uploaded_img/${cartItem.image}" />
-                                </div>
-                                <div class="flex-1 ml-2 p-2">
-                                    <h3 class="text-white font-normal text-sm capitalize rosarivo leading-3">${cartItem.name} ${cartItem.variation ? '(' + cartItem.variation + ')' : ''}</h3>
-                                    <p class="text-gray-400 rosarivo">₱<span class="price">${cartItem.price * cartItem.quantity}</span></p>
-                                    <p class="text-white rosarivo my-1">Quantity</p>
-                                    <div class="flex items-center">
-                                        <button title="Plus" type="button" class="quantity-btn rounded-tl-md rounded-bl-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="${cartItem.id}" onclick="addQuantity(${cartItem.id})"><span>+</span></button>
-                                        <p class="text-white rosarivo mx-2"><span class="quantity">${cartItem.quantity}</span></p>
-                                        <button title="Minus" type="button" class="quantity-btn rounded-tr-md rounded-br-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="${cartItem.id}" onclick="minusQuantity(${cartItem.id})"><span>-</span></button>
-                                    </div>
-                                </div> 
-                                <div class="absolute bottom-2 right-2">
-                                    <button title="Delete" type="button" class="delete-btn deleteCart rounded-md p-2 cursor-pointer" data-id="${cartItem.id}">
-                                        <img class="w-6 h-6 rounded-md" src="../images/delete-svgrepo-com.svg">
-                                    </button>
-                                </div>
+                if (data.cart.length > 0) {
+                    data.cart.forEach(cartItem => {
+                        const cartHTML = `
+                        <div class="cart relative rounded-md bg-dark-brown flex flex-start items-center h-28" data-id="${cartItem.id}">
+                            <div class="w-28 h-full">
+                                <img class="rounded-tl-md rounded-bl-md w-full h-full object-cover" src="../uploaded_img/${cartItem.image}" />
                             </div>
-                            `;
-                            cartList.insertAdjacentHTML('beforeend', cartHTML);
-                        });
-                    } else {
-                        cartList.innerHTML = '<p class="text-center text-gray-400">Your cart is empty.</p>';
-                    }
+                            <div class="flex-1 ml-2 p-2">
+                                <h3 class="text-white font-normal text-sm capitalize rosarivo leading-3">${cartItem.name} ${cartItem.variation ? '(' + cartItem.variation + ')' : ''}</h3>
+                                <p class="text-gray-400 rosarivo">₱<span class="price">${cartItem.price * cartItem.quantity}</span></p>
+
+                                <div class="flex items-center gap-2 my-1">
+                                    <div class="flex bg-light-brown rounded-md">
+                                        <button 
+                                            type="button" 
+                                            class="temperature-btn px-2 py-1 text-sm rosarivo rounded-l-md ${cartItem.temperature === 'Hot' ? 'bg-amber-600 text-white' : 'text-white' }"
+                                            onclick="updateTemperature(${cartItem.id}, 'Hot')"
+                                        >
+                                            Hot
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            class="temperature-btn px-2 py-1 text-sm rosarivo rounded-r-md ${cartItem.temperature === 'Ice' ? 'bg-amber-600 text-white' : 'text-white' }"
+                                            onclick="updateTemperature(${cartItem.id}, 'Ice')"
+                                        >
+                                            Ice
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center mt-1">
+                                    <span class="text-white rosarivo mr-2">Quantity</span>
+                                    <button title="Plus" type="button" class="quantity-btn rounded-tl-md rounded-bl-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="${cartItem.id}" onclick="addQuantity(${cartItem.id})"><span>+</span></button>
+                                    <p class="text-white rosarivo mx-2"><span class="quantity">${cartItem.quantity}</span></p>
+                                    <button title="Minus" type="button" class="quantity-btn rounded-tr-md rounded-br-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="${cartItem.id}" onclick="minusQuantity(${cartItem.id})"><span>-</span></button>
+                                </div>
+                            </div> 
+                            <div class="absolute bottom-2 right-2">
+                                <button title="Delete" type="button" class="delete-btn deleteCart rounded-md p-2 cursor-pointer" data-id="${cartItem.id}">
+                                    <img class="w-6 h-6 rounded-md" src="../images/delete-svgrepo-com.svg">
+                                </button>
+                            </div>
+                        </div>
+                        `;
+                        cartList.insertAdjacentHTML('beforeend', cartHTML);
+                    });
                 } else {
-                    console.error('Element with ID "list-cart" not found.');
+                    cartList.innerHTML = '<p class="text-center text-gray-400">Your cart is empty.</p>';
                 }
-                const placeOrderButtonHTML = `
-                <div class="text-end mt-4">
-                    <button title="Place Order" id="placeOrder" type="button" class="px-8 py-2 rounded-3xl bg-light-brown focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-amber-400 focus:ring-amber-400 transition duration-150 ease-in-out salsa text-xl text-white" onclick="confirmModalHandler(true)">Place order</button>
-                </div>`;
-                cartList.insertAdjacentHTML('beforeend', placeOrderButtonHTML);
-
-                console.log(cartList);
-
-                const cartListConfirmModal = document.getElementById('cartListConfirmModal');
-                cartListConfirmModal.innerHTML = '';
-                let total = 0;
-
-                data.cart.forEach(cartItem => {
-                    total += cartItem.price * cartItem.quantity;
-                    const confirmHTML = `
-                    <div class="mb-4 ms-4">            
-                        <div class="flex items-center">
-                            <img class="w-14 h-14 rounded-md mr-5" src="../uploaded_img/${cartItem.image}" alt=""/>
-                            <div class="flex-1" data-id="${cartItem.id}">
-                                <h3 class="flex items-start mb-1 text-lg font-medium text-gray-900">${cartItem.name} ${cartItem.variation ? '(' + cartItem.variation + ')' : ''}<p class="salsa bg-blue-100 text-black text-sm font-medium mr-2 px-2.5 py-0.5 rounded ms-3">x<span id="confirm-quantity">${cartItem.quantity}</span></p></h3>
-                                <p class="block mb-3 text-sm font-normal leading-none text-gray-500">₱<span id="confirm-price" class="salsa">${cartItem.price * cartItem.quantity}</span></p>
-                            </div>               
-                        </div>
-                    </div>`;
-                    cartListConfirmModal.insertAdjacentHTML('beforeend', confirmHTML);
-                });
-                console.log(cartListConfirmModal);
-
-                const totalConfirmModal = document.getElementById('totalConfirmModal');
-                totalConfirmModal.innerHTML = '';
-                const confirmTotalHTML = `
-                    <div class="flex justify-end items-center">
-                        <div class="pr-5">
-                            <p class="text-gray-500 text-sm font-medium leading-tight tracking-normal salsa" for="total">Total</p>
-                            <p id="total" class="salsa block mb-3 text-md font-normal leading-none text-gray-800 dark:text-gray-700">
-                                ₱<span id="confirm-total" class="text-gray-800 salsa mb-3 text-md font-normal leading-none">${total.toFixed(2)}</span>
-                            </p>
-                        </div>
-                        <form id="add_order" action="" method="POST">
-                            <input type="text" class="hidden" name="uid" id="uid" value="<?= $_SESSION['uid'] ?>" title="uid" placeholder="">
-                            <button title="Confirm" type="submit" id="submitBtn" class="addToOrder bg-light-brown border border-light-brown px-5 py-2 text-sm font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-amber-400" data-id="${data.cart[0].id}">Confirm</button>
-                        </form>
-                    </div>
-                `;
-                totalConfirmModal.insertAdjacentHTML('beforeend', confirmTotalHTML);
-                const formOrder = totalConfirmModal.querySelector('#add_order');
-                formOrder.addEventListener('submit', addOrder);
-
-                attachDeleteEventListeners();
-
             } else {
-                if (divMessage) {
-                    divMessage.classList.remove('hidden');
-                }
-                messages.textContent = data.message;
+                console.error('Element with ID "list-cart" not found.');
             }
-            setTimeout(function() {
-                if (divMessage) {
-                    divMessage.classList.add('hidden');
-                }
-            }, 2000);
-        })
-        .catch(error => {
-            console.error('Error submitting form:', error);
-        });
-    }
+            const placeOrderButtonHTML = `
+            <div class="text-end mt-4">
+                <button title="Place Order" id="placeOrder" type="button" class="px-8 py-2 rounded-3xl bg-light-brown focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-amber-400 focus:ring-amber-400 transition duration-150 ease-in-out salsa text-xl text-white" onclick="confirmModalHandler(true)">Place order</button>
+            </div>`;
+            cartList.insertAdjacentHTML('beforeend', placeOrderButtonHTML);
 
+            console.log(cartList);
 
-    const priceInput = document.getElementById('price');
-    const priceError = document.getElementById('priceError');
+            const cartListConfirmModal = document.getElementById('cartListConfirmModal');
+            cartListConfirmModal.innerHTML = '';
+            let total = 0;
 
-    priceInput.addEventListener('input', function() {
-        const priceValue = this.value.trim(); 
-        const isValid = /^[0-9]+(\.[0-9]{1,2})?$/.test(priceValue); 
+            data.cart.forEach(cartItem => {
+                total += cartItem.price * cartItem.quantity;
+                const confirmHTML = `
+                <div class="mb-4 ms-4">            
+                    <div class="flex items-center">
+                        <img class="w-14 h-14 rounded-md mr-5" src="../uploaded_img/${cartItem.image}" alt=""/>
+                        <div class="flex-1" data-id="${cartItem.id}">
+                            <h3 class="flex items-start mb-1 text-lg font-medium text-gray-900">${cartItem.name} ${cartItem.variation ? '(' + cartItem.variation + ')' : ''}<p class="salsa bg-blue-100 text-black text-sm font-medium mr-2 px-2.5 py-0.5 rounded ms-3">x<span id="confirm-quantity">${cartItem.quantity}</span></p></h3>
+                            <p class="block mb-3 text-sm font-normal leading-none text-gray-500">₱<span id="confirm-price" class="salsa">${cartItem.price * cartItem.quantity}</span></p>
+                        </div>               
+                    </div>
+                </div>`;
+                cartListConfirmModal.insertAdjacentHTML('beforeend', confirmHTML);
+            });
+            console.log(cartListConfirmModal);
 
-        if (!isValid) {
-            priceError.textContent = 'Please enter a valid price';
-            priceInput.classList.add('border-red-500');
+            const totalConfirmModal = document.getElementById('totalConfirmModal');
+            totalConfirmModal.innerHTML = '';
+            const confirmTotalHTML = `
+                <div class="flex justify-end items-center">
+                    <div class="pr-5">
+                        <p class="text-gray-500 text-sm font-medium leading-tight tracking-normal salsa" for="total">Total</p>
+                        <p id="total" class="salsa block mb-3 text-md font-normal leading-none text-gray-800 dark:text-gray-700">
+                            ₱<span id="confirm-total" class="text-gray-800 salsa mb-3 text-md font-normal leading-none">${total.toFixed(2)}</span>
+                        </p>
+                    </div>
+                    <form id="add_order" action="" method="POST">
+                        <input type="text" class="hidden" name="uid" id="uid" value="<?= $_SESSION['uid'] ?>" title="uid" placeholder="">
+                        <button title="Confirm" type="submit" id="submitBtn" class="addToOrder bg-light-brown border border-light-brown px-5 py-2 text-sm font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-amber-400" data-id="${data.cart[0].id}">Confirm</button>
+                    </form>
+                </div>
+            `;
+            totalConfirmModal.insertAdjacentHTML('beforeend', confirmTotalHTML);
+            const formOrder = totalConfirmModal.querySelector('#add_order');
+            formOrder.addEventListener('submit', addOrder);
+
+            attachDeleteEventListeners();
+
         } else {
-            priceError.textContent = '';
-            priceInput.classList.remove('border-red-500');
+            if (divMessage) {
+                divMessage.classList.remove('hidden');
+            }
+            messages.textContent = data.message;
         }
+        setTimeout(function() {
+            if (divMessage) {
+                divMessage.classList.add('hidden');
+            }
+        }, 2000);
+    })
+    .catch(error => {
+        console.error('Error submitting form:', error);
     });
-    function showButtons(element) {
-        element.querySelector('.cart-btn').classList.remove('hidden');
-        element.querySelector('.blur-bg').classList.remove('hidden');
-    }
+}
 
-    function hideButtons(element) {
-        element.querySelector('.cart-btn').classList.add('hidden');
-        element.querySelector('.blur-bg').classList.add('hidden');
+const priceInput = document.getElementById('price');
+const priceError = document.getElementById('priceError');
+priceInput.addEventListener('input', function() {
+    const priceValue = this.value.trim(); 
+    const isValid = /^[0-9]+(\.[0-9]{1,2})?$/.test(priceValue); 
+
+    if (!isValid) {
+        priceError.textContent = 'Please enter a valid price';
+        priceInput.classList.add('border-red-500');
+    } else {
+        priceError.textContent = '';
+        priceInput.classList.remove('border-red-500');
     }
+});
+
+function showButtons(element) {
+    element.querySelector('.cart-btn').classList.remove('hidden');
+    element.querySelector('.blur-bg').classList.remove('hidden');
+}
+
+function hideButtons(element) {
+    element.querySelector('.cart-btn').classList.add('hidden');
+    element.querySelector('.blur-bg').classList.add('hidden');
+}
 </script>

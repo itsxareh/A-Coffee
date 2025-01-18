@@ -21,26 +21,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             foreach ($products as $product) {
                 $productParts = explode(" ", $product, 2);
                 $quantity = $productParts[0];
-                if (preg_match('/(.+?)\s*\((.+?)\)/', $productParts[1], $matches)) {
-                    $name = trim($matches[1]);
-                    $var = trim($matches[2]);
+                if (preg_match('/(.+?)\s*\((.*?)\)\s*\((.*?)\)$/', $productParts[1], $matches)) {
+                    $productName = trim($matches[1]);       // Product name
+                    $productVar = trim($matches[2]);        // Product variation (e.g., 12oz)
+                    $productTemp = trim($matches[3]);       // Product temperature (e.g., Hot/Ice)
+                } elseif (preg_match('/(.+?)\s*\((.*?)\)$/', $productParts[1], $matches)) {
+                    $productName = trim($matches[1]);       // Product name
+                    $productVar = trim($matches[2]);        // Product variation (e.g., 16oz)
+                    $productTemp = "";                      // No temperature provided
                 } else {
-                    $name = trim($productParts[1]);
-                    $var = "normal"; 
+                    $productName = trim($productParts[1]);  // Product name only
+                    $productVar = "Regular";                // Default variation
+                    $productTemp = "";                      // Default temperature
                 }
                 
                 // Fetch the product price
                 $get_price = $conn->prepare("SELECT product_variations.price as price FROM product_variations LEFT JOIN products ON product_variations.product_id = products.id WHERE product_variations.size = ? AND name = ?");
-                $get_price->execute([$var, $name]);
+                $get_price->execute([$productVar, $productName]);
                 $product_data = $get_price->fetch(PDO::FETCH_ASSOC);
 
                 if ($product_data) {
                     $price = $product_data['price'];
                     $subtotal = $price * $quantity;
                     $total_amount += $subtotal;
-
+                    $productTemp = $productTemp ? '('.$productTemp.')' : '';
                     $product_details[] = [
-                        'name' => $name . ' (' . $var . ')',
+                        'name' => $productName . ' (' . $productVar . ')'. $productTemp,
                         'price' => $price,
                         'quantity' => $quantity,
                         'subtotal' => $subtotal
