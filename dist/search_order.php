@@ -14,6 +14,7 @@ $select_products = $conn->prepare("
         category c ON p.category = c.id
     WHERE 
         p.name LIKE ?
+        AND p.delete_flag = 0
     ORDER BY 
         c.id, p.name
 ");

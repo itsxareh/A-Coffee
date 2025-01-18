@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($order_id) {
         // Fetch the order details including the products string
-        $get_order = $conn->prepare("SELECT o.id, o.placed_on, o.products FROM orders o WHERE o.id = ?");
+        $get_order = $conn->prepare("SELECT o.id, o.placed_on, o.products FROM orders o WHERE o.id = ? ");
         $get_order->execute([$order_id]);
         $order = $get_order->fetch(PDO::FETCH_ASSOC);
 

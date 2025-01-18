@@ -1,7 +1,7 @@
 <?php 
 if (isset($_GET['id'])){
     $id = $_GET['id'];
-    $select_staff = $conn->prepare("SELECT * FROM users WHERE id = ?");
+    $select_staff = $conn->prepare("SELECT * FROM users WHERE id = ? AND delete_flag = 0");
     $select_staff->execute([$id]);
     $staff = $select_staff->fetch(PDO::FETCH_ASSOC); 
 

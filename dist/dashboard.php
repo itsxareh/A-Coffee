@@ -6,8 +6,13 @@
 </div>
 <div class="grid autofit-grid2 gap-12 p-2 mb-8">
     <?php 
-        $get_orders = $conn->prepare("SELECT o.uid  FROM orders o LEFT JOIN users u ON o.uid = u.uid WHERE o.uid = ?");
-        $get_orders->execute([$uid]);
+        if ($fetch_profile['user_type'] == 0) {
+            $get_orders = $conn->prepare("SELECT o.uid  FROM orders o LEFT JOIN users u ON o.uid = u.uid WHERE o.uid = ? AND o.delete_flag = 0");
+            $get_orders->execute([$uid]);
+        } else {
+            $get_orders = $conn->prepare("SELECT * FROM orders WHERE delete_flag = 0");
+            $get_orders->execute();
+        }
         $total_orders = $get_orders->rowCount();
     ?>
     <div class="rounded-lg shadow-lg bg-dark-brown text-center flex flex-col justify-around h-52">
@@ -15,7 +20,7 @@
         <span class="text-gray text-2xl">Total Orders</span>
     </div>
     <?php 
-        $get_products = $conn->prepare("SELECT * FROM products");
+        $get_products = $conn->prepare("SELECT * FROM products WHERE delete_flag = 0");
         $get_products->execute();
         $total_products = $get_products->rowCount();
     ?>
@@ -24,14 +29,19 @@
         <span class="text-gray text-2xl">Products</span>
     </div>
     <?php
-        $get_total = $conn->prepare("SELECT SUM(o.amount) AS total_amount FROM orders o LEFT JOIN users u ON o.uid = u.uid WHERE o.status = 1 AND o.uid = ?");
-        $get_total->execute([$uid]);
+        if ($fetch_profile['user_type'] == 0 ){
+            $get_total = $conn->prepare("SELECT SUM(o.amount) AS total_amount FROM orders o LEFT JOIN users u ON o.uid = u.uid WHERE o.status = 1 AND DATE(STR_TO_DATE(o.placed_on, '%m-%d-%Y %H:%i:%s')) = CURDATE() AND o.uid = ?");
+            $get_total->execute([$uid]);
+        } else {
+            $get_total = $conn->prepare("SELECT SUM(o.amount) AS total_amount FROM orders o WHERE o.status = 1 AND DATE(STR_TO_DATE(o.placed_on, '%m-%d-%Y %H:%i:%s')) = CURDATE();");
+            $get_total->execute();
+        }
         $get_total_amount = $get_total->fetch(PDO::FETCH_ASSOC);
         $total_amount = $get_total_amount['total_amount'];
     ?>
     <div class="rounded-lg shadow-lg bg-dark-brown text-center flex flex-col justify-around h-52">
         <p class="text-white text-5xl line-clamp-1 hover:line-clamp-1">₱<?= $total_amount ? $total_amount : 0 ?></p>
-        <span class="text-gray text-2xl">Total Sales</span>        
+        <span class="text-gray text-2xl">Daily Sales</span>        
     </div>
 </div>
 <div class="text-3xl text-center text-white rosarivo">Orders</div>
@@ -48,8 +58,13 @@
         </thead>
         <tbody>
             <?php
-            $get_orders = $conn->prepare("SELECT * FROM `orders` WHERE uid = ? ORDER BY CASE WHEN status = 2 THEN 0 WHEN status = 1 THEN 1 END, CASE WHEN status = 1 THEN id END DESC;");
-            $get_orders->execute([$uid]);
+            if ($fetch_profile['user_type'] == 1) {
+                $get_orders = $conn->prepare("SELECT * FROM `orders` WHERE delete_flag = 0 ORDER BY CASE WHEN status = 2 THEN 0 WHEN status = 1 THEN 1 END, CASE WHEN status = 1 THEN id END DESC;");
+                $get_orders->execute();
+            } else {
+                $get_orders = $conn->prepare("SELECT * FROM `orders` WHERE uid = ? AND delete_flag = 0 ORDER BY CASE WHEN status = 2 THEN 0 WHEN status = 1 THEN 1 END, CASE WHEN status = 1 THEN id END DESC;");
+                $get_orders->execute([$uid]);
+            }
             $orders = $get_orders->fetchAll(PDO::FETCH_ASSOC);
             if (count($orders) > 0){
                 foreach($orders as $order){ ?>

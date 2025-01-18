@@ -9,7 +9,7 @@ try {
             SELECT p.*, c.category_name, c.id as category_id 
             FROM products p 
             LEFT JOIN category c ON p.category = c.id 
-            WHERE p.id = ?
+            WHERE p.id = ? AND p.delete_flag = 0
         ");
         $stmt->execute([$id]);
         $product = $stmt->fetch(PDO::FETCH_ASSOC);

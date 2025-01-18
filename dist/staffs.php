@@ -18,13 +18,27 @@
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Name</th>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">UID</th>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Received Orders</th>
-                <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Total Sales</th>
+                <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Daily Sales</th>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Action</th>
             </tr>
         </thead>
         <tbody id="staffsList">
             <?php 
-                $select_staffs = $conn->prepare("SELECT u.id, u.image, u.name, u.uid, SUM(o.amount) AS total, COUNT(o.uid) AS quantity FROM users u LEFT JOIN orders o ON u.uid = o.uid GROUP BY u.uid");
+                $select_staffs = $conn->prepare("SELECT 
+                                                    u.id, 
+                                                    u.image, 
+                                                    u.name, 
+                                                    u.uid, 
+                                                    SUM(o.amount) AS total, 
+                                                    COUNT(o.uid) AS quantity
+                                                FROM 
+                                                    users u
+                                                LEFT JOIN 
+                                                    orders o 
+                                                    ON u.uid = o.uid 
+                                                    AND DATE(STR_TO_DATE(o.placed_on, '%m-%d-%Y %H:%i:%s')) = CURDATE()
+                                                GROUP BY 
+                                                    u.id, u.image, u.name, u.uid;");
                 $select_staffs->execute();
                 $staffs = $select_staffs->fetchAll(PDO::FETCH_ASSOC);
                 if (count($staffs) > 0){

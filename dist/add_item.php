@@ -6,7 +6,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = trim($_POST['name']);
     $description = isset($_POST['description']) ? trim($_POST['description']) : '';
     $quantity = isset($_POST['quantity']) ? str_replace(" ", "", $_POST['quantity']) : '';
-    $uid = $_POST['uid'];
+    $uid = $_SESSION['uid'];
     $id = $_POST['id'];
     $data = array();
 
@@ -27,7 +27,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($insert_item) {
             $item = $select_new_item->fetch(PDO::FETCH_ASSOC);
             if ($item) {
-                $conn->prepare("INSERT INTO `inventory-log`(uid, item_id, quantity, date) VALUES (?,?,?,?)")->execute([$uid, $item['id'], $quantity, $current_time]);
+                $log = $_SESSION['name']. " added a new item: ". $name .".";
+                $insert_log = $conn->prepare("INSERT INTO activity_log(uid, log, datetime) VALUES (?,?,?)");
+                $insert_log->bindParam(1, $uid);
+                $insert_log->bindParam(2, $log);
+                $insert_log->bindParam(3, $currentDateTime);
+                $insert_log->execute();
+                
                 $stmt = $conn->prepare("SELECT id, name, description, quantity FROM inventory WHERE id = ?");
                 $stmt->bindParam(1, $item['id']);
                 $stmt->execute();
@@ -41,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     } else {
         // Fetch current quantity in the database
-        $select_item = $conn->prepare("SELECT quantity FROM `inventory` WHERE id = ?");
+        $select_item = $conn->prepare("SELECT quantity, name FROM `inventory` WHERE id = ?");
         $select_item->bindParam(1, $id);
         $select_item->execute();
         $select_quantity = $select_item->fetch(PDO::FETCH_ASSOC);
@@ -74,13 +80,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $update_item->execute();
 
         if ($update_item) {
+            $log = $_SESSION['name']. " updated ". $name ." information.";
+            $insert_log = $conn->prepare("INSERT INTO activity_log(uid, log, datetime) VALUES (?,?,?)");
+            $insert_log->bindParam(1, $uid);
+            $insert_log->bindParam(2, $log);
+            $insert_log->bindParam(3, $currentDateTime);
+            $insert_log->execute();
+
             if ($quantity !== '') {
-                $insert_item = $conn->prepare("INSERT INTO `inventory-log`(uid, item_id, quantity, date) VALUES (?,?,?,?)");
-                $insert_item->bindParam(1, $uid);
-                $insert_item->bindParam(2, $id);
-                $insert_item->bindParam(3, $total_quantity);
-                $insert_item->bindParam(4, $current_time);
-                $insert_item->execute();
+                $log = $_SESSION['name']. " updated ". $select_quantity['name'] . "'s quantity: ". $quantity . ".";
+                $insert_log = $conn->prepare("INSERT INTO activity_log(uid, log, datetime) VALUES (?,?,?)");
+                $insert_log->bindParam(1, $uid);
+                $insert_log->bindParam(2, $log);
+                $insert_log->bindParam(3, $currentDateTime);
+                $insert_log->execute();
             }
 
             $select_new_item = $conn->prepare("SELECT * FROM inventory WHERE id = ?");
@@ -109,6 +122,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 function convertToBaseUnit($quantity, $unit, $unitDb) {
+    $validUnits = ['l', 'ml', 'kg', 'g', 'cup', 'oz', 'tbsp'];
+    
+    if (!in_array(strtolower($unit), $validUnits) || !in_array(strtolower($unitDb), $validUnits)) {
+        throw new Exception("Invalid unit type");
+    }
 
     if ($unitDb == $unit) {
         return $quantity * 1; 

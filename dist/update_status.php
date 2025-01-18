@@ -8,7 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["orderId"]) && isset($_
     $orderId = $_POST["orderId"];
     $status = $_POST["status"];
 
-    $select_cart = $conn->prepare("SELECT * FROM `orders` WHERE id = ? AND uid = ?");
+    $select_cart = $conn->prepare("SELECT * FROM `orders` WHERE id = ? AND uid = ? AND delete_flag = 0");
     $select_cart->execute([$orderId, $uid]);
 
     if ($select_cart->rowCount() > 0) {
@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["orderId"]) && isset($_
         if (empty($products)) {
             $response = array("success" => false, "message" => 'The order is empty');
         } else {
-            $update_order = $conn->prepare("UPDATE `orders` SET status = ? WHERE id = ?");
+            $update_order = $conn->prepare("UPDATE `orders` SET status = ? WHERE id = ? AND delete_flag = 0");
             $check_inventory = $conn->prepare("SELECT quantity, name FROM `inventory`");
 
             $conn->beginTransaction();

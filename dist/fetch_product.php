@@ -5,7 +5,7 @@ try {
     if (isset($_GET['id'])) {
         $id = $_GET['id'];
         
-        $stmt = $conn->prepare("SELECT *, category.id as category_id FROM products LEFT JOIN category ON products.category = category.id WHERE products.id = ?");
+        $stmt = $conn->prepare("SELECT *, products.id as id, category.id as category_id FROM products LEFT JOIN category ON products.category = category.id WHERE products.id = ? AND products.delete_flag = 0");
         $stmt->execute([$id]);
         $product = $stmt->fetch(PDO::FETCH_ASSOC);
         

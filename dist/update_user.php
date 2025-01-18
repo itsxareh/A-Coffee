@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST"){
     $image_folder = '../uploaded_img/' .uniqid().'-'.$image;
     $old_image = $_POST['old_image'];
 
-    $select_staff = $conn->prepare("SELECT * FROM users WHERE uid = ?");
+    $select_staff = $conn->prepare("SELECT * FROM users WHERE uid = ? AND delete_flag = 0");
     $select_staff->bindParam(1, $uid);
     $select_staff->execute();
     $staff = $select_staff->fetch(PDO::FETCH_ASSOC);
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST"){
                 $message[] = 'Image size is too large!';
             } else {
                 if (move_uploaded_file($image_tmp_name, $image_folder)) {
-                    $update_image = $conn->prepare("UPDATE `users` SET image = ? WHERE uid = ?");
+                    $update_image = $conn->prepare("UPDATE `users` SET image = ? WHERE uid = ? AND delete_flag = 0");
                     $update_image->bindParam(1, $image_folder);
                     $update_image->bindParam(2, $staff['uid']);
                     $update_image->execute();
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST"){
         }
         if (password_verify($password, $staff['password'])){
             if (!empty($npassword)){
-                $select_staff = $conn->prepare("UPDATE users SET password = ? WHERE uid = ?");
+                $select_staff = $conn->prepare("UPDATE users SET password = ? WHERE uid = ? AND delete_flag = 0");
                 $select_staff->bindParam(1, $uid);
                 $npassword = password_hash($npassword, PASSWORD_DEFAULT);
                 $select_staff->bindParam(2, $npassword);

@@ -45,7 +45,7 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
   ?>
   <div class="relative z-0 flex h-full w-full overflow-hidden"> 
     <div id="sidebar" class="relative z-3 first-letter:w-[260px] flex-shrink-0 overflow-x-hidden bg-dark-brown">
-    <div class="absolute z-2 opacity-80 inset-0  top-0 left-0 right-0 bottom-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>   
+    <div class="absolute z-2 opacity-80 inset-0  top-0 left-0 right-0 bottom-0 " style="background-color: rgba(0, 0, 0, 0.1);"></div>   
     <div class="h-full"  style="width:260px">
         <div class="flex h-full min-h-0 flex-col">
           <div class="relative h-full w-full flex-1 items-start border-white/20">
@@ -144,7 +144,7 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
               <?php if ($fetch_profile['user_type'] == 1) : ?>
               <div class="flex flex-col pt-2">
                 <div class="flex w-full justify-end">
-                  <a title="Inventory Log" href="index.php?page=inventory_log"><img class="w-6 h-6" src="../images/time-past-svgrepo-com.svg" alt=""></a>
+                  <a title="Activity Log" href="index.php?page=activity_log"><img class="w-6 h-6" src="../images/time-past-svgrepo-com.svg" alt=""></a>
                 </div>
               </div>
               <?php endif; ?>

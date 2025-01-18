@@ -3,7 +3,7 @@ include 'config.php';
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
-    $stmt = $conn->prepare("SELECT id, name, description, quantity FROM inventory WHERE id = ?");
+    $stmt = $conn->prepare("SELECT id, name, description, quantity FROM inventory WHERE id = ? AND delete_flag = 0");
     $stmt->execute([$id]);
     $data = $stmt->fetch(PDO::FETCH_ASSOC);
 

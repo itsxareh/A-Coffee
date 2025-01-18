@@ -6,7 +6,7 @@ ini_set('display_errors', 1);
 $searchTerm = isset($_GET['search']) ? '%' . $_GET['search'] . '%' : '';
 
 if ($searchTerm !== '') {
-    $select_products = $conn->prepare("SELECT * FROM products WHERE name LIKE ? OR category LIKE ? AND delete_flag = 0 ");
+    $select_products = $conn->prepare("SELECT * FROM products WHERE (name LIKE ? OR category LIKE ?) AND delete_flag = 0 ");
     $select_products->execute([$searchTerm, $searchTerm]);
 
     $products = $select_products->fetchAll(PDO::FETCH_ASSOC);

@@ -4,7 +4,7 @@ include 'config.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
    try {
       $conn->beginTransaction();
-      
+      $uid = $_SESSION['uid'];
       $id = $_POST['id'];
       $name = trim($_POST['name']);
       $price = trim($_POST['price']);
@@ -37,6 +37,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                   ]);
                }
             }
+         } else {
+            $data['message'] = 'No product variants were provided!';
          }
 
          $select_new_product = $conn->prepare("SELECT p.*, GROUP_CONCAT(v.id, ':', v.size, ':', v.price, ':', v.ingredients) as variations 
@@ -77,6 +79,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             if ($product) {
                $data = $product;
+               $log = $_SESSION['name']. " added a new product: ". $product['name'];
+               $insertLog = $conn->prepare("INSERT INTO activity_log (uid, log, datetime) VALUES (?, ?, ?)");
+               $insertLog->bindParam(1, $uid);
+               $insertLog->bindParam(2, $log);
+               $insertLog->bindParam(3, $currentDateTime);
+               $insertLog->execute();
                $data['message'] = "New product added.";
                $data['insert'] = true;
             } else {
@@ -85,15 +93,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
          }
       } 
-      // For updating existing product
       else {
-         $update_product = $conn->prepare("UPDATE `products` SET name = ?, price = ?, category = ?, description = ?, ingredients = ? WHERE id = ?");
+         $update_product = $conn->prepare("UPDATE `products` SET name = ?, category = ?, description = ? WHERE id = ?");
          $update_product->bindParam(1, $name);
-         $update_product->bindParam(2, $price);
-         $update_product->bindParam(3, $category);
-         $update_product->bindParam(4, $description);
-         $update_product->bindParam(5, $ingredients);
-         $update_product->bindParam(6, $id);
+         $update_product->bindParam(2, $category);
+         $update_product->bindParam(3, $description);
+         $update_product->bindParam(4, $id);
          $update_product->execute();
 
          // Delete existing variations
@@ -114,6 +119,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                   ]);
                }
             }
+         } else {
+            $data['message'] = 'No product variants were provided!';
          }
 
          $select_product = $conn->prepare("SELECT p.*, GROUP_CONCAT(v.id, ':', v.size, ':', v.price, ':', v.ingredients) as variations 
@@ -155,6 +162,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             if ($product) {
                $data = $product;
+               $log = $_SESSION['name']. " updated a product: ". $product['name'];
+               $insertLog = $conn->prepare("INSERT INTO activity_log (uid, log, datetime) VALUES (?, ?, ?)");
+               $insertLog->bindParam(1, $uid);
+               $insertLog->bindParam(2, $log);
+               $insertLog->bindParam(3, $currentDateTime);
+               $insertLog->execute();
                $data['message'] =  "Updated product successfully";
                $data['update'] = true;
             } else {

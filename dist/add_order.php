@@ -21,7 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE uid = ?");
         $insert_order = $conn->prepare("INSERT INTO `orders`(uid, products, amount, status, placed_on) VALUES(?,?,?,?,?)");
-
+        $insert_log = $conn->prepare("INSERT INTO `activity_log`(uid, log, datetime) VALUES (?,?,?)");
+        
         $conn->beginTransaction();
         $should_process_order = true;
 
@@ -83,29 +84,47 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($should_process_order) {
             $products_string = '';
             foreach ($cart_products as $index => $product) {
-                $product_info = $product['quantity'] . ' ' . $product['product_name'] . ' ' . '('.$product['variation'].')' . ' ' . '('.$product['temperature'].')';
+                $productTemp = !empty($product['temperature']) ? ' ('.$product['temperature'].')' : '';
+                $product_info = $product['quantity'] . ' ' . $product['product_name'] . ' ' . '('.$product['variation'].')' . '' . $productTemp;
                 $products_string .= $product_info;
                 if ($index < count($cart_products) - 1) {
                     $products_string .= ', ';
                 }
             }
-            $insert_order->bindParam(1, $uid);
-            $insert_order->bindParam(2, $products_string);
-            $insert_order->bindParam(3, $cart_total);
-            $insert_order->bindParam(4, $status);
-            $insert_order->bindParam(5, $current_time);
-            $insert_order->execute();
-            $delete_cart->bindParam(1, $uid);
-            $delete_cart->execute();
-            $conn->commit();
+            try {
+                $insert_order->bindParam(1, $uid);
+                $insert_order->bindParam(2, $products_string);
+                $insert_order->bindParam(3, $cart_total);
+                $insert_order->bindParam(4, $status);
+                $insert_order->bindParam(5, $current_time);
+                $insert_order->execute();
 
-            $response['success'] = true;
-            $response['message'] = "Product Ordered successfully";
-            $response['msg'] = $parsed_ingredients;
+                $order_id = $conn->lastInsertId();
+
+                $log = $_SESSION['name'] . " order placed($order_id): " . $products_string;
+                $insert_log->bindParam(1, $uid);
+                $insert_log->bindParam(2, $log);
+                $insert_log->bindParam(3, $currentDateTime);
+                $insert_log->execute();
+
+                $delete_cart->bindParam(1, $uid);
+                $delete_cart->execute();
+
+                $conn->commit();
+        
+                $response['success'] = true;
+                $response['message'] = "Product Ordered successfully";
+                $response['msg'] = $parsed_ingredients;
+            } catch (PDOException $e) {
+                $conn->rollBack();
+                $response['success'] = false;
+                $response['message'] = "Error processing order: ".$e->getMessage();
+                error_log($e->getMessage());  // Log the actual error
+            }
         }
     } else {
         $response['success'] = false;
-        $response['message'] = 'Your cart is '. $uid  . 'empty!';
+        $response['message'] = 'Your cart is empty!';
     }
         
 }

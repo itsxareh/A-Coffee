@@ -6,7 +6,7 @@ ini_set('display_errors', 1);
 $searchTerm = isset($_GET['search']) ? '%' . $_GET['search'] . '%' : '';
 
 if ($searchTerm !== '') {
-    $select_items = $conn->prepare("SELECT * FROM inventory WHERE name LIKE ?");
+    $select_items = $conn->prepare("SELECT * FROM inventory WHERE name LIKE ? AND delete_flag = 0");
     $select_items->execute([$searchTerm]);
 
     $items = $select_items->fetchAll(PDO::FETCH_ASSOC);

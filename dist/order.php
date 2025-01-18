@@ -68,7 +68,7 @@ ini_set('display_errors', 1);
                 <div class="products-container" data-category="<?= $category['category_id']?>">
                     <div class="grid autofit-grid gap-6 justify-start items-start">
                         <?php 
-                        $select_products = $conn->prepare("SELECT * FROM products WHERE category = ?");
+                        $select_products = $conn->prepare("SELECT * FROM products WHERE category = ? AND delete_flag = 0");
                         $select_products->execute([$category['category_id']]);
                         $products = $select_products->fetchAll(PDO::FETCH_ASSOC);
                         if (count($products) > 0){ 
@@ -86,7 +86,7 @@ ini_set('display_errors', 1);
                                                         <img class="rounded-md" src="../images/cart-arrow-down-svgrepo-com.svg">
                                                     </button>
                                                 </div>
-                                                <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= $product['image'] ?>"/>
+                                                <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= isset($product['image']) ? $product['image'] : 'IcedCappuccino.jpg' ?>"/>
                                             </div>
                                             <div class="flex justify-center items-center">
                                                 <p style="padding: 0.25rem;" class="text-center text-white salsa text-md p-1"><?= ucwords($product['name']) ?></p>
@@ -105,13 +105,13 @@ ini_set('display_errors', 1);
                                                     <input type="text" class="hidden" id="name" name="name" value="<?= $product['name']?>" autocomplete="off">
                                                     <input type="text" class="hidden" id="price" name="price" value="<?= $product_variations[0]['price']?>">
                                                     <input type="text" class="hidden" id="quantity" name="quantity" value="1">
-                                                    <input type="text" class="hidden" id="image" name="image" value="<?= $product['image']?>">
+                                                    <input type="text" class="hidden" id="image" name="image" value="<?= isset($product['image']) ? $product['image'] : 'IcedCappuccino.jpg'?>">
                                                     <button type="submit" id="cartBtn" class="cart-btn rounded-md p-2 cursor-pointer hidden">
                                                         <img class="rounded-md" src="../images/cart-arrow-down-svgrepo-com.svg">
                                                     </button>
                                                 </form>
                                             </div>
-                                            <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= $product['image'] ?>"/>
+                                            <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= isset($product['image']) ? $product['image'] : 'IcedCappuccino.jpg' ?>"/>
                                         </div>
                                         <div class="flex justify-center items-center">
                                             <p style="padding: 0.25rem;" class="text-white salsa text-md p-1"><?= ucwords($product['name']) ?></p>
@@ -344,10 +344,12 @@ function updateTemperature(cartId, temperature) {
     })
     .then(response => response.json())
     .then(data => {
+        console.log(data);
         if (data.success) {
             // Update temperature in the confirmation modal
             const confirmOrderModal = document.getElementById('confirm-modal');
             const cartItemInModal = confirmOrderModal.querySelector(`[data-id="${cartId}"]`);
+            console.log(cartItemInModal);
             if (cartItemInModal) {
                 const temperatureElement = cartItemInModal.querySelector('#confirm-temperature');
                 if (temperatureElement) {
@@ -573,7 +575,6 @@ function initializeProductEventListeners() {
     });
 }
 
-// Initial event listeners setup
 </script>
 <script>
 const confirmModal = document.getElementById("confirm-modal");
@@ -890,7 +891,7 @@ function addOrder() {
         if (data.success === true){
             setTimeout(function () {
                 window.location.href = 'index.php?page=dashboard';
-            }, 1500);
+            }, 300);
         }
         if (data.message) {
             divMessage.classList.remove('hidden');
@@ -1013,7 +1014,11 @@ function addToCart(form) {
                     <div class="flex items-center">
                         <img class="w-14 h-14 rounded-md mr-5" src="../uploaded_img/${cartItem.image}" alt=""/>
                         <div class="flex-1" data-id="${cartItem.id}">
-                            <h3 class="flex items-start mb-1 text-lg font-medium text-gray-900">${cartItem.name} ${cartItem.variation ? '(' + cartItem.variation + ')' : ''}<p class="salsa bg-blue-100 text-black text-sm font-medium mr-2 px-2.5 py-0.5 rounded ms-3">x<span id="confirm-quantity">${cartItem.quantity}</span></p></h3>
+                            <h3 class="flex items-start mb-1 text-lg font-medium text-gray-900">${cartItem.name} ${cartItem.variation ? '(' + cartItem.variation + ')' : ''}
+                            <p class="ml-1" id="confirm-temperature">
+                                <?= !empty($cart['temperature']) ? '('.$cart['temperature'].')' : '' ?>
+                            </p>
+                            <p class="salsa bg-blue-100 text-black text-sm font-medium mr-2 px-2.5 py-0.5 rounded ms-3">x<span id="confirm-quantity">${cartItem.quantity}</span></p></h3>
                             <p class="block mb-3 text-sm font-normal leading-none text-gray-500">₱<span id="confirm-price" class="salsa">${cartItem.price * cartItem.quantity}</span></p>
                         </div>               
                     </div>

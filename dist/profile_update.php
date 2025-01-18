@@ -1,6 +1,6 @@
 <?php
 if (isset($_SESSION['uid'])){
-    $select_profile = $conn->prepare("SELECT *, DATE_FORMAT(STR_TO_DATE(birthdate, '%m-%d-%Y'), '%Y-%m-%d') AS bdate FROM users WHERE uid = ?");
+    $select_profile = $conn->prepare("SELECT *, DATE_FORMAT(STR_TO_DATE(birthdate, '%m-%d-%Y'), '%Y-%m-%d') AS bdate FROM users WHERE uid = ? AND delete_flag = 0");
     $select_profile->bindParam(1, $_SESSION['uid']);
     $select_profile->execute();
     $profile = $select_profile->fetch(PDO::FETCH_ASSOC);     

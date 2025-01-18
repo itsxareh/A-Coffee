@@ -24,7 +24,7 @@
         </thead>
         <tbody id="itemsList">
             <?php 
-                $select_items = $conn->prepare("SELECT * FROM inventory ORDER BY id DESC");
+                $select_items = $conn->prepare("SELECT * FROM inventory WHERE delete_flag = 0 ORDER BY id DESC");
                 $select_items->execute();
                 $items = $select_items->fetchAll(PDO::FETCH_ASSOC);
                 if (count($items) > 0){

@@ -1,10 +1,8 @@
 <?php
 include 'config.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    date_default_timezone_set('Asia/Manila');
-    $current_time = date('m-d-Y h:i:s');
     $name = trim($_POST['name']);
-    $uid = $_POST['uid'];
+    $uid = $_SESSION['uid'];
     $id = $_POST['id'];
     $data = array();
     
@@ -22,8 +20,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($insert_item) {
             $item = $select_new_item->fetch(PDO::FETCH_ASSOC);
             if ($item) {
-                $log = "You added new category: ". $item['category_name'];
-                $conn->prepare("INSERT INTO `activity_log`(uid, log, datetime) VALUES (?,?,?)")->execute([$uid, $log, $current_time]);
+                $log = $_SESSION['name']. " added new category: ". $item['category_name'];
+                $conn->prepare("INSERT INTO `activity_log`(uid, log, datetime) VALUES (?,?,?)")->execute([$uid, $log, $currentDateTime]);
                 $stmt = $conn->prepare("SELECT id, category_name FROM category WHERE id = ?");
                 $stmt->bindParam(1, $item['id']);
                 $stmt->execute();
@@ -42,12 +40,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $update_item->execute();
 
         if ($update_item){
-            $log = "You updated category: ". $name;
-            $insert_item = $conn->prepare("INSERT INTO `activity_log`(uid, log, datetime) VALUES (?,?,?)");
-            $insert_item->bindParam(1, $uid);
-            $insert_item->bindParam(2, $id);
-            $insert_item->bindParam(3, $current_time);
-            $insert_item->execute();
+            $log =  $_SESSION['name']. " updated the category: ". $name;
+            $insertLog = $conn->prepare("INSERT INTO activity_log (uid, log, datetime) VALUES (?, ?, ?)");
+            $insertLog->bindParam(1, $uid);
+            $insertLog->bindParam(2, $log);
+            $insertLog->bindParam(3, $currentDateTime);
+            $insertLog->execute();
         }
         $select_new_item = $conn->prepare("SELECT * FROM category WHERE id = ?");
         $select_new_item->bindParam(1, $id);

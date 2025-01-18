@@ -5,7 +5,7 @@
     </div>
 </div>
 <div class="upper flex justify-between mb-4">
-    <span class="text-gray text-2xl salsa title">Inventory Log</span>
+    <span class="text-gray text-2xl salsa">Activity Log</span>
     <div class="button-input flex">
         <input title="Search" id="search" name="search" placeholder="Search" class="search ml-4 px-4 py-2 w-48 rounded-md salsa text-black" type="text">
     </div>
@@ -16,23 +16,19 @@
             <tr>
                 <!-- <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Item</th> -->
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Date</th>
-                <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Staff</th>
-                <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Item</th>
-                <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Quantity</th>
+                <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Log</th>
             </tr>
         </thead>
         <tbody id="itemsList">
             <?php 
-                $inventory_log = $conn->prepare("SELECT i.*, u.name as name, inv.name as itemName FROM `inventory-log` i LEFT JOIN users u ON i.uid = u.uid LEFT JOIN inventory inv ON i.item_id = inv.id ORDER BY i.date DESC");
+                $inventory_log = $conn->prepare("SELECT * FROM activity_log ORDER BY id DESC");
                 $inventory_log->execute();
                 $log = $inventory_log->fetchAll(PDO::FETCH_ASSOC);
                 if (count($log) > 0){ 
                     foreach ($log as $row) {?>
                     <tr class="border-color" data-id="<?= $row['id']; ?>">
-                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ucwords($row['date']); ?></td>
-                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ucwords($row['name'])?></td>
-                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ucwords($row['itemName']) ? ucwords($row['itemName']) : 'N/A' ?></td>
-                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ucwords($row['quantity']) ? ucwords($row['quantity']) : 'N/A' ?></td>
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= DateTime::createFromFormat('m-d-Y H:i:s', $row['datetime'])->format("F d Y h:i A")?></td>
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ($row['log'])?></td>
                     </tr>   
                 <?php
                     }

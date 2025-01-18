@@ -14,6 +14,16 @@ if (isset($_POST['login'])) {
     if ($row && password_verify($password, $row['password']) || $uid === 'admin' && $password === 'admin') {
         if ($row['user_type'] == 0 || $row['user_type'] == 1) {
             $_SESSION['uid'] = $row['uid'];
+            $_SESSION['name'] = $row['name'];
+            $_SESSION['user_type'] = $row['user_type'];
+            
+            $log = $_SESSION['name'].' logged in.';
+            $insert_log = $conn->prepare("INSERT INTO `activty_log`(uid, log, datetime) VALUES (?,?,?)");
+            $insert_log->bindParam(1, $_SESSION['uid']);
+            $insert_log->bindParam(2, $log);
+            $insert_log->bindParam(3, $currentDateTime);
+            $insert_log->execute();
+
             header('location:index.php');
             exit();
         } else {

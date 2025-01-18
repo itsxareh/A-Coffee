@@ -59,6 +59,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $select_staff = $conn->prepare("SELECT * FROM users WHERE uid = ?");
                 $select_staff->bindParam(1, $last_insert_id);
                 $select_staff->execute();
+
+                $log =  $_SESSION['name']. " added a new staff: ". $name;
+                $insertLog = $conn->prepare("INSERT INTO activity_log (uid, log, datetime) VALUES (?, ?, ?)");
+                $insertLog->bindParam(1, $uid);
+                $insertLog->bindParam(2, $log);
+                $insertLog->bindParam(3, $currentDateTime);
+                $insertLog->execute();
+
                 $data['message'] = "New staff added.";
                 $data['insert'] = true;
             } else {    
@@ -73,6 +81,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $update_staff->bindParam($key, $value);
         }
         $update_staff->execute();
+
+        $log =  $_SESSION['name']. " updated staff information: ". $name;
+        $insertLog = $conn->prepare("INSERT INTO activity_log (uid, log, datetime) VALUES (?, ?, ?)");
+        $insertLog->bindParam(1, $uid);
+        $insertLog->bindParam(2, $log);
+        $insertLog->bindParam(3, $currentDateTime);
+        $insertLog->execute();
+
+
         $select_staff = $conn->prepare("SELECT * FROM users WHERE uid = ?");
         $select_staff->bindParam(1, $uid);
         $select_staff->execute();

@@ -6,7 +6,7 @@ ini_set('display_errors', 1);
 $searchTerm = isset($_GET['search']) ? '%' . $_GET['search'] . '%' : '';
 
 if ($searchTerm !== '') {
-    $select_staffs = $conn->prepare("SELECT u.id, u.image, u.name, u.uid, SUM(o.amount) AS total, SUM(o.amount) AS quantity FROM users u LEFT JOIN orders o ON u.uid = o.uid WHERE name LIKE ? GROUP BY u.uid");
+    $select_staffs = $conn->prepare("SELECT u.id, u.image, u.name, u.uid, SUM(o.amount) AS total, SUM(o.amount) AS quantity FROM users u LEFT JOIN orders o ON u.uid = o.uid WHERE name LIKE ? AND delete_flag = 0 GROUP BY u.uid");
     $select_staffs->execute([$searchTerm]);
 
     $staffs = $select_staffs->fetchAll(PDO::FETCH_ASSOC);

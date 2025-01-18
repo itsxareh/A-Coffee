@@ -28,7 +28,7 @@
                     <button title="Delete" class="delete-btn rounded-md p-2 cursor-pointer hover:block hidden" onclick="showDeleteModal(<?= $product['id'] ?>)">
                         <img class="w-5 h-5 rounded-md" src="../images/delete-svgrepo-com.svg">
                     </button>
-                </div>
+                </div>  
                 <button type="button" id="view-btn" class="view-btn w-full h-full absolute cart-btn rounded-md cursor-pointer hidden" onclick="showViewModal(<?= $product['id'] ?>)">
                     <center><img title="View" class="rounded-md w-12 h-12 text-center" src="../images/details-more-svgrepo-com.svg"></center>
                 </button>
@@ -110,7 +110,7 @@
                         </div>
                         <button type="button" id="add-variation" class="focus:outline-none hover:bg-amber-400  transition duration-150 ease-in-out bg-light-brown rounded text-white px-4 sm:px-8 py-2 text-xs sm:text-sm salsa">Add Variation</button>
                     </div>
-                    <div class="col-span-full">
+                    <div class="col-span-full mt-2">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa"class="text-gray-800 text-sm font-semibold leading-tight tracking-normal salsa" for="description">Description</label>
                         <textarea title="Description" id="description" name="description" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" rows="3" required></textarea>
                     </div>
@@ -194,66 +194,6 @@
     </div>
 </div>
 <script>
-    const container = document.getElementById('variations-container');
-    const addButton = document.getElementById('add-variation');
-    let variationCount = 1;
-
-    toggleRemoveButtons();
-
-    addButton.addEventListener('click', function() {
-        const newRow = document.createElement('div');
-        newRow.className = 'variation-row mb-4';
-        newRow.innerHTML = `
-            <div class="grid cols-grid-2 gap-x-2">
-                <div class="col-span-1">
-                    <label class="text-gray-800 text-sm font-medium">Size</label>
-                    <input type="text" name="variations[${variationCount}][size]"
-                        class="mt-1 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border">
-                </div>
-                <div class="col-span-1">
-                    <label class="text-gray-800 text-sm font-medium">Price</label>
-                    <div class="relative">
-                        <div class="absolute text-gray-600 flex items-center px-2 border-r h-10 mt-1">
-                            <img width="16px" src="../images/peso-svgrepo-com.svg" alt="">
-                        </div>
-                        <input type="number" name="variations[${variationCount}][price]" 
-                            class="mt-1 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-12 text-sm border-gray-300 rounded border">
-                    </div>
-                </div>
-                <div class="col-span-full">
-                    <label class="text-gray-800 text-sm font-medium">Ingredients</label>
-                    <textarea name="variations[${variationCount}][ingredients]"
-                        class="mt-1 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" 
-                        rows="2"></textarea>
-                </div>
-            </div>
-            <div class="mt-2 flex justify-end">
-                <button type="button" class="remove-variation text-gray-800 hover:underline">Remove Variation</button>
-            </div>
-        `;
-        container.appendChild(newRow);
-        variationCount++;
-        toggleRemoveButtons();
-    });
-
-    container.addEventListener('click', function(e) {
-        if (e.target.classList.contains('remove-variation')) {
-            if (variationCount > 1) {
-                e.target.closest('.variation-row').remove();
-                variationCount--;
-                toggleRemoveButtons();
-            }
-        }
-    });
-
-    function toggleRemoveButtons() {
-        const removeButtons = container.querySelectorAll('.remove-variation');
-        removeButtons.forEach(button => {
-            button.style.display = variationCount > 1 ? 'inline-block' : 'none';
-        });
-    }
-</script>
-<script>
 const modal = document.getElementById("add-modal");
 const viewModal = document.getElementById("view-modal");
 const deleteModal = document.getElementById("delete-modal");
@@ -318,6 +258,7 @@ function fadeIn(el, display) {
         fetch(`search_product.php?search=${searchTerm}`)
         .then(response => response.text())
         .then(data => {
+            console.log(searchTerm);
             productsList.innerHTML = data;
         })
         .catch(error => {
@@ -348,7 +289,10 @@ function submitForm(event) {
             isValid = false;
         }
     });
-
+    if (variations.length > 0) {
+        divMessage.classList.remove('hidden');
+        messages.textContent = "Product variation is required."
+    }
     if (!isValid) {
         alert('Please fill all variation fields');
         return;
@@ -363,7 +307,7 @@ function submitForm(event) {
             if (data.insert === true) {
                 const productsList = document.getElementById('productsList');
                 const newProduct = document.createElement('div');
-                newProduct.setAttribute('class', 'products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-96 max-w-lg');
+                newProduct.setAttribute('class', 'products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-40 max-w-lg');
                 newProduct.setAttribute('data-id', data.id);
                 newProduct.setAttribute('title', data.name);
                 newProduct.setAttribute('onmouseover', 'showButtons(this)');
@@ -371,12 +315,12 @@ function submitForm(event) {
                 newProduct.innerHTML = `
                     <div class="relative flex w-full h-full flex-col items-center justify-center">
                         <div class="blur-bg absolute w-full h-full hidden rounded-md" style="background-color: rgba(0,0,0,0.5);"></div>
-                        <div class="absolute flex flex-col items-center top-4 right-4 z-10">
+                        <div class="absolute flex flex-col items-center top-0 right-0 z-10">
                             <button title="Edit" class="edit-btn rounded-md p-2 cursor-pointer hover:block hidden" onclick="showEditModal(${data.id})">
-                                <img class="w-8 h-8 rounded-md" src="../images/edit-svgrepo-com.svg">
+                                <img class="w-5 h-5 rounded-md" src="../images/edit-svgrepo-com.svg">
                             </button>
                             <button title="Delete" class="delete-btn rounded-md p-2 cursor-pointer hover:block hidden" onclick="showDeleteModal(${data.id})">
-                                <img class="w-8 h-8 rounded-md" src="../images/delete-svgrepo-com.svg">
+                                <img class="w-5 h-5 rounded-md" src="../images/delete-svgrepo-com.svg">
                             </button>
                         </div>
                         <button type="button" id="view-btn" class="view-btn w-full h-full absolute cart-btn rounded-md cursor-pointer hidden" onclick="showViewModal(${data.id})">
@@ -392,13 +336,15 @@ function submitForm(event) {
                 messages.textContent = data.message;
             } else if (data.update === true) {
                 const updatedRow = document.querySelector(`div[data-id="${data.id}"]`);
-                updatedRow.querySelector('.productImg').src = '../uploaded_img/' + data.image;  
+                updatedRow.querySelector('.productImg').src = '../uploaded_img/' + data.image !== null ? data.image : 'IcedCappuccino.jpg';  
                 updatedRow.querySelector('button.edit-btn').setAttribute('onclick', `showEditModal(${data.id})`);
                 updatedRow.querySelector('button.delete-btn').setAttribute('onclick', `showDeleteModal(${data.id})`);
                 updatedRow.querySelector('button.view-btn').setAttribute('onclick', `showViewModal(${data.id})`);
                 if (divMessage) {
                     divMessage.classList.remove('hidden');
                 }
+                messages.textContent = data.message;
+            } else {
                 messages.textContent = data.message;
             }
             setTimeout(function () {
@@ -420,7 +366,6 @@ function submitForm(event) {
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                // Populate basic product information
                 document.getElementById('id').value = data.id;
                 document.getElementById('name').value = data.name;
                 const categorySelect = document.getElementById('category');
@@ -443,8 +388,11 @@ function submitForm(event) {
                         .catch(error => console.error('Error fetching categories:', error));
                 }
                 document.getElementById('description').value = data.description;
-                document.getElementById('old_image').value = data.image;
-                document.getElementById('previewImage').src = '../uploaded_img/' + data.image;
+                const defaultImage = '../uploaded_img/IcedCappuccino.jpg';
+                const imagePath = data.image ? '../uploaded_img/' + data.image : defaultImage;
+
+                document.getElementById('old_image').value = data.image || 'IcedCappuccino.jpg'; // Store the default name if null
+                document.getElementById('previewImage').src = imagePath;
 
                 // Clear existing variations
                 const variationsContainer = document.getElementById('variations-container');
@@ -520,7 +468,6 @@ function submitForm(event) {
             });
         });
         
-        toggleRemoveButtons()
     }
     document.getElementById('add-variation').addEventListener('click', () => {
         const container = document.getElementById('variations-container');

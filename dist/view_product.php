@@ -1,7 +1,7 @@
 <?php 
 if (isset($_GET['id'])){
     $id = $_GET['id'];
-    $select_products = $conn->prepare("SELECT * FROM products WHERE id = ?");
+    $select_products = $conn->prepare("SELECT * FROM products WHERE id = ? AND delete_flag = 0");
     $select_products->execute([$id]);
     $products = $select_products->fetch(PDO::FETCH_ASSOC); 
     if ($products) {
