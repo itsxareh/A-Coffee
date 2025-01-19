@@ -225,8 +225,9 @@ ini_set('display_errors', 1);
                                         <?php
                                     }
                                     ?>
-                                    <div class="text-end">
-                                        <button title="Place Order" id="placeOrder" type="button" class="px-8 py-2 rounded-3xl bg-light-brown focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-amber-400 focus:ring-amber-400 transition duration-150 ease-in-out  salsa text-xl text-white" onclick="confirmModalHandler(true)">Place order</button>
+                                    <div class="flex justify-between">
+                                        <p class="text-md text-gray-600 rosarivo font-normal my-auto">Total: <span id="totalPlaceOrder" class="rosarivo font-bold text-gray-900"></span></p>
+                                        <button title="Place Order" id="placeOrder" type="button" class="mt-0 px-8 py-2 rounded-3xl bg-light-brown focus:outline-none hover:bg-amber-400 transition duration-150 ease-in-out  salsa text-xl text-white" onclick="confirmModalHandler(true)">Place order</button>
                                     </div>
                                     <?php
                                 } else {
@@ -507,11 +508,16 @@ function initializeProductEventListeners() {
                         console.error('Element with ID "list-cart" not found.');
                     }
                     const placeOrderButtonHTML = `
-                    <div class="text-end mt-4">
-                        <button title="Place Order" id="placeOrder" type="button" class="px-8 py-2 rounded-3xl bg-light-brown focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-amber-400 focus:ring-amber-400 transition duration-150 ease-in-out salsa text-xl text-white" onclick="confirmModalHandler(true)">Place order</button>
+                    <div class="flex justify-between">
+                        <p class="text-md text-gray-600 rosarivo font-normal my-auto">Total: <span id="totalPlaceOrder" class="rosarivo font-bold text-gray-900"></span></p>
+                        <button title="Place Order" id="placeOrder" type="button" class="mt-0 px-8 py-2 rounded-3xl bg-light-brown focus:outline-none hover:bg-amber-400 transition duration-150 ease-in-out  salsa text-xl text-white" onclick="confirmModalHandler(true)">Place order</button>
                     </div>`;
                     cartList.insertAdjacentHTML('beforeend', placeOrderButtonHTML);
-
+ 
+                    const totalPlaceOrder = document.getElementById('totalPlaceOrder');
+                    if (totalPlaceOrder) {
+                        totalPlaceOrder.textContent = '₱' + (parseFloat(data.totalPlaceOrder) || 0).toFixed(2);
+                    }
                     console.log(cartList);
 
                     const cartListConfirmModal = document.getElementById('cartListConfirmModal');
@@ -740,6 +746,10 @@ function attachDeleteEventListeners() {
                         if (ordersNoElement) {
                             ordersNoElement.textContent = data.ordersNo;
                         }
+                        const totalPlaceOrder = document.getElementById('totalPlaceOrder');
+                        if (totalPlaceOrder) {
+                            totalPlaceOrder.textContent = '₱' + (parseFloat(data.total) || 0).toFixed(2);
+                        }
 
                         // Check if cart is empty
                         const remainingCarts = listCart.querySelectorAll('.cart');
@@ -927,6 +937,7 @@ function addToCart(form) {
     })
     .then(response => response.json())
     .then(data => {
+        console.log('Received data:', data);
         if(variationModalHandler){
             variationModalHandler(false);
         }
@@ -936,8 +947,7 @@ function addToCart(form) {
                 divMessage.classList.remove('hidden');
             }
             messages.textContent = data.message;
-            ordersNo.innerHTML = data.total; 
-
+            ordersNo.innerHTML = data.total;
             // Update cart UI
             const cartList = document.getElementById('list-cart');
             if (cartList) {
@@ -996,8 +1006,9 @@ function addToCart(form) {
                 console.error('Element with ID "list-cart" not found.');
             }
             const placeOrderButtonHTML = `
-            <div class="text-end mt-4">
-                <button title="Place Order" id="placeOrder" type="button" class="px-8 py-2 rounded-3xl bg-light-brown focus:outline-none focus:ring-2 focus:ring-offset-2 hover:bg-amber-400 focus:ring-amber-400 transition duration-150 ease-in-out salsa text-xl text-white" onclick="confirmModalHandler(true)">Place order</button>
+            <div class="flex justify-between">
+                <p class="text-md text-gray-600 rosarivo font-normal my-auto">Total: <span id="totalPlaceOrder" class="rosarivo font-bold text-gray-900"></span></p>
+                <button title="Place Order" id="placeOrder" type="button" class="mt-0 px-8 py-2 rounded-3xl bg-light-brown focus:outline-none hover:bg-amber-400 transition duration-150 ease-in-out  salsa text-xl text-white" onclick="confirmModalHandler(true)">Place order</button>
             </div>`;
             cartList.insertAdjacentHTML('beforeend', placeOrderButtonHTML);
 
@@ -1016,7 +1027,7 @@ function addToCart(form) {
                         <div class="flex-1" data-id="${cartItem.id}">
                             <h3 class="flex items-start mb-1 text-lg font-medium text-gray-900">${cartItem.name} ${cartItem.variation ? '(' + cartItem.variation + ')' : ''}
                             <p class="ml-1" id="confirm-temperature">
-                                <?= !empty($cart['temperature']) ? '('.$cart['temperature'].')' : '' ?>
+                                ${cartItem.temperature ? '(' + cartItem.temperature + ')' : ''}
                             </p>
                             <p class="salsa bg-blue-100 text-black text-sm font-medium mr-2 px-2.5 py-0.5 rounded ms-3">x<span id="confirm-quantity">${cartItem.quantity}</span></p></h3>
                             <p class="block mb-3 text-sm font-normal leading-none text-gray-500">₱<span id="confirm-price" class="salsa">${cartItem.price * cartItem.quantity}</span></p>
@@ -1025,6 +1036,11 @@ function addToCart(form) {
                 </div>`;
                 cartListConfirmModal.insertAdjacentHTML('beforeend', confirmHTML);
             });
+             
+            const totalPlaceOrder = document.getElementById('totalPlaceOrder');
+            if (totalPlaceOrder) {
+                totalPlaceOrder.textContent = '₱' + (parseFloat(data.totalPlaceOrder) || 0).toFixed(2);
+            }
             console.log(cartListConfirmModal);
 
             const totalConfirmModal = document.getElementById('totalConfirmModal');
