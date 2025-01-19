@@ -46,9 +46,9 @@
                     
                     <tr class="border-color" data-id="<?= $staff['id']; ?>">
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
-                            <a class="cursor-pointer" href="index.php?page=view_staff&id=<?= $staff['id']; ?>" title="View Staff Details">
+                            <button class="cursor-pointer" onclick="showViewModal(<?= $staff['id'] ?>)" title="View Staff Details">
                                 <img class="w-16 h-16 object-cover" src="../uploaded_img/<?= $staff['image']; ?>">
-                            </a>
+                            </button>
                         </td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ucwords($staff['name']); ?></td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $staff['uid']; ?></td>
@@ -143,7 +143,55 @@
         </div>
     </div>
 </div>
-
+<div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="view-modal">
+    <div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
+    <div class="w-full max-w-xl p-5 relative mx-auto my-auto rounded-xl shadow-lg bg-white">
+        <div class="">
+            <div class="flex flex-row items-center">
+                <div class="w-2/5 flex flex-col items-center justify-center">
+                    <img class="w-40 h-40 object-cover rounded-lg" id="viewImage" src="">
+                    <h3 id="viewName" class="text-center text-xl font-semibold text-gray-800 capitalize rosarivo"></h3>
+                    <p id="viewUid" class="text-center text-sm text-gray-600 capitalize rosarivo"></p>
+                </div>
+                <div class="w-3/5 py-5">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="viewGender" class="text-gray-600 text-xs">Gender</label>
+                            <p id="viewGender" class="text-gray-900 capitalize rosarivo"></p>
+                        </div>
+                        <div class="text-end">
+                            <label for="viewDateJoined" class="text-gray-600 text-xs">Date joined</label>
+                            <p id="viewDateJoined" class="text-gray-900 normal-case rosarivo"></p>
+                        </div>
+                        <div>
+                            <label for="viewEmail" class="text-gray-600 text-xs">Email address</label>
+                            <p id="viewEmail" class="text-gray-900 normal-case rosarivo"></p>
+                        </div>
+                        <div class="text-end">
+                            <label for="viewUsertype" class="text-gray-600 text-xs">Type</label>
+                            <p id="viewUsertype" class="text-gray-900 normal-case rosarivo"></p>
+                        </div>
+                        <div>
+                            <label for="viewPNumber" class="text-gray-600 text-xs">Phone number</label>
+                            <p id="viewPNumber" class="text-gray-900 rosarivo"></p>
+                        </div>
+                        <div class="text-end">
+                            <label for="viewBirthdate" class="text-gray-600 text-xs">Birth date</label>
+                            <p id="viewBirthdate" class="text-sm text-gray-900 rosarivo"></p>
+                        </div>
+                        <div class="col-span-2">
+                            <label for="viewAddress" class="text-gray-600 text-xs">Address</label>
+                            <p id="viewAddress" class="text-gray-900 capitalize rosarivo"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center space-x-4 md:block">
+                <button class="md:mb-0 bg-light-brown px-5 py-2 text-sm font-medium tracking-wider border text-white rounded-full hover:shadow-lg hover:bg-amber-400" onclick="viewModalHandler()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="delete-modal">
    	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
     <div class="w-full  max-w-lg p-5 relative mx-auto h-80 rounded-xl shadow-lg  bg-white ">
@@ -168,6 +216,8 @@
 <script>
     const modal = document.getElementById("add-modal");
     const openModalBtn = document.getElementById("addModalBtn");
+    const viewModal = document.getElementById("view-modal");
+    const closeInfoModalBtn = document.getElementById("closeInfoModalBtn");
     const deleteModal = document.getElementById("delete-modal");
     const deleteModalBtn = document.getElementById("deleteModalBtn");
     const editModal = document.getElementById("edit-modal");
@@ -181,6 +231,13 @@
             fadeIn(modal);
         } else {
             fadeOut(modal);
+        }
+    }
+    function viewModalHandler(val) {
+        if (val) {
+            fadeIn(viewModal);
+        } else {
+            fadeOut(viewModal);
         }
     }
     function deleteModalHandler(val) {
@@ -232,6 +289,26 @@
         const deleteBtn = deleteModal.querySelector(".deleteStaff");
         deleteBtn.setAttribute("data-id", staffId);
         fadeIn(deleteModal);
+    }
+    function showViewModal(id) {
+        fetch('fetch_viewStaff.php?id=' + id)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                document.getElementById('viewUid').textContent = data.uid;
+                document.getElementById('viewName').textContent = data.name;
+                document.getElementById('viewPNumber').textContent = data.pnumber;
+                document.getElementById('viewDateJoined').textContent = data.joined_at;
+                document.getElementById('viewGender').textContent = data.gender.charAt(0);
+                document.getElementById('viewEmail').textContent = data.email;
+                document.getElementById('viewBirthdate').textContent = data.birthdate;
+                document.getElementById('viewUsertype').textContent = data.user_type;
+                document.getElementById('viewAddress').textContent = data.address;
+                document.getElementById('viewImage').src = '../uploaded_img/' + data.image;
+                
+                fadeIn(viewModal);
+            })
+            .catch(error => console.error('Error fetching data:', error));
     }
     function showEditModal(id) {
         fetch('fetch_staff.php?id=' + id)

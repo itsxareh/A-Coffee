@@ -183,7 +183,7 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
                           <img class="w-10 h-10" src="../images/profile-circle-svgrepo-com.svg" alt="">
                       </div>
                       <div class="nav-profile absolute right-1 -bottom-32 shadow-lg border rounded-lg p-4 w-60 hidden bg-dark-brown">
-                          <a href="index.php?page=profile_update" class="salsa text-sm font-normal block w-full p-2 mt-2 rounded-md text-center text-white bg-light-brown shadow-sm hover:text-white transition-colors duration-300">Update profile</a>
+                          <a href="index.php?page=profile_update" class="salsa text-sm font-normal block w-full p-2 mt-2 rounded-md text-center text-white bg-light-brown shadow-sm hover:text-white transition-colors duration-300">Account Settings</a>
                           <a href="logout.php" class="salsa text-sm font-normal block w-full p-2 mt-2 rounded-md text-center text-white bg-red-600 shadow-sm hover:text-white hover:bg-red-500 transition-colors duration-300">Logout</a>
                       </div>
                     </div>

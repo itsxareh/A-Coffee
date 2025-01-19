@@ -20,7 +20,7 @@ if(isset($message)){
    </script>
    ';
 }
-$select_profile = $conn->prepare("SELECT * FROM `users` WHERE uid = ?");
+$select_profile = $conn->prepare("SELECT * FROM `users` WHERE uid = ? AND delete_flag = 0");
 $select_profile->execute([$uid]);
 $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
 
@@ -36,7 +36,7 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
                 <img class="w-10 h-10" src="../images/profile-circle-svgrepo-com.svg" alt="">
             </div>
             <div class="nav-profile absolute right-1 -bottom-32 shadow-lg border rounded-lg p-4 w-60 hidden" style="background-color: var(--light-brown);">
-                <a href="index.php?page=profile_update" class="salsa text-lg block w-full p-2 mt-2 rounded-md text-center text-white bg-orange-600 shadow-sm hover:text-white hover:bg-orange-500 transition-colors duration-300">Update profile</a>
+                <a href="index.php?page=profile_update" class="salsa text-lg block w-full p-2 mt-2 rounded-md text-center text-white bg-orange-600 shadow-sm hover:text-white hover:bg-orange-500 transition-colors duration-300">Account Settings</a>
                 <a href="logout.php" class="salsa text-lg block w-full p-2 mt-2 rounded-md text-center text-white bg-red-600 shadow-sm hover:text-white hover:bg-red-500 transition-colors duration-300">Logout</a>
             </div>
         </div>
