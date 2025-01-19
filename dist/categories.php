@@ -185,7 +185,7 @@
     const formElement = document.getElementById('add_category'); 
     submitBtn.addEventListener('click', submitForm);
 
-    function submitForm(event) {
+function submitForm(event) {
     event.preventDefault();
     const formData = new FormData(formElement);
 

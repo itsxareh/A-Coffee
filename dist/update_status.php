@@ -3,7 +3,7 @@ include 'config.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["orderId"]) && isset($_POST["status"]) && isset($_SESSION["uid"])) {
     date_default_timezone_set('Asia/Manila');
-    $current_time = date('m-d-Y h:i:s');
+    $current_time = date('m-d-Y H:i:s');
     $uid = $_SESSION['uid'];
     $orderId = $_POST["orderId"];
     $status = $_POST["status"];
@@ -21,6 +21,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["orderId"]) && isset($_
         } else {
             $update_order = $conn->prepare("UPDATE `orders` SET status = ? WHERE id = ? AND delete_flag = 0");
             $check_inventory = $conn->prepare("SELECT quantity, name FROM `inventory`");
+            $insert_sale = $conn->prepare("INSERT INTO `sales` (order_id, amount, datetime) VALUES (?,?,?)");
+            $insert_log = $conn->prepare("INSERT INTO `activity_log`(uid, log, datetime) VALUES (?,?,?)");
+            
 
             $conn->beginTransaction();
             $should_process_order = true;
@@ -45,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["orderId"]) && isset($_
                 $select_ingredients->execute([$productVar, $productName]);
                 $ingredientRow = $select_ingredients->fetch(PDO::FETCH_ASSOC);
                 $ingredientsString = $ingredientRow['ingredients'];
-                $ingredients = explode(", ", $ingredientsString);
+                $ingredients = explode(",", $ingredientsString);
                 $parsed_ingredients = [];
 
                 foreach ($ingredients as $ingredient) { 
@@ -100,6 +103,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["orderId"]) && isset($_
                     }
                     $item_inventory = rtrim($item_inventory, ', ');
                 }
+                $insert_sale->execute([$orderId, $cart_item['amount'], $currentDateTime]);
+                $insert_log->execute([$uid, $_SESSION['name']." marked order {$orderId} as done.", $currentDateTime]);
+
                 $conn->commit();
                 $response = array("success" => true, "message" => "Order {$orderId} marked as done", "notification" => $item_inventory ? $item_inventory : '');
             }

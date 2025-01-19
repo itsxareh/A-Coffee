@@ -49,6 +49,8 @@ ini_set('display_errors', 1);
             products 
         ON 
             products.category = category.id
+        WHERE 
+            category.delete_flag = 0
         GROUP BY 
             category.id, category.category_name
         ORDER BY 
@@ -843,6 +845,10 @@ function updateQuantity(cartId, action) {
         const confirmTotal = document.querySelector('#confirm-total');
         if (confirmTotal) {
             confirmTotal.textContent = total.toFixed(2);
+        }
+        const totalPlaceOrder = document.getElementById('totalPlaceOrder');
+        if (totalPlaceOrder) {
+            totalPlaceOrder.textContent = '₱' + total.toFixed(2);
         }
     })
     .catch(error => {

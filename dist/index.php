@@ -49,8 +49,8 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
     <div class="h-full"  style="width:260px">
         <div class="flex h-full min-h-0 flex-col">
           <div class="relative h-full w-full flex-1 items-start border-white/20">
-          <div class="absolute right-0 top-0 -mr-12 pt-3.5 opacity-100">
-              <button id="svpClose" type="button" title="Close" class="flex h-10 w-10 items-center justify-center border rounded-lg focus:bg-white">
+            <div class="absolute right-0 top-0 -mr-12 pt-3.5 opacity-100 ">
+              <button id="svpClose" type="button" title="Close" class="flex h-10 w-10 items-center justify-center border rounded-lg focus:bg-white" tabindex="-1">
                 <img src="../images/close.svg">
               </button>
             </div>
@@ -204,8 +204,8 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
   </div>
 <script src="../src/script.js"></script>
 <script>
-  window.addEventListener('error', function (e) {
-    console.error('Error:', e.message, ' at ', e.filename, ':', e.lineno);
+window.addEventListener('error', function (e) {
+  console.error('Error:', e.message, ' at ', e.filename, ':', e.lineno);
 });
 const profileBtn = document.querySelector('#profileBtn');
 const navProfile = document.querySelector('.nav-profile');

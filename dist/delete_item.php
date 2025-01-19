@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     $item = $select_item->fetch(PDO::FETCH_ASSOC);
     $name = $item['name'];
     
-    $log = $_SESSION['name']. " deleted a item in inventory: ". ucwords($name) .".";
+    $log = $_SESSION['name']. " deleted an item in inventory: ". ucwords($name) .".";
     $insert_log = $conn->prepare("INSERT INTO activity_log(uid, log, datetime) VALUES (?,?,?)");
     $insert_log->bindParam(1, $uid);
     $insert_log->bindParam(2, $log);

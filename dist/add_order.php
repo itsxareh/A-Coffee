@@ -3,7 +3,7 @@ include 'config.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     date_default_timezone_set('Asia/Manila');
-    $current_time = date('m-d-Y h:i:s');
+    $current_time = date('m-d-Y H:i:s');
     $uid = $_SESSION['uid'];
     $status = '2';
     $cart_total = 0;
