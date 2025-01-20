@@ -156,7 +156,7 @@ INSERT INTO `category` (`id`, `category_name`, `delete_flag`) VALUES
 (2, 'espresso', 0),
 (3, 'non-coffee', 0),
 (4, 'soda series', 0),
-(5, 'Foods', 0)
+(5, 'Foods', 0);
 
 -- --------------------------------------------------------
 
@@ -183,7 +183,7 @@ INSERT INTO `inventory` (`id`, `name`, `quantity`, `description`, `added_at`, `i
 (2, 'Whole Milk', '7.500l', '', '03-04-2024 12:56:12', '', 0),
 (5, 'Instant Coffee', '14.400kg', '', '03-04-2024 12:57:39', '', 0),
 (6, 'Vanilla Syrup', '14.220l', '', '03-04-2024 10:10:35', '', 0),
-(7, 'Large cup', '10', 'N/A', '03-04-2024 11:16:29', '', 0),
+(7, 'Large cup', '10', 'N/A', '03-04-2024 11:16:29', '', 0);
 
 -- --------------------------------------------------------
 
@@ -281,7 +281,7 @@ INSERT INTO `products` (`id`, `name`, `category`, `description`, `image`, `delet
 (55, 'Green Apple', 4, 'Cocoas and fresh milk served on ice with whipped cream and chocolate powder.', 'IcedChocolateMilk.jpg', 0),
 (56, 'Passion Fruit', 4, 'Cocoas and fresh milk served on ice with whipped cream and chocolate powder.', 'IcedChocolateMilk.jpg', 0),
 (57, 'Strawberry', 2, 'Cocoas and fresh milk served on ice with whipped cream and chocolate powder.', 'IcedChocolateMilk.jpg', 0),
-(58, 'Blueberry', 4, 'Cocoas and fresh milk served on ice with whipped cream and chocolate powder.', 'IcedChocolateMilk.jpg', 0),
+(58, 'Blueberry', 4, 'Cocoas and fresh milk served on ice with whipped cream and chocolate powder.', 'IcedChocolateMilk.jpg', 0);
 
 -- --------------------------------------------------------
 
