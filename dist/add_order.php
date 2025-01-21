@@ -1,11 +1,44 @@
 <?php 
 include 'config.php';
 
+class QuantityParser {
+    private static function standardizeUnit($unit) {
+        $unit = strtolower(trim($unit));
+        
+        $unitMap = [
+            'l' => 'l',
+            'liter' => 'l',
+            'litre' => 'l',
+            'kg' => 'kg',
+            'kilogram' => 'kg',
+            '' => 'units'
+        ];
+        
+        return isset($unitMap[$unit]) ? $unitMap[$unit] : $unit;
+    }
+    
+    public static function parseQuantity($quantityStr) {
+        $quantityStr = trim($quantityStr);
+        
+        if (preg_match('/^(\d+\.?\d*)([a-zA-Z]*)$/', $quantityStr, $matches)) {
+            $value = (float)$matches[1];
+            $unit = self::standardizeUnit($matches[2]);
+            
+            return [
+                'value' => $value,
+                'unit' => $unit,
+                'original' => $quantityStr
+            ];
+        }
+        
+        return null;
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     date_default_timezone_set('Asia/Manila');
     $current_time = date('m-d-Y H:i:s');
     $uid = $_SESSION['uid'];
-    $status = '2';
     $cart_total = 0;
     $cart_products = [];
 
@@ -20,7 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $cart_total += $sub_total;
         }
         $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE uid = ?");
-        $insert_order = $conn->prepare("INSERT INTO `orders`(uid, products, amount, status, placed_on) VALUES(?,?,?,?,?)");
+        $check_inventory = $conn->prepare("SELECT id, quantity, name FROM `inventory` WHERE delete_flag = 0");
+        $insert_order = $conn->prepare("INSERT INTO `orders`(uid, products, amount, placed_on) VALUES(?,?,?,?)");
         $insert_log = $conn->prepare("INSERT INTO `activity_log`(uid, log, datetime) VALUES (?,?,?)");
         
         $conn->beginTransaction();
@@ -57,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $ingredient_quantity = $ingredient['quantity'];
                 $itemName = $ingredient['itemName'];
                 $unit = $ingredient['unit'];
-                $inventory_query = $conn->prepare("SELECT quantity FROM `inventory` WHERE name = ?");
+                $inventory_query = $conn->prepare("SELECT quantity FROM `inventory` WHERE name = ? AND delete_flag = 0");
                 $inventory_query->bindParam(1, $itemName);
                 $inventory_query->execute();
 
@@ -77,6 +111,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     } elseif ($db_value < $standard_quantity) {
                         $response['message'] = "Insufficient quantity for " . ucwords($itemName);
                         $should_process_order = false;
+                    } else { 
+                        $update_inventory = $conn->prepare("UPDATE `inventory` SET quantity = ? WHERE name = ?");
+                        $update_inventory->execute([$total_quantity, $itemName]);
                     }
                 }
             }
@@ -95,8 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $insert_order->bindParam(1, $uid);
                 $insert_order->bindParam(2, $products_string);
                 $insert_order->bindParam(3, $cart_total);
-                $insert_order->bindParam(4, $status);
-                $insert_order->bindParam(5, $current_time);
+                $insert_order->bindParam(4, $current_time);
                 $insert_order->execute();
 
                 $order_id = $conn->lastInsertId();
@@ -110,6 +146,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $delete_cart->bindParam(1, $uid);
                 $delete_cart->execute();
 
+
+                $THRESHOLDS = [
+                    'l' => 5.0,    // 10 liters
+                    'kg' => 10.0,   // 15 kilograms
+                    'units' => 20   // 20 pieces
+                ];
+
+                $check_inventory->execute();
+                $lowStockItems = [];
+                
+                while ($row = $check_inventory->fetch(PDO::FETCH_ASSOC)) {
+                    $parsedQuantity = QuantityParser::parseQuantity($row['quantity']);
+                    
+                    if ($parsedQuantity) {
+                        $threshold = isset($THRESHOLDS[$parsedQuantity['unit']]) 
+                            ? $THRESHOLDS[$parsedQuantity['unit']] 
+                            : 10.0; // Default threshold
+                        
+                        if ($parsedQuantity['value'] <= $threshold) {
+                            $lowStockItems[] = [
+                                'product_id' => $row['id'],
+                                'product_name' => $row['name'],
+                                'current_quantity' => $parsedQuantity['original'],
+                                'threshold' => $threshold . $parsedQuantity['unit']
+                            ];
+                        }
+                    }
+                }
+                
+                $response = [
+                    'status' => 'ok',
+                    'notification' => '',
+                ];
+
+                if (count($lowStockItems) > 0) {
+                    $response['status'] = 'low';
+                    $response['notification'] = 'Low stock alert: ' . count($lowStockItems) . ' items need attention!';
+                    $response['items'] = $lowStockItems;
+                }
                 $conn->commit();
         
                 $response['success'] = true;
@@ -119,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $conn->rollBack();
                 $response['success'] = false;
                 $response['message'] = "Error processing order: ".$e->getMessage();
-                error_log($e->getMessage());  // Log the actual error
+                error_log($e->getMessage());
             }
         }
     } else {

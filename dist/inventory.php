@@ -18,7 +18,9 @@
                 <!-- <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Item</th> -->
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Name</th>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Quantity</th>
+                <!-- <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Before Quantity</th> -->
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Description</th>
+                <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Last Update</th>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Action</th>
             </tr>
         </thead>
@@ -44,9 +46,12 @@
                         </td> -->
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ucwords($item['name']); ?></td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $db_value.''.$db_unit ?></td>
+                        <!-- <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $item['quantity_before'] ? $item['quantity_before'] :  $db_value.''.$db_unit ?></td> -->
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $item['description'] === '' ? 'N/A' : $item['description']; ?></td>
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $item['updated_at'] === '' ? 'N/A' :  DateTime::createFromFormat("m-d-Y H:i:s", $item['updated_at'])->format("F d Y h:i A"); ?></td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                             <div class="flex items-center gap-4">
+                                <button id="undoModalBtn" class="w-6 h-6" onclick="showUndoModal(<?= $item['id'] ?>)"><img src="../images/undo-svgrepo-com.svg" alt=""></button>
                                 <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(<?= $item['id'] ?>)"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
                                 <button id="deleteModalBtn" class="w-6 h-6" onclick="showDeleteModal(<?= $item['id'] ?>)"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
                             </div>
@@ -61,7 +66,7 @@
         </tbody>
     </table>
 </div>
-<div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="add-modal">
+<div class="py-20 px-4 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="add-modal">
    	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
     <div role="alert" class="container mx-auto w-11/12 md:w-2/3 max-w-xl">
         <div class="relative py-8 px-5 md:px-10 bg-white shadow-md rounded border border-gray-400">
@@ -105,8 +110,29 @@
         </div>
     </div>
 </div>
-
-<div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="delete-modal">
+<div class="py-20 px-4 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="undo-modal">
+   	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
+    <div class="w-full max-w-lg p-5 relative mx-auto h-80 rounded-xl shadow-lg  bg-white ">
+        <div class="">
+            <div class="text-center p-5 flex-auto justify-center">
+                <div class="w-full">
+                <svg class="text-center" width="50px" height="50px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g id="Edit / Undo">
+                    <path id="Vector" d="M10 8H5V3M5.29102 16.3569C6.22284 17.7918 7.59014 18.8902 9.19218 19.4907C10.7942 20.0913 12.547 20.1624 14.1925 19.6937C15.8379 19.225 17.2893 18.2413 18.3344 16.8867C19.3795 15.5321 19.963 13.878 19.9989 12.1675C20.0347 10.4569 19.5211 8.78001 18.5337 7.38281C17.5462 5.98561 16.1366 4.942 14.5122 4.40479C12.8878 3.86757 11.1341 3.86499 9.5083 4.39795C7.88252 4.93091 6.47059 5.97095 5.47949 7.36556" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </g>
+                </svg>
+                </div>
+                <h2 class="text-xl font-bold py-4 text-black">Are you sure?</h3>
+                <p class="text-sm text-gray-500 px-8">Do you really want to undo the changes?</p>    
+            </div>
+            <div class="p-3  mt-2 text-center space-x-4 md:block">
+                <button class="undoItem mb-2 md:mb-0 bg-amber-500 border border-amber-500 px-5 py-2 text-sm shadow-sm font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-amber-600" data-id=<?= $item['id']; ?> >Undo changes</button>
+                <button class="mb-2 md:mb-0 bg-white px-5 py-2 text-sm shadow-sm font-medium tracking-wider border text-gray-600 rounded-full hover:shadow-lg hover:bg-gray-100" onclick="undoModalHandler()">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="py-20 px-4 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="delete-modal">
    	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
     <div class="w-full max-w-lg p-5 relative mx-auto h-80 rounded-xl shadow-lg  bg-white ">
         <div class="">
@@ -117,7 +143,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 flex items-center text-red-500 mx-auto" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                 </svg>
-                <h2 class="text-xl font-bold py-4 ">Are you sure?</h3>
+                <h2 class="text-xl font-bold py-4 text-black">Are you sure?</h3>
                 <p class="text-sm text-gray-500 px-8">Do you really want to this delete this item? This process cannot be undone</p>    
             </div>
             <div class="p-3  mt-2 text-center space-x-4 md:block">
@@ -134,6 +160,8 @@
     const deleteModalBtn = document.getElementById("deleteModalBtn");
     const editModal = document.getElementById("edit-modal");
     const editModalBtn = document.getElementById("editModalBtn");
+    const undoModal = document.getElementById("undo-modal");
+    const undoModalBtn = document.getElementById("undoModalBtn");
     const messages = document.getElementById("message");
     const divMessage = document.getElementsByClassName('hide-message')[0];
     
@@ -152,6 +180,14 @@
             fadeOut(deleteModal);
         }
     }
+    function undoModalHandler(val) {
+        if (val) {
+            fadeIn(undoModal);
+        } else {
+            fadeOut(undoModal);
+        }
+    }
+    
     function fadeOut(el) {
         el.style.opacity = 1;
         (function fade() {
@@ -195,6 +231,11 @@
         deleteBtn.setAttribute("data-id", itemId);
         fadeIn(deleteModal);
     }
+    function showUndoModal(itemId) {
+        const undoBtn = undoModal.querySelector(".undoItem");
+        undoBtn.setAttribute("data-id", itemId);
+        fadeIn(undoModal);
+    }
     function showEditModal(id) {
         fetch('fetch_item.php?id=' + id)
             .then(response => response.json())
@@ -234,10 +275,13 @@
                     <img class="w-16 h-16 object-cover" src="../uploaded_img/">
                 </td>-->
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
-                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity.toUpperCase()}</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity}</td>
+                // <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">N/A</td>
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.description}</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.added_at}</td>
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                     <div class="flex items-center gap-4">
+                        <button id="undoModalBtn" class="w-6 h-6" onclick="showUndoModal(${data.id})"><img src="../images/undo-svgrepo-com.svg" alt=""></button>
                         <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(${data.id})"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
                         <button id="deleteModalBtn" class="w-6 h-6" onclick="showDeleteModal(${data.id})"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
                     </div>
@@ -250,16 +294,38 @@
             }
             messages.textContent = data.message;
         } else if (data.update === true) {
+            const inputDate = data.updated_at;
+            const [datePart, timePart] = inputDate.split(" ");
+            const [month, day, year] = datePart.split("-");
+            const date = new Date(`${year}-${month}-${day}T${timePart}`);
+
+            // Format the date
+            const options = { year: "numeric", month: "long", day: "numeric" };
+            const formattedDate = date.toLocaleDateString("en-US", options);
+
+            // Format the time
+            let hours = date.getHours();
+            const minutes = date.getMinutes().toString().padStart(2, "0");
+            const ampm = hours >= 12 ? "PM" : "AM";
+            hours = hours % 12 || 12;
+
+            const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes} ${ampm}`;
+
+            // Combine the formatted date and time
+            const dateResult = `${formattedDate} ${formattedTime}`;
             const updatedRow = document.querySelector(`tr[data-id="${data.id}"]`);
             updatedRow.innerHTML = `
                 <!--<td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                     <img class="w-16 h-16 object-cover" src="../uploaded_img/">
                 </td>-->
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
-                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity.toUpperCase()}</td>
-                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.description}</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity}</td>
+                // <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity_before}</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.description === '' ? 'N/A' : data.description}</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${dateResult}</td>
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                     <div class="flex items-center gap-4">
+                        <button id="undoModalBtn" class="w-6 h-6" onclick="showUndoModal(${data.id})"><img src="../images/undo-svgrepo-com.svg" alt=""></button>
                         <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(${data.id})"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
                         <button id="deleteModalBtn" class="w-6 h-6" onclick="showDeleteModal(${data.id})"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
                     </div>

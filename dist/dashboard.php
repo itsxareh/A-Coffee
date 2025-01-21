@@ -105,7 +105,7 @@
     </table>
 </div>
 
-<div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 h-full hidden" id="notification-modal">
+<div class="py-20 px-4 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 h-full hidden" id="notification-modal">
    	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
     <div class="w-full  max-w-lg p-5 relative mx-auto h-auto rounded-xl shadow-lg  bg-white ">
             <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-whit" onclick="notificationModalHandler()">
@@ -124,7 +124,7 @@
         </div>
     </div>
 </div> 
-<div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 h-full hidden" id="receipt-modal">
+<div class="py-20 px-4 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 h-full hidden" id="receipt-modal">
    	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
     <div class="w-full max-w-lg p-5 relative mx-auto my-auto rounded-xl shadow-lg  bg-white ">
             <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-whit" onclick="receiptModalHandler()">
@@ -145,7 +145,7 @@
         </div>
     </div>
 </div> 
-<div class="py-20 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="delete-modal">
+<div class="py-20 px-4 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden h-full" id="delete-modal">
    	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
     <div class="w-full  max-w-lg p-5 relative mx-auto h-80 rounded-xl shadow-lg  bg-white ">
         <div class="">
@@ -188,7 +188,7 @@ document.querySelectorAll('.statusBtn').forEach(button => {
                         const row = button.closest('tr');
                         const tbody = row.parentNode;
                         tbody.appendChild(row);
-                        
+                        window.location.href = 'index.php?page=order';
                         if (divMessage) {
                             divMessage.classList.remove('hidden');
                             messages.textContent = response.message;
@@ -361,7 +361,7 @@ document.addEventListener('keydown', (e) => {
                             ${data.products.map(product => `
                                 <tr data-id="${data.order_id}">
                                     <td class="py-3 text-sm text-gray-900">${product.quantity}</td>
-                                    <td class="py-3 text-sm text-gray-900">${product.name}</td>
+                                    <td class="py-3 text-sm text-gray-900">${product.name} ${product.temp ? '<strong>' + product.temp + '</strong>' : ''}</td>
                                     <td class="py-3 text-sm text-gray-900">₱${product.price}</td>
                                 </tr>
                             `).join('')}

@@ -25,7 +25,11 @@ if (isset($_POST['login'])) {
             $insert_log->bindParam(3, $currentDateTime);
             $insert_log->execute();
 
-            header('location:index.php');
+            if ($_SESSION['user_type'] == 0){
+                header('location:index.php?page=order');
+            } else {
+                header('location:index.php');
+            }
             exit();
         } else {
             $message[] = "Your account has been blocked.";

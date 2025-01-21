@@ -2,7 +2,7 @@
 include 'config.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     date_default_timezone_set('Asia/Manila');
-    $current_time = date('m-d-Y h:i:s');
+    $current_time = date('m-d-Y H:i:s');
     $name = trim($_POST['name']);
     $description = isset($_POST['description']) ? trim($_POST['description']) : '';
     $quantity = isset($_POST['quantity']) ? str_replace(" ", "", $_POST['quantity']) : '';
@@ -55,10 +55,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($quantity === '') {
             // Only update name and description, keep quantity unchanged
-            $update_item = $conn->prepare("UPDATE `inventory` SET name = ?, description = ? WHERE id = ?");
+            $update_item = $conn->prepare("UPDATE `inventory` SET name = ?, description = ?, updated_at = ? WHERE id = ?");
             $update_item->bindParam(1, $name);
             $update_item->bindParam(2, $description);
-            $update_item->bindParam(3, $id);
+            $update_item->bindParam(3, $currentDateTime);
+            $update_item->bindParam(4, $id);
         } else {
             // Update name, description, and quantity
             preg_match('/(\d*\.?\d+)\s*([a-zA-Z]+)/', $quantity_db, $matches);
@@ -70,11 +71,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $standard_quantity = convertToBaseUnit($quantity_value, $quantity_unit, $db_unit);
 
             $total_quantity = number_format((floatval($standard_quantity) + floatval($db_value)), 3, '.', '').''.$db_unit;
-            $update_item = $conn->prepare("UPDATE `inventory` SET name = ?, description = ?, quantity = ? WHERE id = ?");
+            $update_item = $conn->prepare("UPDATE `inventory` SET name = ?, description = ?, quantity = ?, quantity_before = ?, updated_at = ? WHERE id = ?");
             $update_item->bindParam(1, $name);
             $update_item->bindParam(2, $description);
             $update_item->bindParam(3, $total_quantity);
-            $update_item->bindParam(4, $id);
+            $update_item->bindParam(4, $quantity_db);
+            $update_item->bindParam(5, $currentDateTime);
+            $update_item->bindParam(6, $id);
         }
 
         $update_item->execute();
@@ -103,7 +106,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($update_item) {
                 $item = $select_new_item->fetch(PDO::FETCH_ASSOC);
                 if ($item) {
-                    $stmt = $conn->prepare("SELECT id, name, description, quantity FROM inventory WHERE id = ?");
+                    $stmt = $conn->prepare("SELECT id, name, description, quantity, quantity_before, updated_at, added_at FROM inventory WHERE id = ?");
                     $stmt->bindParam(1, $id);
                     $stmt->execute();
                     $data = $stmt->fetch(PDO::FETCH_ASSOC);

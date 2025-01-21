@@ -46,7 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $total_amount += $subtotal;
                     $productTemp = $productTemp ? '('.$productTemp.')' : '';
                     $product_details[] = [
-                        'name' => $productName . ' (' . $productVar . ')'. $productTemp,
+                        'name' => $productName . ' (' . $productVar . ')',
+                        'temp' =>  $productTemp,
                         'price' => $price,
                         'quantity' => $quantity,
                         'subtotal' => $subtotal
