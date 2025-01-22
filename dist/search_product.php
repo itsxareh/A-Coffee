@@ -27,7 +27,7 @@ if ($searchTerm !== '') {
                 <button type="button" id="view-btn" class="view-btn w-full h-full absolute cart-btn rounded-md cursor-pointer hidden" onclick="showViewModal(<?= $product['id'] ?>)">
                     <center><img title="View" class="rounded-md w-12 h-12 text-center" src="../images/details-more-svgrepo-com.svg"></center>
                 </button>
-                <img class="productImg w-full h-full object-cover rounded-md" src="../uploaded_img/<?= isset($product['image']) ? $product['image'] : 'IcedCappuccino.jpg' ?>">
+                <img class="productImg w-full h-full object-cover rounded-md" src="../uploaded_img/<?= isset($product['image']) ? $product['image'] : 'CoffeeFrappuccino.jpg' ?>">
             </div>
         </div>
         <?php

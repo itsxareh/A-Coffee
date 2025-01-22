@@ -52,12 +52,36 @@
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Order ID</th>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left min-w-48 max-w-72">Orders</th>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Price</th>
-                <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Status</th>
+                <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Placed On</th>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Action</th>
             </tr>
         </thead>
         <tbody>
             <?php
+            function getRelativeTime($placedOn) {
+                $timestamp = strtotime($placedOn);
+                $now = time();
+                $diff = $now - $timestamp;
+            
+                if ($diff < 60) {
+                    return 'Just now';
+                } elseif ($diff < 3600) {
+                    $minutes = floor($diff / 60);
+                    return $minutes . 'm ago';
+                } elseif ($diff < 86400) {
+                    $hours = floor($diff / 3600);
+                    return $hours . 'h ago';
+                } elseif ($diff < 2592000) {
+                    $days = floor($diff / 86400);
+                    return $days . 'd ago';
+                } elseif ($diff < 31536000) {
+                    $months = floor($diff / 2592000);
+                    return $months . 'mo ago';
+                } 
+                $years = floor($diff / 31536000);
+                return $years . 'y ago';
+            }
+
             if ($fetch_profile['user_type'] == 1) {
                 $get_orders = $conn->prepare("SELECT * FROM `orders` WHERE delete_flag = 0 ORDER BY CASE WHEN status = 2 THEN 0 WHEN status = 1 THEN 1 END, CASE WHEN status = 1 THEN id END DESC;");
                 $get_orders->execute();
@@ -72,7 +96,7 @@
                     <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap rosarivo"><?= $order['id'] ?></td>
                     <td class="text-gray text-medium text-sm p-3 py-4 whitespace-wrap rosarivo min-w-48 max-w-72"><?= $order['products']?></td>
                     <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap rosarivo">₱<?= $order['amount']; ?></td>
-                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap text-balance rosarivo">
+                    <!-- <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap text-balance rosarivo">
                     <?php if ($order['status']===2) { ?>
                         <select class="text-white text-medium text-sm bg-transparent whitespace-nowrap rosarivo status-select" name="status" data-id="<?= $order['id'] ?>">
                             <option class="text-black text-medium rosarivo " value="2" <?= $order['status'] == 2 ? 'selected' : '' ?>>On Process</option>
@@ -82,6 +106,9 @@
                     } else {
                         echo 'Done';
                     }?>
+                    </td> -->
+                    <td class="placed_on" data-timestamp="<?= $order['placed_on']; ?>">
+                        <?= getRelativeTime($order['placed_on']); ?>
                     </td>
                     <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap rosarivo">
                         <div class="flex items-center gap-4">
@@ -118,7 +145,7 @@
                 <h3 class="mb-4 text-xl font-bold text-gray-900">Approaching Low Quantity</h3>
                 <p class="text-gray-500 text-md font-normal dark:text-gray-400 mb-6">The following item/s have low inventory quantity. Please restocking soon:<p>
                 <div class="text-center"><span id="notification" class="text-md font-medium text-gray-900 mb-6"></span></div>
-                <div class="p-3  mt-2 text-center space-x-4 md:block">
+                <div class="text-center space-x-4 md:block">
                     <button class="mb-2 md:mb-0 bg-light-brown px-5 py-2 text-sm font-medium tracking-wider border text-white rounded-full hover:shadow-lg hover:bg-amber-400" onclick="notificationModalHandler()">Okay</button>
                 </div>
         </div>
@@ -166,6 +193,49 @@
         </div>
     </div>
 </div>
+<script>
+function getRelativeTime(placed_on) {
+    const date = new Date(placed_on.replace(/-/g, '/'));
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000);
+
+    if (diff < 60) {
+        return 'Just now';
+    } else if (diff < 3600) {
+        const minutes = Math.floor(diff / 60);
+        return `${minutes}m ago`;
+    } else if (diff < 86400) {
+        const hours = Math.floor(diff / 3600);
+        return `${hours}h ago`;
+    } else if (diff < 2592000) {
+        const days = Math.floor(diff / 86400);
+        return `${days}d ago`;
+    } else if (diff < 31536000) {
+        const months = Math.floor(diff / 2592000);
+        return `${months}mo ago`;
+    } else {
+        const years = Math.floor(diff / 31536000);
+        return `${years}y ago`;
+    }
+}
+
+function updateTimestamps() {
+    const timestamps = document.querySelectorAll('.placed_on');
+    timestamps.forEach(element => {
+        // Use the data-timestamp attribute instead of text content
+        const originalDate = element.getAttribute('data-timestamp');
+        if (originalDate) {
+            element.textContent = getRelativeTime(originalDate);
+        }
+    });
+}
+
+updateTimestamps();
+
+setInterval(updateTimestamps, 60000);
+
+
+</script>
 <script>
 const messages = document.getElementById("message");
 const divMessage = document.getElementsByClassName('hide-message')[0];
@@ -369,7 +439,9 @@ document.addEventListener('keydown', (e) => {
                         </table>
                     </div>
                     
-                    <p class="text-end text-md font-semibold text-gray-900 mt-5"><strong>Total Amount:</strong> ₱${data.amount}</p>
+                    <p class="text-end text-md font-semibold text-gray-900 mt-5"><strong>Total Amount:</strong> ₱${parseFloat(data.amount).toFixed(2)}</p>
+                    <p class="text-end text-md font-semibold text-gray-900 mt-1"><strong>Cash:</strong> ₱${parseFloat(data.cash).toFixed(2)}</p>
+                    <p class="text-end text-md font-semibold text-gray-900 mt-1"><strong>Change:</strong> ₱${parseFloat(data.cash - data.amount).toFixed(2)}</p>
                 `;
             } else {
                 alert('Failed to fetch order details.');

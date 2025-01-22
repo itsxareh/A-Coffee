@@ -52,10 +52,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
          if ($insert_product) {
             $product = $select_new_product->fetch(PDO::FETCH_ASSOC);
             // Handle image upload
+            $unique_id = rand(000000000, 999999999);
             $image = $_FILES['image']['name'];
+            $uniq_image = $unique_id . '-' . $image;
             $image_size = $_FILES['image']['size'];
             $image_tmp_name = $_FILES['image']['tmp_name'];
-            $image_folder = '../uploaded_img/' . $image;
+            $image_folder = '../uploaded_img/' . $uniq_image;
             $old_image = $_POST['old_image'];
 
             if (!empty($image)) {
@@ -64,7 +66,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                } else {
                   if (move_uploaded_file($image_tmp_name, $image_folder)) {
                      $update_image = $conn->prepare("UPDATE `products` SET image = ? WHERE id = ?");
-                     $update_image->bindParam(1, $image);
+                     $update_image->bindParam(1, $uniq_image);
                      $update_image->bindParam(2, $product['id']);
                      $update_image->execute();
 
@@ -85,6 +87,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                $insertLog->bindParam(2, $log);
                $insertLog->bindParam(3, $currentDateTime);
                $insertLog->execute();
+               
+               $data['image'] = !empty($image) ? $uniq_image : NULL;
                $data['message'] = "New product added.";
                $data['insert'] = true;
             } else {
@@ -134,10 +138,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
          if ($update_product) {
             $product = $select_product->fetch(PDO::FETCH_ASSOC);
             // Handle image upload for update
-            $image = trim($_FILES['image']['name']);
+            $unique_id = rand(000000000, 999999999);
+            $image = $_FILES['image']['name'];
+            $uniq_image = $unique_id . '-' . $image;
             $image_size = $_FILES['image']['size'];
             $image_tmp_name = $_FILES['image']['tmp_name'];
-            $image_folder = '../uploaded_img/' . $image;
+            $image_folder = '../uploaded_img/' . $uniq_image;
             $old_image = $_POST['old_image'];
 
             if (!empty($image)) {
@@ -146,7 +152,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                } else {
                   if (move_uploaded_file($image_tmp_name, $image_folder)) {
                      $update_image = $conn->prepare("UPDATE `products` SET image = ? WHERE id = ?");
-                     $update_image->bindParam(1, $image);
+                     $update_image->bindParam(1, $uniq_image);
                      $update_image->bindParam(2, $product['id']);
                      $update_image->execute();
 
@@ -168,6 +174,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                $insertLog->bindParam(2, $log);
                $insertLog->bindParam(3, $currentDateTime);
                $insertLog->execute();
+               $data['image'] = !empty($image) ? $uniq_image : $product['image'];
                $data['message'] =  "Updated product successfully";
                $data['update'] = true;
             } else {

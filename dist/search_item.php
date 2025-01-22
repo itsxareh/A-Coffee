@@ -23,14 +23,26 @@ if ($searchTerm !== '') {
                 $quantity_unit = 'piece/s';
             } ?>
         <tr class="border-color" data-id="<?= $item['id']; ?>">
-            <!--<td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
-                    <img class="w-16 h-16 object-cover" src="../uploaded_img/<?= $item['image']; ?>">
-            </td>-->
             <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ucwords($item['name']); ?></td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $quantity_value.$quantity_unit ?></td>
-            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $item['description']; ?></td>
+            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $quantity_value.''.$quantity_unit ?></td>
+            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $item['description'] === '' ? 'N/A' : $item['description']; ?></td>
+            <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $item['updated_at'] === '' ? 'N/A' :  DateTime::createFromFormat("m-d-Y H:i:s", $item['updated_at'])->format("F d Y h:i A"); ?></td>
             <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                 <div class="flex items-center gap-4">
+                    <?php 
+                    if (!empty($item['updated_at'])) {
+                        $updated = DateTime::createFromFormat("m-d-Y H:i:s", $item['updated_at']);
+                        $now = new DateTime();
+                        $diff = $now->getTimestamp() - $updated->getTimestamp();
+                        if ($diff <= 86400) {
+                            ?>
+                            <button id="undoModalBtn" class="w-6 h-6" onclick="showUndoModal(<?= $item['id'] ?>)">
+                                <img src="../images/undo-left-svgrepo-com.svg" alt="">
+                            </button>
+                            <?php
+                        }
+                    }
+                    ?>
                     <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(<?= $item['id'] ?>)"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
                     <button id="deleteModalBtn" class="w-6 h-6" onclick="showDeleteModal(<?= $item['id'] ?>)"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
                 </div>

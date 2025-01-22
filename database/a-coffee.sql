@@ -250,7 +250,7 @@ CREATE TABLE `products` (
 INSERT INTO `products` (`id`, `name`, `category`, `description`, `image`, `delete_flag`) VALUES
 (2, 'Strawberry', 4, 'Cocoas and fresh milk served on ice with whipped cream and chocolate powder.', 'SaltedCaramelColdBrew.jpg', 0),
 (3, 'Caramel Latte', 2, 'Just before serving, our slow-steeped custom blend Cold Brew is topped with a delicate float of house-made vanilla sweet cream that cascades throughout the cup.\r\n\r\n', 'VanillaSweetCreamColdBrew.jpg', 0),
-(4, 'Hazelnut Latte', 2, 'Dark, rich espresso lies in wait under a smoothed and stretched layer of thick milk foam. An alchemy of barista artistry and craft.\r\n\r\n', 'IcedCappuccino.jpg', 0),
+(4, 'Hazelnut Latte', 2, 'Dark, rich espresso lies in wait under a smoothed and stretched layer of thick milk foam. An alchemy of barista artistry and craft.\r\n\r\n', 'IcedChocolateMilk.jpg', 0),
 (5, 'Mocha Latte', 2, 'Coffee meets milk and ice in a blender for a rumble and tumble and together they create one of our original Frappuccino® beverages.\r\n\r\n', 'CoffeeFrappuccino.jpg', 0),
 (6, 'Vanilla Latte', 2, 'Coffee is combined with a shot of espresso and milk, then blended with ice to give you a nice little jolt and lots of sipping joy.\r\n\r\n', 'EspressoFrappuccino.jpg', 0),
 (7, 'French Vanilla Latte', 2, 'Coffee Jelly Frappuccino\n', 'CoffeeJellyFrappuccino.jpg', 0),

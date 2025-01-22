@@ -32,7 +32,7 @@
                 <button type="button" id="view-btn" class="view-btn w-full h-full absolute cart-btn rounded-md cursor-pointer hidden" onclick="showViewModal(<?= $product['id'] ?>)">
                     <center><img title="View" class="rounded-md w-12 h-12 text-center" src="../images/details-more-svgrepo-com.svg"></center>
                 </button>
-                <img class="productImg w-full h-full object-cover rounded-md" src="../uploaded_img/<?= isset($product['image']) ? $product['image'] : 'IcedCappuccino.jpg' ?>">
+                <img class="productImg w-full h-full object-cover rounded-md" src="../uploaded_img/<?= isset($product['image']) ? $product['image'] : 'CoffeeFrappuccino.jpg' ?>">
             </div>
         </div>
         <?php 
@@ -42,87 +42,62 @@
     }
     ?>
 </div>
-<div class="py-20 px-4 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 hidden" id="add-modal">
-   	<div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
-    <div role="alert" class="container my-auto mx-auto w-11/12 md:w-2/3 max-w-3xl" style="max-height: 900px;">
-        <div class="relative py-8 px-5 md:px-10 bg-white shadow-md rounded border border-gray-400">
+<div class="py-20 px-4 transition duration-150 ease-in-out fixed z-10 top-0 right-0 bottom-0 left-0 hidden" id="add-modal">
+    <div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
+    <div role="alert" class="container mx-auto w-11/12 md:w-2/3 max-w-3xl h-[calc(100vh-10rem)] overflow-y-auto flex items-center">
+        <div class="relative py-8 px-5 md:px-10 bg-white shadow-md rounded border border-gray-400 w-full max-h-full flex flex-col">
             <h1 class="text-gray-800 font-lg font-medium tracking-normal leading-tight">Enter Product Details</h1>
-            <form id="add_product" action="add_product.php" method="POST" enctype="multipart/form-data">
-                <input type="text" class="hidden" name="id" id="id">
-                <div class=" grid cols-grid-1 cols-grid-2 gap-x-2">
-                    <div class="col-span-full flex justify-center">
-                        <div class="text-center">
-                            <img id="previewImage" class="w-48 h-48 rounded-full bg-center object-cover" src="../images/image-svgrepo-com.svg">
-                            <label class="relative cursor-pointer rounded-lg float-end" for="image">
-                                <img class="w-6 h-6" src="../images/upload-minimalistic-svgrepo-com.svg">
-                                <input id="image" name="image" class="sr-only" type="file" accept="image/jpg, image/jpeg, image/png" onchange="previewFile()" >
-                                <input type="hidden" name="old_image" id="old_image">
-                            </label>
-                        </div>
-                    </div>
-                    <div class="col-span-1">
-                        <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="name">Name</label>
-                        <input title="Name" id="name" name="name" class="mb-2 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" autocomplete="off" placeholder="Cappuccino" type="text" required>
-                    </div>
-                    <div class="col-span-1">
-                        <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="category">Category</label>
-                        <select title="Category" id="category" name="category"class="mb-2 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" required>
-                            <?php 
-                                $select_category = $conn->prepare("SELECT * FROM category WHERE delete_flag = 0");
-                                $select_category->execute();
-                                $categories = $select_category->fetchAll(PDO::FETCH_ASSOC);
-                                foreach ($categories as $category){?>
-                                    <option value="<?php echo $category['id'];?>"><?php echo ucwords($category['category_name']);?></option>
-                            <?php }?>
-                        </select>
-                    </div>
-                    <div class="col-span-full">
-                        <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa">Product Variations</label>
-                        <div id="variations-container">
-                            <div class="variation-row mb-4">
-                                <div class="grid cols-grid-2 gap-x-2">
-                                    <div class="col-span-1">
-                                        <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa">Size</label>
-                                        <input type="text" name="variations[0][size]" 
-                                            class="mt-1 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border">
-                                    </div>
-                                    <div class="col-span-1">
-                                        <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa">Price</label>
-                                        <div class="relative">
-                                            <div class="absolute text-gray-600 flex items-center px-2 border-r h-10">
-                                                <img width="12px" src="../images/peso-svgrepo-com.svg" alt="">
-                                            </div>
-                                            <input type="number" name="variations[0][price]"
-                                                class="mt-1 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-12 text-sm border-gray-300 rounded border">
-                                        </div>
-                                    </div>
-                                    <div class="col-span-full">
-                                        <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa">Ingredients</label>
-                                        <textarea name="variations[0][ingredients]" 
-                                            class="mt-1 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" 
-                                            rows="2"></textarea>
-                                    </div>
-                                </div>
-                                <div class="mt-2 flex justify-end">
-                                    <button type="button" class="remove-variation text-gray-800">Remove Variation</button>
-                                </div>
+            <div class="flex-1 overflow-y-auto my-4">
+                <form id="add_product" action="add_product.php" method="POST" enctype="multipart/form-data">
+                    <input type="text" class="hidden" name="id" id="id">
+                    <div class=" grid cols-grid-1 cols-grid-2 gap-x-2">
+                        <div class="col-span-full flex justify-center">
+                            <div class="text-center">
+                                <img id="previewImage" class="w-48 h-48 rounded-full bg-center object-cover" src="../images/image-svgrepo-com.svg">
+                                <label class="relative cursor-pointer rounded-lg float-end" for="image">
+                                    <img class="w-6 h-6" src="../images/upload-minimalistic-svgrepo-com.svg">
+                                    <input id="image" name="image" class="sr-only" type="file" accept="image/jpg, image/jpeg, image/png" onchange="previewFile()" >
+                                    <input type="hidden" name="old_image" id="old_image">
+                                </label>
                             </div>
                         </div>
-                        <button type="button" id="add-variation" class="focus:outline-none hover:bg-amber-400  transition duration-150 ease-in-out bg-light-brown rounded text-white px-4 sm:px-8 py-2 text-xs sm:text-sm salsa">Add Variation</button>
+                        <div class="col-span-1">
+                            <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="name">Name</label>
+                            <input title="Name" id="name" name="name" class="mb-2 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" autocomplete="off" placeholder="Cappuccino" type="text" required>
+                        </div>
+                        <div class="col-span-1">
+                            <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="category">Category</label>
+                            <select title="Category" id="category" name="category"class="mb-2 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" required>
+                                <?php 
+                                    $select_category = $conn->prepare("SELECT * FROM category WHERE delete_flag = 0");
+                                    $select_category->execute();
+                                    $categories = $select_category->fetchAll(PDO::FETCH_ASSOC);
+                                    foreach ($categories as $category){?>
+                                        <option value="<?php echo $category['id'];?>"><?php echo ucwords($category['category_name']);?></option>
+                                <?php }?>
+                            </select>
+                        </div>
+                        <div class="col-span-full">
+                            <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa">Product Variations</label>
+                            <div id="variations-container">
+                                
+                            </div>
+                            <button type="button" id="add-variation" class="focus:outline-none hover:bg-amber-400  transition duration-150 ease-in-out bg-light-brown rounded text-white px-4 sm:px-8 py-2 text-xs sm:text-sm salsa">Add Variation</button>
+                        </div>
+                        <div class="col-span-full mt-2">
+                            <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa"class="text-gray-800 text-sm font-semibold leading-tight tracking-normal salsa" for="description">Description</label>
+                            <textarea title="Description" id="description" name="description" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" rows="3" required></textarea>
+                        </div>
                     </div>
-                    <div class="col-span-full mt-2">
-                        <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa"class="text-gray-800 text-sm font-semibold leading-tight tracking-normal salsa" for="description">Description</label>
-                        <textarea title="Description" id="description" name="description" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" rows="3" required></textarea>
+                    <div class="flex items-center justify-start w-full">
+                        <button title="Submit" type="submit" name="submit" id="submitBtn" class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-600 transition duration-150 ease-in-out bg-light-brown rounded text-white px-8 py-2 text-sm">Submit</button>
+                        <button title="Cancel" type="button" class="focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-gray-400 ml-3 bg-gray-100 transition duration-150 text-gray-600 ease-in-out hover:border-gray-400 hover:bg-gray-300 border rounded px-8 py-2 text-sm" onclick="modalHandler()">Cancel</button>
                     </div>
-                </div>
-                <div class="flex items-center justify-start w-full">
-                    <button title="Submit" type="submit" name="submit" id="submitBtn" class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-600 transition duration-150 ease-in-out bg-light-brown rounded text-white px-8 py-2 text-sm">Submit</button>
-                    <button title="Cancel" type="button" class="focus:outline-none focus:ring-2 focus:ring-offset-2  focus:ring-gray-400 ml-3 bg-gray-100 transition duration-150 text-gray-600 ease-in-out hover:border-gray-400 hover:bg-gray-300 border rounded px-8 py-2 text-sm" onclick="modalHandler()">Cancel</button>
-                </div>
-                <button title="Close" type="button" class="cursor-pointer absolute top-0 right-0 mt-4 mr-5 text-gray-400 hover:text-gray-600 transition duration-150 ease-in-out rounded focus:ring-2 focus:outline-none focus:ring-gray-600" onclick="modalHandler()" aria-label="close modal" role="button">
-                    <img class="w-5 h-5" src="../images/close-svgrepo-com.svg" alt="">
-                </button>
-            </form>
+                    <button title="Close" type="button" class="cursor-pointer absolute top-0 right-0 mt-4 mr-5 text-gray-400 hover:text-gray-600 transition duration-150 ease-in-out rounded focus:ring-2 focus:outline-none focus:ring-gray-600" onclick="modalHandler()" aria-label="close modal" role="button">
+                        <img class="w-5 h-5" src="../images/close-svgrepo-com.svg" alt="">
+                    </button>
+                </form>                
+            </div>
         </div>
     </div>
 </div>
@@ -290,7 +265,13 @@ function submitForm(event) {
         }
     });
     if (!isValid) {
-        alert('Please fill all variation fields');
+        if (divMessage) {
+            messages.textContent = 'Please fill up all fields.';
+            divMessage.classList.remove('hidden'); 
+            setTimeout(function() {
+                divMessage.classList.add('hidden'); 
+            }, 3000);
+        }
         return;
     }
     fetch('add_product.php', {
@@ -322,7 +303,7 @@ function submitForm(event) {
                         <button type="button" id="view-btn" class="view-btn w-full h-full absolute cart-btn rounded-md cursor-pointer hidden" onclick="showViewModal(${data.id})">
                             <center><img title="View" class="rounded-md w-12 h-12 text-center" src="../images/details-more-svgrepo-com.svg"></center>
                         </button>
-                        <img class="productImg w-full h-full object-cover rounded-md" src="../uploaded_img/${data.image ? data.image : 'IcedCappuccino.jpg'}">
+                        <img class="productImg w-full h-full object-cover rounded-md" src="../uploaded_img/${(data.image !== null ? data.image : 'CoffeeFrappuccino.jpg')}">
                     </div>
                 `;
                 productsList.appendChild(newProduct);
@@ -332,7 +313,7 @@ function submitForm(event) {
                 messages.textContent = data.message;
             } else if (data.update === true) {
                 const updatedRow = document.querySelector(`div[data-id="${data.id}"]`);
-                updatedRow.querySelector('.productImg').src = '../uploaded_img/' + data.image !== null ? data.image : 'IcedCappuccino.jpg';  
+                updatedRow.querySelector('.productImg').src = '../uploaded_img/' + (data.image !== null ? data.image : 'CoffeeFrappuccino.jpg');  
                 updatedRow.querySelector('button.edit-btn').setAttribute('onclick', `showEditModal(${data.id})`);
                 updatedRow.querySelector('button.delete-btn').setAttribute('onclick', `showDeleteModal(${data.id})`);
                 updatedRow.querySelector('button.view-btn').setAttribute('onclick', `showViewModal(${data.id})`);
@@ -384,10 +365,10 @@ function submitForm(event) {
                         .catch(error => console.error('Error fetching categories:', error));
                 }
                 document.getElementById('description').value = data.description;
-                const defaultImage = '../uploaded_img/IcedCappuccino.jpg';
+                const defaultImage = '../uploaded_img/CoffeeFrappuccino.jpg';
                 const imagePath = data.image ? '../uploaded_img/' + data.image : defaultImage;
 
-                document.getElementById('old_image').value = data.image || 'IcedCappuccino.jpg'; // Store the default name if null
+                document.getElementById('old_image').value = data.image || 'CoffeeFrappuccino.jpg';
                 document.getElementById('previewImage').src = imagePath;
 
                 // Clear existing variations

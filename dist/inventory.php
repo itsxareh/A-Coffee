@@ -41,17 +41,26 @@
                             $db_unit = 'piece/s';
                         }?>
                     <tr class="border-color" data-id="<?= $item['id']; ?>">
-                        <!-- <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
-                                <img class="w-16 h-16 object-cover" src="../uploaded_img/<?= $item['image']; ?>">
-                        </td> -->
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ucwords($item['name']); ?></td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $db_value.''.$db_unit ?></td>
-                        <!-- <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $item['quantity_before'] ? $item['quantity_before'] :  $db_value.''.$db_unit ?></td> -->
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $item['description'] === '' ? 'N/A' : $item['description']; ?></td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $item['updated_at'] === '' ? 'N/A' :  DateTime::createFromFormat("m-d-Y H:i:s", $item['updated_at'])->format("F d Y h:i A"); ?></td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                             <div class="flex items-center gap-4">
-                                <button id="undoModalBtn" class="w-6 h-6" onclick="showUndoModal(<?= $item['id'] ?>)"><img src="../images/undo-svgrepo-com.svg" alt=""></button>
+                                <?php 
+                                if (!empty($item['updated_at'])) {
+                                    $updated = DateTime::createFromFormat("m-d-Y H:i:s", $item['updated_at']);
+                                    $now = new DateTime();
+                                    $diff = $now->getTimestamp() - $updated->getTimestamp();
+                                    if ($diff <= 86400) {
+                                        ?>
+                                        <button id="undoModalBtn" class="w-6 h-6" onclick="showUndoModal(<?= $item['id'] ?>)">
+                                            <img src="../images/undo-left-svgrepo-com.svg" alt="">
+                                        </button>
+                                        <?php
+                                    }
+                                }
+                                ?>
                                 <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(<?= $item['id'] ?>)"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
                                 <button id="deleteModalBtn" class="w-6 h-6" onclick="showDeleteModal(<?= $item['id'] ?>)"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
                             </div>
@@ -115,19 +124,19 @@
     <div class="w-full max-w-lg p-5 relative mx-auto h-80 rounded-xl shadow-lg  bg-white ">
         <div class="">
             <div class="text-center p-5 flex-auto justify-center">
-                <div class="w-full">
-                <svg class="text-center" width="50px" height="50px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <g id="Edit / Undo">
-                    <path id="Vector" d="M10 8H5V3M5.29102 16.3569C6.22284 17.7918 7.59014 18.8902 9.19218 19.4907C10.7942 20.0913 12.547 20.1624 14.1925 19.6937C15.8379 19.225 17.2893 18.2413 18.3344 16.8867C19.3795 15.5321 19.963 13.878 19.9989 12.1675C20.0347 10.4569 19.5211 8.78001 18.5337 7.38281C17.5462 5.98561 16.1366 4.942 14.5122 4.40479C12.8878 3.86757 11.1341 3.86499 9.5083 4.39795C7.88252 4.93091 6.47059 5.97095 5.47949 7.36556" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </g>
-                </svg>
-                </div>
-                <h2 class="text-xl font-bold py-4 text-black">Are you sure?</h3>
-                <p class="text-sm text-gray-500 px-8">Do you really want to undo the changes?</p>    
+                <center>
+                    <svg width="40px" height="40px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M7.53033 3.46967C7.82322 3.76256 7.82322 4.23744 7.53033 4.53033L5.81066 6.25L15.0358 6.25C15.94 6.24999 16.6693 6.24998 17.2576 6.3033C17.864 6.35826 18.3938 6.47456 18.875 6.75241C19.4451 7.08154 19.9185 7.55492 20.2476 8.12499C20.5254 8.60624 20.6417 9.13604 20.6967 9.74239C20.75 10.3307 20.75 11.06 20.75 11.9643V12.0358C20.75 12.94 20.75 13.6693 20.6967 14.2576C20.6418 14.8639 20.5255 15.3937 20.2476 15.875C19.9185 16.4451 19.4451 16.9185 18.875 17.2476C18.3938 17.5254 17.864 17.6417 17.2576 17.6967C16.6693 17.75 15.94 17.75 15.0358 17.75H8.00001C7.58579 17.75 7.25001 17.4142 7.25001 17C7.25001 16.5858 7.58579 16.25 8.00001 16.25H15C15.9484 16.25 16.6096 16.2493 17.1222 16.2028C17.6245 16.1573 17.9101 16.0726 18.125 15.9486C18.4671 15.7511 18.7511 15.467 18.9486 15.125C19.0726 14.9101 19.1573 14.6245 19.2028 14.1222C19.2493 13.6096 19.25 12.9484 19.25 12C19.25 11.0516 19.2493 10.3904 19.2028 9.87779C19.1573 9.37548 19.0726 9.0899 18.9486 8.87499C18.7511 8.53295 18.467 8.24892 18.125 8.05144C17.9101 7.92737 17.6245 7.84271 17.1222 7.79718C16.6096 7.75072 15.9484 7.75 15 7.75H5.81066L7.53033 9.46967C7.82322 9.76256 7.82322 10.2374 7.53033 10.5303C7.23744 10.8232 6.76256 10.8232 6.46967 10.5303L3.46967 7.53033C3.17678 7.23744 3.17678 6.76256 3.46967 6.46967L6.46967 3.46967C6.76256 3.17678 7.23744 3.17678 7.53033 3.46967Z"
+                        fill="#000" />
+                    </svg>
+                </center>
+                <h2 class="text-xl font-bold py-4 text-black">Undo Changes</h3>
+                <p class="text-sm text-gray-500 px-8">This will revert the item to its previous quantity. Continue?</p>    
             </div>
             <div class="p-3  mt-2 text-center space-x-4 md:block">
-                <button class="undoItem mb-2 md:mb-0 bg-amber-500 border border-amber-500 px-5 py-2 text-sm shadow-sm font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-amber-600" data-id=<?= $item['id']; ?> >Undo changes</button>
-                <button class="mb-2 md:mb-0 bg-white px-5 py-2 text-sm shadow-sm font-medium tracking-wider border text-gray-600 rounded-full hover:shadow-lg hover:bg-gray-100" onclick="undoModalHandler()">Cancel</button>
+                <button class=" md:mb-0 bg-white px-5 py-2 text-sm shadow-sm font-medium tracking-wider border text-gray-600 rounded-full hover:shadow-lg hover:bg-gray-100" onclick="undoModalHandler()">Cancel</button>
+                <button id="undoConfirmBtn" class="undoItem md:mb-0 bg-amber-500 border border-amber-500 px-5 py-2 text-sm shadow-sm font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-amber-600" data-id=<?= $item['id']; ?> >Undo changes</button>
             </div>
         </div>
     </div>
@@ -232,9 +241,64 @@
         fadeIn(deleteModal);
     }
     function showUndoModal(itemId) {
-        const undoBtn = undoModal.querySelector(".undoItem");
+        const undoBtn = undoModal.querySelector("#undoConfirmBtn");
         undoBtn.setAttribute("data-id", itemId);
         fadeIn(undoModal);
+
+        fetch(`check_undo_eligibility.php?id=${itemId}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if (data.eligible) {
+                undoBtn.onclick = () => undoChanges(itemId);
+            } else {
+                fadeOut(undoModal);
+                const row = document.querySelector(`tr[data-id="${itemId}"]`);
+                if (row) {
+                    row.querySelector('td:nth-child(5)').innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(${itemId})"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
+                        <button id="deleteModalBtn" class="w-6 h-6" onclick="showDeleteModal(${itemId})"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
+                    </div>
+                    `;
+                }
+            }
+        });
+    }
+    function undoChanges(itemId) {
+        fetch('undo_inventory.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `id=${itemId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                fadeOut(undoModal);
+                
+                const row = document.querySelector(`tr[data-id="${itemId}"]`);
+                if (row) {
+                    row.querySelector('td:nth-child(2)').textContent = data.quantity;
+                    row.querySelector('td:nth-child(4)').textContent = data.updated_at;
+                    row.querySelector('td:nth-child(5)').innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(${itemId})"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
+                        <button id="deleteModalBtn" class="w-6 h-6" onclick="showDeleteModal(${itemId})"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
+                    </div>
+                    `;
+                }
+                
+                
+            } else {
+                alert(data.message || 'Error undoing changes');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error undoing changes');
+        });
     }
     function showEditModal(id) {
         fetch('fetch_item.php?id=' + id)
@@ -281,7 +345,6 @@
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.added_at}</td>
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                     <div class="flex items-center gap-4">
-                        <button id="undoModalBtn" class="w-6 h-6" onclick="showUndoModal(${data.id})"><img src="../images/undo-svgrepo-com.svg" alt=""></button>
                         <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(${data.id})"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
                         <button id="deleteModalBtn" class="w-6 h-6" onclick="showDeleteModal(${data.id})"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
                     </div>
@@ -320,12 +383,11 @@
                 </td>-->
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity}</td>
-                // <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity_before}</td>
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.description === '' ? 'N/A' : data.description}</td>
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${dateResult}</td>
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                     <div class="flex items-center gap-4">
-                        <button id="undoModalBtn" class="w-6 h-6" onclick="showUndoModal(${data.id})"><img src="../images/undo-svgrepo-com.svg" alt=""></button>
+                        <button id="undoModalBtn" class="w-6 h-6" onclick="showUndoModal(${data.id})"><img src="../images/undo-left-svgrepo-com.svg" alt=""></button>
                         <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(${data.id})"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
                         <button id="deleteModalBtn" class="w-6 h-6" onclick="showDeleteModal(${data.id})"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
                     </div>

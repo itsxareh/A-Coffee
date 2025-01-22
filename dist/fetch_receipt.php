@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($order_id) {
         // Fetch the order details including the products string
-        $get_order = $conn->prepare("SELECT o.id, o.placed_on, o.products FROM orders o WHERE o.id = ? ");
+        $get_order = $conn->prepare("SELECT o.id, o.placed_on, o.products, o.cash FROM orders o WHERE o.id = ? ");
         $get_order->execute([$order_id]);
         $order = $get_order->fetch(PDO::FETCH_ASSOC);
 
@@ -31,12 +31,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $productTemp = "";                      // No temperature provided
                 } else {
                     $productName = trim($productParts[1]);  // Product name only
-                    $productVar = "Regular";                // Default variation
+                    $productVar = "";                // Default variation
                     $productTemp = "";                      // Default temperature
                 }
                 
                 // Fetch the product price
-                $get_price = $conn->prepare("SELECT product_variations.price as price FROM product_variations LEFT JOIN products ON product_variations.product_id = products.id WHERE product_variations.size = ? AND name = ?");
+                $get_price = $conn->prepare("SELECT COALESCE(pv.price, 0) as price, p.name FROM products p LEFT JOIN product_variations pv ON p.id = pv.product_id AND (pv.size = ? OR pv.size IS NULL) WHERE p.name = ? LIMIT 1");
                 $get_price->execute([$productVar, $productName]);
                 $product_data = $get_price->fetch(PDO::FETCH_ASSOC);
 
@@ -44,9 +44,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $price = $product_data['price'];
                     $subtotal = $price * $quantity;
                     $total_amount += $subtotal;
-                    $productTemp = $productTemp ? '('.$productTemp.')' : '';
+                    $productTemp = !empty($productTemp) ? '('.$productTemp.')' : '';
+                    $productVar = !empty($productVar) ? '('.$productVar.')' : '';
                     $product_details[] = [
-                        'name' => $productName . ' (' . $productVar . ')',
+                        'name' => $productName . $productVar,
                         'temp' =>  $productTemp,
                         'price' => $price,
                         'quantity' => $quantity,
@@ -61,6 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'order_id' => $order['id'],
                 'placed_on' => DateTime::createFromFormat("m-d-Y H:i:s", $order['placed_on'])->format("F d Y h:i A"),
                 'amount' => $total_amount,
+                'cash' => $order['cash'] === null ? 0 : $order['cash'],
                 'products' => $product_details
             ];
         } else {

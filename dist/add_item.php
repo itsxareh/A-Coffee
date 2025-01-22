@@ -127,9 +127,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 function convertToBaseUnit($quantity, $unit, $unitDb) {
     $validUnits = ['l', 'ml', 'kg', 'g', 'cup', 'oz', 'tbsp'];
     
-    if (!in_array(strtolower($unit), $validUnits) || !in_array(strtolower($unitDb), $validUnits)) {
-        throw new Exception("Invalid unit type");
-    }
+    // if (!in_array(strtolower($unit), $validUnits) || !in_array(strtolower($unitDb), $validUnits)) {
+    //     throw new Exception("Invalid unit type");
+    // }
 
     if ($unitDb == $unit) {
         return $quantity * 1; 

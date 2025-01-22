@@ -40,21 +40,21 @@ ini_set('display_errors', 1);
 <div id="productsList" class="flex flex-col gap-2">
     <?php 
     $select_category = $conn->prepare("SELECT 
-        category.id AS category_id, 
-        category.category_name AS category_name, 
-        COUNT(products.id) AS product_count
-        FROM 
-            category
-        LEFT JOIN 
-            products 
-        ON 
-            products.category = category.id
-        WHERE 
-            category.delete_flag = 0
-        GROUP BY 
-            category.id, category.category_name
-        ORDER BY 
-            category.id;");
+                                        category.id AS category_id, 
+                                        category.category_name AS category_name, 
+                                        COUNT(CASE WHEN products.delete_flag = 0 THEN products.id END) AS product_count
+                                    FROM 
+                                        category
+                                    LEFT JOIN 
+                                        products 
+                                    ON 
+                                        products.category = category.id
+                                    WHERE 
+                                        category.delete_flag = 0
+                                    GROUP BY 
+                                        category.id, category.category_name
+                                    ORDER BY 
+                                        category.id;");
     $select_category->execute();
     $category = $select_category->fetchAll(PDO::FETCH_ASSOC);
     if (count($category) > 0){
@@ -88,7 +88,7 @@ ini_set('display_errors', 1);
                                                         <img class="rounded-md" src="../images/cart-arrow-down-svgrepo-com.svg">
                                                     </button>
                                                 </div>
-                                                <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= isset($product['image']) ? $product['image'] : 'IcedCappuccino.jpg' ?>"/>
+                                                <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= isset($product['image']) ? $product['image'] : 'CoffeeFrappuccino.jpg' ?>"/>
                                             </div>
                                             <div class="flex justify-center items-center">
                                                 <p style="padding: 0.25rem;" class="text-center text-white salsa text-md p-1"><?= ucwords($product['name']) ?></p>
@@ -107,13 +107,13 @@ ini_set('display_errors', 1);
                                                     <input type="text" class="hidden" id="name" name="name" value="<?= $product['name']?>" autocomplete="off">
                                                     <input type="text" class="hidden" id="price" name="price" value="<?= $product_variations[0]['price']?>">
                                                     <input type="text" class="hidden" id="quantity" name="quantity" value="1">
-                                                    <input type="text" class="hidden" id="image" name="image" value="<?= isset($product['image']) ? $product['image'] : 'IcedCappuccino.jpg'?>">
+                                                    <input type="text" class="hidden" id="image" name="image" value="<?= isset($product['image']) ? $product['image'] : 'CoffeeFrappuccino.jpg'?>">
                                                     <button type="submit" id="cartBtn" class="cart-btn rounded-md p-2 cursor-pointer hidden">
                                                         <img class="rounded-md" src="../images/cart-arrow-down-svgrepo-com.svg">
                                                     </button>
                                                 </form>
                                             </div>
-                                            <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= isset($product['image']) ? $product['image'] : 'IcedCappuccino.jpg' ?>"/>
+                                            <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= isset($product['image']) ? $product['image'] : 'CoffeeFrappuccino.jpg' ?>"/>
                                         </div>
                                         <div class="flex justify-center items-center">
                                             <p style="padding: 0.25rem;" class="text-white salsa text-md p-1"><?= ucwords($product['name']) ?></p>
@@ -157,90 +157,89 @@ ini_set('display_errors', 1);
     </div>
 </div>
 <div class="cart-container fixed right-8 bottom-8">
-        <div class="relative">
-            <button id="cartButton" title="Cart" class="w-12 h-12 p-2 bg-white transition duration-150 ease-in-out rounded-full relative">
-                <span id="ordersNo" class="absolute text-white bg-red-600 rounded-full px-2 -top-2 -right-2"><?= $total ?></span>
-                <img class="w-full h-full" src="../images/cart-shopping-svgrepo-com.svg">
-            </button>
-            <div id="orderCart" class="order-cart absolute max-w-lg bg-white rounded-md shadow-lg z-50">
-                <div class="relative">
-                    <div class="cart-container px-4 rounded-md bg-white right-0">
-                        <div class="cart-header flex items-center justify-between text-gray salsa text-md font-semibold py-2">
-                            <span class="text-black salsa text-xl">Orders</span>
-                            <button class="close-cart p-2 cursor-pointer" onclick="hideCart()">
-                                <img class="w-4 h-4" src="../images/close-svgrepo-com.svg">
-                            </button>
-                        </div>
-                        <div class="cart-body py-2">
-                            <div id="list-cart" class="grid relative autofit-grid1 gap-3 max-h-xl overflow-y-auto">
-                            <?php
-                                $check_cart = $conn->prepare("SELECT *, cart.id as id, product_variations.size as variation FROM `cart` LEFT JOIN product_variations ON cart.variation_id = product_variations.id WHERE uid = ?");
-                                $check_cart->bindParam(1, $uid);
-                                $check_cart->execute();
-                                $carts = $check_cart->fetchAll(PDO::FETCH_ASSOC);
-                                $total_cart = $conn->prepare("SELECT *, SUM(price * quantity) as total FROM cart WHERE uid = ?");
-                                $total_cart->execute([$uid]);
-                                $totalCart = $total_cart->fetch(PDO::FETCH_ASSOC);
+    <div class="relative">
+        <button id="cartButton" title="Cart" class="w-12 h-12 p-2 bg-white transition duration-150 ease-in-out rounded-full relative">
+            <span id="ordersNo" class="absolute text-white bg-red-600 rounded-full px-2 -top-2 -right-2"><?= $total ?></span>
+            <img class="w-full h-full" src="../images/cart-shopping-svgrepo-com.svg">
+        </button>
+        <div id="orderCart" class="order-cart absolute max-w-lg bg-white rounded-md shadow-lg z-50">
+            <div class="relative">
+                <div class="cart-container px-4 rounded-md bg-white right-0">
+                    <div class="cart-header flex items-center justify-between text-gray salsa text-md font-semibold py-2">
+                        <span class="text-black salsa text-xl">Orders</span>
+                        <button class="close-cart p-2 cursor-pointer" onclick="hideCart()">
+                            <img class="w-4 h-4" src="../images/close-svgrepo-com.svg">
+                        </button>
+                    </div>
+                    <div class="cart-body py-2">
+                        <div id="list-cart" class="grid relative autofit-grid1 gap-3 max-h-xl overflow-y-auto">
+                        <?php
+                            $check_cart = $conn->prepare("SELECT *, cart.id as id, product_variations.size as variation FROM `cart` LEFT JOIN product_variations ON cart.variation_id = product_variations.id WHERE uid = ?");
+                            $check_cart->bindParam(1, $uid);
+                            $check_cart->execute();
+                            $carts = $check_cart->fetchAll(PDO::FETCH_ASSOC);
+                            $total_cart = $conn->prepare("SELECT *, SUM(price * quantity) as total FROM cart WHERE uid = ?");
+                            $total_cart->execute([$uid]);
+                            $totalCart = $total_cart->fetch(PDO::FETCH_ASSOC);
 
-                                if(count($carts) > 0){
-                                    foreach($carts as $cart){ ?>
-                                        <div class="cart relative rounded-md bg-dark-brown flex flex-start items-center h-28" data-id="<?= $cart['id'] ?>">
-                                            <div class="w-28 h-full">
-                                                <img class="rounded-tl-md rounded-bl-md w-full h-full object-cover" src="../uploaded_img/<?=$cart['image']?>">
-                                            </div>
-                                            <div class="flex-1 ml-2 p-2">
-                                                <h3 class="text-white font-normal text-sm capitalize rosarivo leading-3">
-                                                    <?= $cart['name']?> <?= isset($cart['variation']) ? '('.$cart['variation'].')' : '' ?>
-                                                </h3>
-                                                <p class="text-gray-400 rosarivo">₱<span class="price"><?= $cart['price'] * $cart['quantity']?></span></p>
-                                                
-                                                <div class="flex items-center gap-2 my-1">
-                                                    <div class="flex bg-light-brown rounded-md">
-                                                        <button 
-                                                            type="button" 
-                                                            class="temperature-btn px-2 py-1 text-sm rosarivo rounded-l-md <?= $cart['temperature'] === 'Hot' ? 'bg-amber-600 text-white' : 'text-white' ?>"
-                                                            onclick="updateTemperature(<?= $cart['id'] ?>, 'Hot')"
-                                                        >
-                                                            Hot
-                                                        </button>
-                                                        <button 
-                                                            type="button" 
-                                                            class="temperature-btn px-2 py-1 text-sm rosarivo rounded-r-md <?= $cart['temperature'] === 'Ice' ? 'bg-amber-600 text-white' : 'text-white' ?>"
-                                                            onclick="updateTemperature(<?= $cart['id'] ?>, 'Ice')"
-                                                        >
-                                                            Ice
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-                                                <div class="flex items-center mt-1">
-                                                    <span class="text-white rosarivo mr-2">Quantity:</span>
-                                                    <button title="Plus" type="button" class="quantity-btn rounded-tl-md rounded-bl-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" onclick="addQuantity(<?= $cart['id'] ?>)"><span>+</span></button>
-                                                    <p class="text-white rosarivo mx-2"><span class="quantity"><?= $cart['quantity']?></span></p>
-                                                    <button title="Minus" type="button" class="quantity-btn rounded-tr-md rounded-br-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" onclick="minusQuantity(<?= $cart['id'] ?>)"><span>-</span></button>
+                            if(count($carts) > 0){
+                                foreach($carts as $cart){ ?>
+                                    <div class="cart relative rounded-md bg-dark-brown flex flex-start items-center h-28" data-id="<?= $cart['id'] ?>">
+                                        <div class="w-28 h-full">
+                                            <img class="rounded-tl-md rounded-bl-md w-full h-full object-cover" src="../uploaded_img/<?=$cart['image']?>">
+                                        </div>
+                                        <div class="flex-1 ml-2 p-2">
+                                            <h3 class="text-white font-normal text-sm capitalize rosarivo leading-3">
+                                                <?= $cart['name']?> <?= isset($cart['variation']) ? '('.$cart['variation'].')' : '' ?>
+                                            </h3>
+                                            <p class="text-gray-400 rosarivo">₱<span class="price"><?= $cart['price'] * $cart['quantity']?></span></p>
+                                            
+                                            <div class="flex items-center gap-2 my-1">
+                                                <div class="flex bg-light-brown rounded-md">
+                                                    <button 
+                                                        type="button" 
+                                                        class="temperature-btn px-2 py-1 text-sm rosarivo rounded-l-md <?= $cart['temperature'] === 'Hot' ? 'bg-amber-600 text-white' : 'text-white' ?>"
+                                                        onclick="updateTemperature(<?= $cart['id'] ?>, 'Hot')"
+                                                    >
+                                                        Hot
+                                                    </button>
+                                                    <button 
+                                                        type="button" 
+                                                        class="temperature-btn px-2 py-1 text-sm rosarivo rounded-r-md <?= $cart['temperature'] === 'Ice' ? 'bg-amber-600 text-white' : 'text-white' ?>"
+                                                        onclick="updateTemperature(<?= $cart['id'] ?>, 'Ice')"
+                                                    >
+                                                        Ice
+                                                    </button>
                                                 </div>
                                             </div>
-                                            <div class="absolute bottom-2 right-2">
-                                                <button title="Delete" type="button" class="delete-btn deleteCart rounded-md p-2 cursor-pointer" data-id="<?= $cart['id'] ?>">
-                                                    <img class="w-6 h-6 rounded-md" src="../images/delete-svgrepo-com.svg">
-                                                </button>
+
+                                            <div class="flex items-center mt-1">
+                                                <span class="text-white rosarivo mr-2">Quantity:</span>
+                                                <button title="Minus" type="button" class="quantity-btn rounded-tl-md rounded-bl-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" onclick="minusQuantity(<?= $cart['id'] ?>)"><span>-</span></button>
+                                                <p class="text-white rosarivo mx-2"><span class="quantity"><?= $cart['quantity']?></span></p>
+                                                <button title="Plus" type="button" class="quantity-btn rounded-tr-md rounded-br-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" onclick="addQuantity(<?= $cart['id'] ?>)"><span>+</span></button>
                                             </div>
                                         </div>
-                                        
-                                        <?php
-                                    }
-                                    ?>
-                                    <div class="flex justify-between">
-                                        <p class="text-md text-gray-600 rosarivo font-normal my-auto">Total: <span id="totalPlaceOrder" class="rosarivo font-bold text-gray-900"><?= $totalCart['total'] === 0 ? '₱0.00' : '₱'.number_format($totalCart['total'], 2) ?></span></p>
-                                        <button title="Place Order" id="placeOrder" type="button" class="mt-0 px-8 py-2 rounded-3xl bg-light-brown focus:outline-none hover:bg-amber-400 transition duration-150 ease-in-out  salsa text-xl text-white" onclick="confirmModalHandler(true)">Place order</button>
+                                        <div class="absolute bottom-2 right-2">
+                                            <button title="Delete" type="button" class="delete-btn deleteCart rounded-md p-2 cursor-pointer" data-id="<?= $cart['id'] ?>">
+                                                <img class="w-6 h-6 rounded-md" src="../images/delete-svgrepo-com.svg">
+                                            </button>
+                                        </div>
                                     </div>
+                                    
                                     <?php
-                                } else {
-                                    echo '
-                                    <p class="text-black text-medium font-semibold p-3 py-4 text-center">Your cart is empty.</p>';
                                 }
-                            ?>
-                            </div>
+                                ?>
+                                <div class="flex justify-between">
+                                    <p class="text-md text-gray-600 rosarivo font-normal my-auto">Total: <span id="totalPlaceOrder" class="rosarivo font-bold text-gray-900"><?= $totalCart['total'] === 0 ? '₱0.00' : '₱'.number_format($totalCart['total'], 2) ?></span></p>
+                                    <button title="Place Order" id="placeOrder" type="button" class="mt-0 px-8 py-2 rounded-3xl bg-light-brown focus:outline-none hover:bg-amber-400 transition duration-150 ease-in-out  salsa text-xl text-white" onclick="confirmModalHandler(true)">Place order</button>
+                                </div>
+                                <?php
+                            } else {
+                                echo '
+                                <p class="text-black text-medium font-semibold p-3 py-4 text-center">Your cart is empty.</p>';
+                            }
+                        ?>
                         </div>
                     </div>
                 </div>
@@ -261,7 +260,7 @@ ini_set('display_errors', 1);
                 <h3 class="mb-4 text-xl font-bold text-gray-900">Approaching Low Quantity</h3>
                 <p class="text-gray-500 text-md font-normal dark:text-gray-400 mb-6">The following item/s have low inventory quantity. Please restocking soon:<p>
                 <div class="text-center"><span id="notification" class="text-md font-medium text-gray-900 mb-6"></span></div>
-                <div class="p-3  mt-2 text-center space-x-4 md:block">
+                <div class="text-center space-x-4 md:block">
                     <button class="mb-2 md:mb-0 bg-light-brown px-5 py-2 text-sm font-medium tracking-wider border text-white rounded-full hover:shadow-lg hover:bg-amber-400" onclick="notificationModalHandler()">Okay</button>
                 </div>
         </div>
@@ -316,14 +315,24 @@ ini_set('display_errors', 1);
                 $carts = $check_cart->fetchAll(PDO::FETCH_ASSOC);
                 if(count($carts) > 0){
                     foreach($carts as $cart){ ?>
-                <div id="totalConfirmModal" class="flex justify-end items-center">
-                    <div class="pr-5">
-                        <p class="text-gray-500 text-sm font-medium leading-tight tracking-normal salsa" for="total">Total</p>
-                        <p id="total"  class="salsa block mb-3 text-md font-normal leading-none text-gray-800 dark:text-gray-700">₱<span id="confirm-total" class="text-gray-800 salsa mb-3 text-md font-normal leading-none"><?= number_format($cart['total'], 2) ?></span></p>
-                    </div>
+                <div id="totalConfirmModal" class="w-full">
                     <form id="add_order" action="" method="POST">
-                        <input type="text" class="hidden" name="uid" id="uid" value="<?= $cart['uid'] ?>" title="uid" placeholder="">
-                        <button title="Confirm" type="submit" id="submitBtn" class="addToOrder bg-light-brown border border-light-brown px-5 py-2 text-sm  font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-amber-400" data-id=<?= $cart['id']; ?> >Confirm</button>
+                        <div class="flex flex-col align-items-end" style="align-items: end;">
+                            <div class="relative">
+                                <div class="absolute text-gray-600 flex items-center px-2 border-r h-10">
+                                    <img width="12px" src="../images/peso-svgrepo-com.svg" alt="">
+                                </div>
+                                <input type="number" name="amount"
+                                    class="text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-[100px] h-10 flex items-center pl-12 text-sm border-gray-300 rounded border">
+                            </div>
+                            <div id="totalConfirmModal" class="flex justify-end items-center">
+                                <div class="pr-5">
+                                    <p class="text-gray-500 text-sm font-medium leading-tight tracking-normal salsa" for="total">Total</p>
+                                    <p id="total"  class="salsa block mb-3 text-md font-normal leading-none text-gray-800 dark:text-gray-700">₱<span id="confirm-total" class="text-gray-800 salsa mb-3 text-md font-normal leading-none"><?= number_format($cart['total'], 2) ?></span></p>
+                                </div>
+                                <button title="Confirm" type="submit" id="submitBtn" class="addToOrder bg-light-brown border border-light-brown px-5 py-2 text-sm  font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-amber-400" data-id=<?= $cart['id']; ?>>Confirm</button>
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <?php
@@ -432,18 +441,6 @@ function showNotification(message) {
     notification.innerHTML = message;
     divNotification.classList.remove('hidden');
 }
-
-// Check inventory periodically
-const INVENTORY_CHECK_INTERVAL = 30000; // 30 seconds
-let inventoryChecker = setInterval(checkInventory, INVENTORY_CHECK_INTERVAL);
-
-// Initial check when page loads
-document.addEventListener('DOMContentLoaded', checkInventory);
-
-// Cleanup interval when page unloads
-window.addEventListener('unload', () => {
-    clearInterval(inventoryChecker);
-});
 
 // Close modal with Escape key
 document.addEventListener('keydown', (e) => {
@@ -564,9 +561,9 @@ function initializeProductEventListeners() {
 
                                         <div class="flex items-center mt-1">
                                             <span class="text-white rosarivo mr-2">Quantity</span>
-                                            <button title="Plus" type="button" class="quantity-btn rounded-tl-md rounded-bl-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="${cartItem.id}" onclick="addQuantity(${cartItem.id})"><span>+</span></button>
+                                            <button title="Minus" type="button" class="quantity-btn rounded-tl-md rounded-bl-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="${cartItem.id}" onclick="minusQuantity(${cartItem.id})"><span>-</span></button>
                                             <p class="text-white rosarivo mx-2"><span class="quantity">${cartItem.quantity}</span></p>
-                                            <button title="Minus" type="button" class="quantity-btn rounded-tr-md rounded-br-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="${cartItem.id}" onclick="minusQuantity(${cartItem.id})"><span>-</span></button>
+                                            <button title="Plus" type="button" class="quantity-btn rounded-tr-md rounded-br-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="${cartItem.id}" onclick="addQuantity(${cartItem.id})"><span>+</span></button>
                                         </div>
                                     </div> 
                                     <div class="absolute bottom-2 right-2">
@@ -620,18 +617,24 @@ function initializeProductEventListeners() {
                     const totalConfirmModal = document.getElementById('totalConfirmModal');
                     totalConfirmModal.innerHTML = '';
                     const confirmTotalHTML = `
-                        <div class="flex justify-end items-center">
-                            <div class="pr-5">
-                                <p class="text-gray-500 text-sm font-medium leading-tight tracking-normal salsa" for="total">Total</p>
-                                <p id="total" class="salsa block mb-3 text-md font-normal leading-none text-gray-800 dark:text-gray-700">
-                                    ₱<span id="confirm-total" class="text-gray-800 salsa mb-3 text-md font-normal leading-none">${total.toFixed(2)}</span>
-                                </p>
+                        <form id="add_order" action="" method="POST">
+                            <div class="flex justify-between">
+                                <div class="relative">
+                                    <div class="absolute text-gray-600 flex items-center px-2 border-r h-10">
+                                        <img width="12px" src="../images/peso-svgrepo-com.svg" alt="">
+                                    </div>
+                                    <input type="number" name="amount"
+                                        class="text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-[100px] h-10 flex items-center pl-12 text-sm border-gray-300 rounded border">
+                                </div>
+                                <div id="totalConfirmModal" class="flex justify-end items-center">
+                                    <div class="pr-5">
+                                        <p class="text-gray-500 text-sm font-medium leading-tight tracking-normal salsa" for="total">Total</p>
+                                        <p id="total"  class="salsa block mb-3 text-md font-normal leading-none text-gray-800 dark:text-gray-700">₱<span id="confirm-total" class="text-gray-800 salsa mb-3 text-md font-normal leading-none">${total.toFixed(2)}</span></p>
+                                    </div>
+                                    <button title="Confirm" type="submit" id="submitBtn" class="addToOrder bg-light-brown border border-light-brown px-5 py-2 text-sm  font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-amber-400" data-id=${data.cart[0].id}>Confirm</button>
+                                </div>
                             </div>
-                            <form id="add_order" action="" method="POST">
-                                <input type="text" class="hidden" name="uid" id="uid" value="<?= $_SESSION['uid'] ?>" title="uid" placeholder="">
-                                <button title="Confirm" type="submit" id="submitBtn" class="addToOrder bg-light-brown border border-light-brown px-5 py-2 text-sm font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-amber-400" data-id="${data.cart[0].id}">Confirm</button>
-                            </form>
-                        </div>
+                        </form>
                     `;
                     totalConfirmModal.insertAdjacentHTML('beforeend', confirmTotalHTML);
                     const formOrder = totalConfirmModal.querySelector('#add_order');
@@ -838,18 +841,24 @@ function attachDeleteEventListeners() {
                             // Update total in confirm modal
                             if (data.total !== undefined && totalConfirmModal) {
                                 const totalHTML = `
-                                    <div class="flex justify-end items-center">
-                                        <div class="pr-5">
-                                            <p class="text-gray-500 text-sm font-medium leading-tight tracking-normal salsa" for="total">Total</p>
-                                            <p id="total" class="salsa block mb-3 text-md font-normal leading-none text-gray-800 dark:text-gray-700">
-                                                ₱<span id="confirm-total" class="text-gray-800 salsa mb-3 text-md font-normal leading-none">${parseFloat(data.total).toFixed(2)}</span>
-                                            </p>
+                                    <form id="add_order" action="" method="POST">
+                                        <div class="flex justify-between">
+                                            <div class="relative">
+                                                <div class="absolute text-gray-600 flex items-center px-2 border-r h-10">
+                                                    <img width="12px" src="../images/peso-svgrepo-com.svg" alt="">
+                                                </div>
+                                                <input type="number" name="amount"
+                                                    class="text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-[100px] h-10 flex items-center pl-12 text-sm border-gray-300 rounded border">
+                                            </div>
+                                            <div id="totalConfirmModal" class="flex justify-end items-center">
+                                                <div class="pr-5">
+                                                    <p class="text-gray-500 text-sm font-medium leading-tight tracking-normal salsa" for="total">Total</p>
+                                                    <p id="total"  class="salsa block mb-3 text-md font-normal leading-none text-gray-800 dark:text-gray-700">₱<span id="confirm-total" class="text-gray-800 salsa mb-3 text-md font-normal leading-none">${parseFloat(data.total).toFixed(2)}</span></p>
+                                                </div>
+                                                <button title="Confirm" type="submit" id="submitBtn" class="addToOrder bg-light-brown border border-light-brown px-5 py-2 text-sm  font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-amber-400">Confirm</button>
+                                            </div>
                                         </div>
-                                        <form id="add_order" action="" method="POST">
-                                            <input type="text" class="hidden" name="uid" id="uid" value="${data.uid}" title="uid">
-                                            <button title="Confirm" type="submit" id="submitBtn" class="addToOrder bg-light-brown border border-light-brown px-5 py-2 text-sm font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-amber-400">Confirm</button>
-                                        </form>
-                                    </div>
+                                    </form>
                                 `;
                                 totalConfirmModal.innerHTML = totalHTML;
                                 const formOrder = totalConfirmModal.querySelector('#add_order');
@@ -968,8 +977,28 @@ formOrder.addEventListener('submit', addOrder);
 
 function addOrder() {
     event.preventDefault();
-    const formData = new FormData(formOrder); 
+    const form = event.target;
+    const amountInput = form.querySelector('input[name="amount"]');
+    const amount = amountInput ? amountInput.value : '0';
 
+    const formData = new FormData();
+    formData.append('amount', amount);
+
+    const totalSpan = document.getElementById('confirm-total');
+    const total = totalSpan ? parseFloat(totalSpan.textContent) : 0;
+
+    if (parseFloat(amount) < total) {
+        if (divMessage) {
+            divMessage.classList.remove('hidden');
+            messages.textContent = 'Amount must be greater than or equal to total';
+        }
+        setTimeout(function() {
+            if (divMessage) {
+                divMessage.classList.add('hidden');
+            }
+        }, 2000);
+        return;
+    }
     fetch('add_order.php', {
         method: 'POST',
         body: formData
@@ -987,6 +1016,8 @@ function addOrder() {
             listCart.innerHTML = '<p class="text-black text-medium font-semibold p-3 py-4 text-center">Your cart is empty.</p>';
             cartListConfirmModal.innerHTML = '';
             totalConfirmModal.innerHTML = '';
+            
+            fadeOut(confirmModal);
         }
         if (data.message) {
             divMessage.classList.remove('hidden');
@@ -994,9 +1025,8 @@ function addOrder() {
 
             setTimeout(()=> {
                 divMessage.classList.add('hidden');
-            }, 1500);
+            }, 3000);
         }
-        fadeOut(confirmModal);
 
         
     })
@@ -1074,9 +1104,9 @@ function addToCart(form) {
 
                                 <div class="flex items-center mt-1">
                                     <span class="text-white rosarivo mr-2">Quantity</span>
-                                    <button title="Plus" type="button" class="quantity-btn rounded-tl-md rounded-bl-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="${cartItem.id}" onclick="addQuantity(${cartItem.id})"><span>+</span></button>
+                                    <button title="Minus" type="button" class="quantity-btn rounded-tl-md rounded-bl-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="${cartItem.id}" onclick="minusQuantity(${cartItem.id})"><span>-</span></button>
                                     <p class="text-white rosarivo mx-2"><span class="quantity">${cartItem.quantity}</span></p>
-                                    <button title="Minus" type="button" class="quantity-btn rounded-tr-md rounded-br-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="${cartItem.id}" onclick="minusQuantity(${cartItem.id})"><span>-</span></button>
+                                    <button title="Plus" type="button" class="quantity-btn rounded-tr-md rounded-br-md px-2 text-gray bg-light-brown w-6 flex items-center justify-center" data-id="${cartItem.id}" onclick="addQuantity(${cartItem.id})"><span>+</span></button>
                                 </div>
                             </div> 
                             <div class="absolute bottom-2 right-2">
@@ -1135,18 +1165,24 @@ function addToCart(form) {
             const totalConfirmModal = document.getElementById('totalConfirmModal');
             totalConfirmModal.innerHTML = '';
             const confirmTotalHTML = `
-                <div class="flex justify-end items-center">
-                    <div class="pr-5">
-                        <p class="text-gray-500 text-sm font-medium leading-tight tracking-normal salsa" for="total">Total</p>
-                        <p id="total" class="salsa block mb-3 text-md font-normal leading-none text-gray-800 dark:text-gray-700">
-                            ₱<span id="confirm-total" class="text-gray-800 salsa mb-3 text-md font-normal leading-none">${total.toFixed(2)}</span>
-                        </p>
-                    </div>
                     <form id="add_order" action="" method="POST">
-                        <input type="text" class="hidden" name="uid" id="uid" value="<?= $_SESSION['uid'] ?>" title="uid" placeholder="">
-                        <button title="Confirm" type="submit" id="submitBtn" class="addToOrder bg-light-brown border border-light-brown px-5 py-2 text-sm font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-amber-400" data-id="${data.cart[0].id}">Confirm</button>
+                        <div class="flex justify-between">
+                            <div class="relative">
+                                <div class="absolute text-gray-600 flex items-center px-2 border-r h-10">
+                                    <img width="12px" src="../images/peso-svgrepo-com.svg" alt="">
+                                </div>
+                                <input type="number" name="amount"
+                                    class="text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-[100px] h-10 flex items-center pl-12 text-sm border-gray-300 rounded border">
+                            </div>
+                            <div id="totalConfirmModal" class="flex justify-end items-center">
+                                <div class="pr-5">
+                                    <p class="text-gray-500 text-sm font-medium leading-tight tracking-normal salsa" for="total">Total</p>
+                                    <p id="total"  class="salsa block mb-3 text-md font-normal leading-none text-gray-800 dark:text-gray-700">₱<span id="confirm-total" class="text-gray-800 salsa mb-3 text-md font-normal leading-none">${total.toFixed(2)}</span></p>
+                                </div>
+                                <button title="Confirm" type="submit" id="submitBtn" class="addToOrder bg-light-brown border border-light-brown px-5 py-2 text-sm  font-medium tracking-wider text-white rounded-full hover:shadow-lg hover:bg-amber-400" data-id=${data.cart[0].id}>Confirm</button>
+                            </div>
+                        </div>
                     </form>
-                </div>
             `;
             totalConfirmModal.insertAdjacentHTML('beforeend', confirmTotalHTML);
             const formOrder = totalConfirmModal.querySelector('#add_order');

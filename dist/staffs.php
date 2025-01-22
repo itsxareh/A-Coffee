@@ -37,6 +37,7 @@
                                                     orders o 
                                                     ON u.uid = o.uid 
                                                     AND DATE(STR_TO_DATE(o.placed_on, '%m-%d-%Y %H:%i:%s')) = CURDATE()
+                                                WHERE u.delete_flag = 0
                                                 GROUP BY 
                                                     u.id, u.image, u.name, u.uid;");
                 $select_staffs->execute();
@@ -176,7 +177,7 @@
                             <p id="viewPNumber" class="text-gray-900 rosarivo"></p>
                         </div>
                         <div class="text-end">
-                            <label for="viewBirthdate" class="text-gray-600 text-xs">Birth date</label>
+                            <label for="viewBirthdate" class="text-gray-600 text-xs">Birthdate</label>
                             <p id="viewBirthdate" class="text-sm text-gray-900 rosarivo"></p>
                         </div>
                         <div class="col-span-2">
@@ -298,10 +299,16 @@
                 document.getElementById('viewUid').textContent = data.uid;
                 document.getElementById('viewName').textContent = data.name;
                 document.getElementById('viewPNumber').textContent = data.pnumber;
-                document.getElementById('viewDateJoined').textContent = data.joined_at;
+                const joinedDate = new Date(data.joined_at);
+                const joinedOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+                const joinedFormattedDate = joinedDate.toLocaleDateString('en-US', joinedOptions);
+                document.getElementById('viewDateJoined').textContent = joinedFormattedDate;
                 document.getElementById('viewGender').textContent = data.gender.charAt(0);
                 document.getElementById('viewEmail').textContent = data.email;
-                document.getElementById('viewBirthdate').textContent = data.birthdate;
+                const birthDate = new Date(data.birthdate);
+                const birthOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+                const birthFormattedDate = birthDate.toLocaleDateString('en-US', birthOptions);
+                document.getElementById('viewBirthdate').textContent = birthFormattedDate;
                 document.getElementById('viewUsertype').textContent = data.user_type;
                 document.getElementById('viewAddress').textContent = data.address;
                 document.getElementById('viewImage').src = '../uploaded_img/' + data.image;
@@ -314,6 +321,7 @@
         fetch('fetch_staff.php?id=' + id)
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 document.getElementById('uid').value = data.uid;
                 document.getElementById('name').value = data.name;
                 document.getElementById('pnumber').value = data.pnumber;
@@ -341,7 +349,7 @@
             method: 'POST',
             body: formData
         })
-        .then(response => response.text())
+        .then(response => response.json())
         .then(data => {
             formElement.reset();
             console.log(data);

@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     $delete_product->execute([$productId]);
 
     $select_item = $conn->prepare("SELECT * FROM products WHERE id = ?");
-    $select_item->execute([$itemId]);
+    $select_item->execute([$productId]);
     $item = $select_item->fetch(PDO::FETCH_ASSOC);
     $name = $item['name'];
     

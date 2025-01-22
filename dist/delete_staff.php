@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     $delete_staff->execute([$staffId]);
     
     $select_item = $conn->prepare("SELECT * FROM users WHERE id = ?");
-    $select_item->execute([$itemId]);
+    $select_item->execute([$staffId]);
     $item = $select_item->fetch(PDO::FETCH_ASSOC);
     $name = $item['name'];
     

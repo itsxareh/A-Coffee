@@ -36,12 +36,28 @@ class QuantityParser {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    header('Content-Type: application/json');
     date_default_timezone_set('Asia/Manila');
     $current_time = date('m-d-Y H:i:s');
     $uid = $_SESSION['uid'];
+    $amount = (float)$_POST['amount'];
     $cart_total = 0;
     $cart_products = [];
 
+    $select_price = $conn->prepare("SELECT *, SUM(price * quantity) as total FROM cart WHERE uid = ?");
+    $select_price->bindParam(1, $uid);
+    $select_price->execute();
+    $cart_amount = $select_price->fetch(PDO::FETCH_ASSOC);
+    $cart_total_amount = (float)$cart_amount['total'];
+
+    if ($amount < $cart_total_amount) {
+        echo json_encode([
+            'success' => false,
+            'message' => "Invalid amount: entered amount (₱{$amount}) is less than the total cart amount (₱{$cart_total}).",
+        ]);
+        exit;
+    }
+    
     $select_cart = $conn->prepare("SELECT c.*, pv.size as variation, pv.ingredients, p.name AS product_name FROM `cart` c LEFT JOIN product_variations pv ON pv.id = c.variation_id LEFT JOIN products p ON p.id = c.product_id WHERE uid = ?");
     $select_cart->bindParam(1, $uid);
     $select_cart->execute();
@@ -54,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE uid = ?");
         $check_inventory = $conn->prepare("SELECT id, quantity, name FROM `inventory` WHERE delete_flag = 0");
-        $insert_order = $conn->prepare("INSERT INTO `orders`(uid, products, amount, placed_on) VALUES(?,?,?,?)");
+        $insert_order = $conn->prepare("INSERT INTO `orders`(uid, products, amount, cash, placed_on) VALUES(?,?,?,?,?)");
         $insert_log = $conn->prepare("INSERT INTO `activity_log`(uid, log, datetime) VALUES (?,?,?)");
         
         $conn->beginTransaction();
@@ -64,6 +80,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $product_id = $cart_item['product_id'];
             $product_quantity = $cart_item['quantity'];
             $ingredients = $cart_item['ingredients'];
+            if (empty($ingredients)){
+                $should_process_order = true;
+                break;
+            }
             $ingredients_array = explode(',', $ingredients);
             $parsed_ingredients = [];
 
@@ -120,9 +140,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         if ($should_process_order) {
             $products_string = '';
-            foreach ($cart_products as $index => $product) {
+            foreach ($cart_products as $index => $product) {    
+                $productName = !empty($product['product_name']) ? $product['product_name']  : $product['name'];
+                $productVar = !empty($product['variation']) ? '('.$product['variation'].')' : '';
                 $productTemp = !empty($product['temperature']) ? ' ('.$product['temperature'].')' : '';
-                $product_info = $product['quantity'] . ' ' . $product['product_name'] . ' ' . '('.$product['variation'].')' . '' . $productTemp;
+                $product_info = $product['quantity'] . ' ' . $productName . ' ' . $productVar . '' . $productTemp;
                 $products_string .= $product_info;
                 if ($index < count($cart_products) - 1) {
                     $products_string .= ', ';
@@ -132,7 +154,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $insert_order->bindParam(1, $uid);
                 $insert_order->bindParam(2, $products_string);
                 $insert_order->bindParam(3, $cart_total);
-                $insert_order->bindParam(4, $current_time);
+                $insert_order->bindParam(4, $amount);
+                $insert_order->bindParam(5, $current_time);
                 $insert_order->execute();
 
                 $order_id = $conn->lastInsertId();
