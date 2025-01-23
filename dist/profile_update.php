@@ -70,7 +70,7 @@ if (isset($_SESSION['uid'])){
                     <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="usertype">User Type</label>
                     <select title="User Type" name="usertype" id="usertype" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border">
                         <?php 
-                            if(isset($profile['user_type']) && $profile['user_type'] == 1){
+                            if(isset($profile['user_type']) && $profile['user_type'] == 0){
                                 echo '<option value="0" selected disabled>Staff</option>';
                             } else {
                                 echo '<option value="1" selected disabled>Admin</option>';
@@ -90,50 +90,123 @@ if (isset($_SESSION['uid'])){
     </div>
 </div>
 <script>
-    const messages = document.getElementById("message");
-    const divMessage = document.getElementsByClassName('hide-message')[0];
-    const submitBtn = document.getElementById('submitBtn');
-    const formElement = document.getElementById('update_user');
-    const password = document.getElementById('password');
+const messages = document.getElementById("message");
+const divMessage = document.getElementsByClassName('hide-message')[0];
+const submitBtn = document.getElementById('submitBtn');
+const formElement = document.getElementById('update_user');
+const password = document.getElementById('password');
+const nPassword = document.getElementById('npassword');
+const name = document.getElementById('name');
+const pnumber = document.getElementById('pnumber');
+const gender = document.getElementById('gender');
+const email = document.getElementById('email');
+const birthdate = document.getElementById('birthdate');
+const usertype = document.getElementById('usertype');
+const address = document.getElementById('address');
 
-    submitBtn.addEventListener('click', submitForm);
+function validateEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
 
-    function submitForm(event){
-        if (password.value == ""){
-            messages.textContent = "Password needed";
-            return false;
-        }
-        event.preventDefault();
+function validatePhone(phone) {
+    return /^\d{11}$/.test(phone);
+}
+
+function validateForm() {
+    if (!name.value.trim()) {
+        messages.textContent = "Name is required";
+        return false;
+    }
+
+    if (!pnumber.value.trim() || !validatePhone(pnumber.value.trim())) {
+        messages.textContent = "Valid phone number (11 digits) is required";
+        return false;
+    }
+
+    if (!email.value.trim() || !validateEmail(email.value.trim())) {
+        messages.textContent = "Valid email is required";
+        return false;
+    }
+
+    if (!gender.value) {
+        messages.textContent = "Gender is required";
+        return false;
+    }
+
+    if (!birthdate.value) {
+        messages.textContent = "Birthdate is required";
+        return false;
+    }
+
+    if (!usertype.value) {
+        messages.textContent = "User type is required";
+        return false;
+    }
+
+    if (!address.value.trim()) {
+        messages.textContent = "Address is required";
+        return false;
+    }
+
+    if (nPassword.value && !password.value) {
+        messages.textContent = "Current password is required to set new password";
+        return false;
+    }
+
+    return true;
+}
+
+function showMessage(message, duration = 1500) {
+    if (divMessage) {
+        divMessage.classList.remove('hidden');
+        messages.textContent = message;
+        setTimeout(() => {
+            divMessage.classList.add('hidden');
+        }, duration);
+    }
+}
+
+function updateFormFields(data) {
+    const fields = ['uid', 'name', 'pnumber', 'gender', 'email', 'usertype', 'address'];
+    fields.forEach(field => {
+        const element = document.getElementById(field);
+        if (element) element.value = data[field];
+    });
+
+    document.getElementById('birthdate').value = data.bdate;
+    document.getElementById('npassword').value = '';
+    document.getElementById('password').value = '';
+    document.getElementById('old_image').value = data.image;
+    document.getElementById('previewImage').src = '../uploaded_img/' + data.image;
+}
+
+async function submitForm(event) {
+    event.preventDefault();
+
+    if (!validateForm()) {
+        if (divMessage) divMessage.classList.remove('hidden');
+        return;
+    }
+
+    try {
         const formData = new FormData(formElement);
-
-        fetch('update_user.php', {
+        const response = await fetch('update_user.php', {
             method: 'POST',
             body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.update === true){
-                document.getElementById('uid').value = data.uid;
-                document.getElementById('name').value = data.name;
-                document.getElementById('pnumber').value = data.pnumber;
-                document.getElementById('gender').value = data.gender;
-                document.getElementById('email').value = data.email;
-                document.getElementById('birthdate').value = data.bdate;
-                document.getElementById('usertype').value = data.user_type;
-                document.getElementById('address').value = data.address;
-                document.getElementById('old_image').value = data.image;
-                document.getElementById('previewImage').src = '../uploaded_img/'+ data.image;
-            }
-            if (divMessage) {
-                divMessage.classList.remove('hidden');
-            }
-            messages.textContent = data.message;
-            setTimeout(function() {
-                if (divMessage) {
-                    divMessage.classList.add('hidden');
-                }
-            }, 1000);
-        })
-        .catch(error => { console.error('Error updating profile:', error)});
+        });
+
+        const data = await response.json();
+        
+        if (data.update === true) {
+            updateFormFields(data);
+        }
+        
+        showMessage(data.message);
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        showMessage('Error updating profile. Please try again.');
     }
+}
+
+submitBtn.addEventListener('click', submitForm);
 </script>

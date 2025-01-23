@@ -61,22 +61,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $update_item->bindParam(3, $currentDateTime);
             $update_item->bindParam(4, $id);
         } else {
-            // Update name, description, and quantity
-            preg_match('/(\d*\.?\d+)\s*([a-zA-Z]+)/', $quantity_db, $matches);
-            $db_value = (float)$matches[1];
-            $db_unit = strtolower($matches[2]);
-            preg_match('/(\d*\.?\d+)\s*([a-zA-Z]+)/', $quantity, $match);
-            $quantity_value = (float)$match[1];
-            $quantity_unit = strtolower($match[2]);
-            $standard_quantity = convertToBaseUnit($quantity_value, $quantity_unit, $db_unit);
+            $db_value = 0;
+            $db_unit = '';
+            $quantity_value = 0;
+            $quantity_unit = '';
 
-            $total_quantity = number_format((floatval($standard_quantity) + floatval($db_value)), 3, '.', '').''.$db_unit;
+            if (preg_match('/(\d*\.?\d+)\s*([a-zA-Z]+)/', $quantity_db, $matches)) {
+                $db_value = (float)$matches[1];
+                $db_unit = strtolower($matches[2]);
+            } else {
+                $db_value = (float)$quantity_db;
+            }
+
+            if (preg_match('/(\d*\.?\d+)\s*([a-zA-Z]+)/', $quantity, $match)) {
+                $quantity_value = (float)$match[1];
+                $quantity_unit = strtolower($match[2]);
+            } else {
+                $quantity_value = (float)$quantity;
+            }
+
+            if ($db_unit && $quantity_unit) {
+                $standard_quantity = convertToBaseUnit($quantity_value, $quantity_unit, $db_unit);
+            } else {
+                $standard_quantity = $quantity_value;
+            }
+
+            $total_quantity = number_format((float)($standard_quantity + $db_value), 3, '.', '');
+            if ($db_unit) {
+                $total_quantity .= $db_unit;
+            }
+
             $update_item = $conn->prepare("UPDATE `inventory` SET name = ?, description = ?, quantity = ?, quantity_before = ?, updated_at = ? WHERE id = ?");
             $update_item->bindParam(1, $name);
             $update_item->bindParam(2, $description);
             $update_item->bindParam(3, $total_quantity);
             $update_item->bindParam(4, $quantity_db);
-            $update_item->bindParam(5, $currentDateTime);
+            $update_item->bindParam(5, $current_time);
             $update_item->bindParam(6, $id);
         }
 
@@ -110,6 +130,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $stmt->bindParam(1, $id);
                     $stmt->execute();
                     $data = $stmt->fetch(PDO::FETCH_ASSOC);
+                    $data['quantity_changed'] = boolval(empty($quantity)); 
                     $data['message'] = "Updated item successfully";
                     $data['update'] = true;
                 } else {
@@ -126,10 +147,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 function convertToBaseUnit($quantity, $unit, $unitDb) {
     $validUnits = ['l', 'ml', 'kg', 'g', 'cup', 'oz', 'tbsp'];
-    
-    // if (!in_array(strtolower($unit), $validUnits) || !in_array(strtolower($unitDb), $validUnits)) {
-    //     throw new Exception("Invalid unit type");
-    // }
 
     if ($unitDb == $unit) {
         return $quantity * 1; 

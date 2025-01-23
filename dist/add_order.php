@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($amount < $cart_total_amount) {
         echo json_encode([
             'success' => false,
-            'message' => "Invalid amount: entered amount (₱{$amount}) is less than the total cart amount (₱{$cart_total}).",
+            'message' => "Amount must be greater than or equal to total",
         ]);
         exit;
     }
@@ -72,6 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $check_inventory = $conn->prepare("SELECT id, quantity, name FROM `inventory` WHERE delete_flag = 0");
         $insert_order = $conn->prepare("INSERT INTO `orders`(uid, products, amount, cash, placed_on) VALUES(?,?,?,?,?)");
         $insert_log = $conn->prepare("INSERT INTO `activity_log`(uid, log, datetime) VALUES (?,?,?)");
+        $insert_sale = $conn->prepare("INSERT INTO `sales` (order_id, amount, datetime) VALUES (?,?,?)");
         
         $conn->beginTransaction();
         $should_process_order = true;
@@ -165,6 +166,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $insert_log->bindParam(2, $log);
                 $insert_log->bindParam(3, $currentDateTime);
                 $insert_log->execute();
+
+                $insert_sale->execute([$order_id, $cart_total, $currentDateTime]);
 
                 $delete_cart->bindParam(1, $uid);
                 $delete_cart->execute();

@@ -83,14 +83,14 @@
                             <img id="previewImage" class="w-48 h-48 rounded-full bg-center object-cover" src="../images/image-svgrepo-com.svg">
                             <label class="relative cursor-pointer rounded-lg float-end" for="image">
                                 <img class="w-6 h-6" src="../images/upload-minimalistic-svgrepo-com.svg">
-                                <input id="image" name="image" class="sr-only" type="file" accept="image/jpg, image/jpeg, image/png" onchange="previewFile()" required>
+                                <input id="image" name="image" class="sr-only" type="file" accept="image/jpg, image/jpeg, image/png" onchange="previewFile()">
                                 <input type="hidden" name="old_image" id="old_image">
                             </label>
                         </div>
                     </div>
                     <div class="col-span-1">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="name">Name</label>
-                        <input name="name" id="name" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="Juan Dela Cruz" type="text" autocomplete="off" required>
+                        <input name="name" id="name" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" type="name" autocomplete="off" required>
                     </div>
                     <div class="col-span-1">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="pnumber">Phone number</label>
@@ -98,24 +98,24 @@
                             <div class="absolute text-gray-600 flex items-center px-2 border-r h-full">
                                 <p class="text-sm text-gray-600 font-normal ">+63</p>
                             </div>
-                            <input name="pnumber" id="pnumber" class="text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-12 text-sm border-gray-300 rounded border" placeholder="9123456789" />
+                            <input name="pnumber" id="pnumber" class="text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-12 text-sm border-gray-300 rounded border" type="number" />
                         </div>
                         <div id="pnumberError" class="text-red-500 salsa"></div>
                     </div>
                     <div class="col-span-1">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="gender">Gender</label>
-                        <select name="gender" id="gender" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border">
+                        <select name="gender" id="gender" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" required>
                             <option value="male" selected>Male</option> 
                             <option value="female">Female</option>
                         </select>
                     </div>
                     <div class="col-span-1">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="email">Email address</label>
-                        <input name="email" id="email" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" autocomplete="off" placeholder="juandelacruz@gmail.com" type="email" required>
+                        <input name="email" id="email" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" autocomplete="off" type="email" required>
                     </div>
                     <div class="col-span-1">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="password">Password</label>
-                        <input name="password" id="password" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="********" type="password" autocomplete="off" required>
+                        <input name="password" id="password" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" type="password" autocomplete="off">
                     </div>
                     <div class="col-span-1">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="birthdate">Birthdate</label>
@@ -123,14 +123,14 @@
                     </div>
                     <div class="col-span-1">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="usertype">User Type</label>
-                        <select name="usertype" id="usertype" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border">
+                        <select name="usertype" id="usertype" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" required>
                             <option class="0" value="0" selected>Staff</option> 
                             <option class="1" value="1">Manager</option>
                         </select>
                     </div>
                     <div class="col-span-full">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="address">Address</label>
-                        <textarea name="address" id="address" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" rows="3" autocomplete="off" placeholder="12 Zamora St. Sampaloc, Manila City" required></textarea>
+                        <textarea name="address" id="address" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" rows="3" autocomplete="off" required></textarea>
                     </div>
                 </div>
                 <div class="flex items-center justify-start w-full">
@@ -338,8 +338,50 @@
     }
     const submitBtn = document.getElementById('submitBtn');
     const formElement = document.getElementById('add_staff'); 
-    submitBtn.addEventListener('click', submitForm);
+    const uidInput = document.getElementById('uid');
+    const pnumberInput = document.getElementById('pnumber');
+    const genderInput = document.getElementById('gender');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const birthdateInput = document.getElementById('birthdate');
+    const nameInput = document.getElementById('name');
+    const usertypeInput = document.getElementById('usertype');
+    const addressInput = document.getElementById('address');
 
+    formElement.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        [nameInput, emailInput, addressInput, passwordInput, pnumberInput].forEach(removeErrorState);
+        
+        let isValid = true;
+        
+        if (!nameInput.value.trim()) {
+            addErrorState(nameInput, 'Name is required');
+            isValid = false;
+        }
+        if (!pnumberInput.value.trim()) {
+            addErrorState(pnumberInput, 'Phone number is required');
+            isValid = false;
+        } else if (!/^9\d{9}$/.test(pnumberInput.value.trim())) {
+            addErrorState(pnumberInput, 'Invalid phone number format');
+            isValid = false;
+        }
+        if (!emailInput.value.trim()) {
+            addErrorState(emailInput, 'Email is required');
+            isValid = false;
+        }
+        if (!addressInput.value.trim()) {
+            addErrorState(addressInput, 'Address is required');
+            isValid = false;
+        }
+        if (!uidInput.value && !passwordInput.value.trim()) {
+            addErrorState(passwordInput, 'Password is required');   
+            isValid = false;
+        }
+        if (isValid) {
+            submitForm(event);
+        }
+    });
     function submitForm(event) {
         modalHandler(false);
         event.preventDefault();
@@ -418,23 +460,6 @@
             console.error('Error submitting form:', error);
         });
     }
-    
-    const pnumberInput = document.getElementById('pnumber');
-    const pnumberError = document.getElementById('pnumberError');
-
-    if (pnumberInput && pnumberError) {
-        pnumberInput.addEventListener('input', function() {
-        const pnumberValue = this.value.trim(); 
-        const isValid = /^[0-9]+(\.[0-9]{1,2})?$/.test(pnumberValue); 
-        if (!isValid) {
-            pnumberError.textContent = 'Please enter a valid phone number';
-            pnumberInput.classList.add('border-red-500');
-        } else {
-            pnumberError.textContent = '';
-            pnumberInput.classList.remove('border-red-500');
-        }
-        });
-    } 
 
     const confirmDeleteBtn = deleteModal.querySelector(".deleteStaff");
     confirmDeleteBtn.addEventListener("click", () => {

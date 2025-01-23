@@ -103,6 +103,7 @@
         </div>
     </div>
 </div>
+<script src="../src/script.js"></script>
 <script>
     const modal = document.getElementById("add-modal");
     const openModalBtn = document.getElementById("addModalBtn");
@@ -182,8 +183,24 @@
             .catch(error => console.error('Error fetching data:', error));
     }
     const submitBtn = document.getElementById('submitBtn');
-    const formElement = document.getElementById('add_category'); 
-    submitBtn.addEventListener('click', submitForm);
+
+    const formElement = document.getElementById('add_category');
+    const nameInput = document.getElementById('name');
+
+    formElement.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        removeErrorState(nameInput);
+        
+        if (!nameInput.value.trim()) {
+            addErrorState(nameInput, 'Category name is required');
+            return;
+        }
+        
+        // If validation passes, proceed with form submission
+        submitForm(event);
+    });
+
 
 function submitForm(event) {
     event.preventDefault();

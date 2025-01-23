@@ -289,8 +289,11 @@
                     </div>
                     `;
                 }
-                
-                
+                if (divMessage) {
+                    divMessage.classList.remove('hidden');
+                }
+                messages.textContent = 'Successfully undo the changes';
+                    
             } else {
                 alert(data.message || 'Error undoing changes');
             }
@@ -315,9 +318,43 @@
             .catch(error => console.error('Error fetching data:', error));
     }
     const submitBtn = document.getElementById('submitBtn');
-    const formElement = document.getElementById('add_item'); 
-    submitBtn.addEventListener('click', submitForm);
+    const formElement = document.getElementById('add_item');
+    const nameInput = document.getElementById('name');
+    const quantityInput = document.getElementById('quantity');
+    const descriptionInput = document.getElementById('description');
 
+    formElement.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        [nameInput, quantityInput, descriptionInput].forEach(removeErrorState);
+        
+        let isValid = true;
+        
+        if (!nameInput.value.trim()) {
+            addErrorState(nameInput, 'Name is required');
+            isValid = false;
+        }
+        
+        if (quantityInput.value.trim()) {
+            const quantityPattern = /^(\d*\.?\d+)\s*(piece\/s|KG|g|L|ml|)$/i;
+            if (!quantityPattern.test(quantityInput.value)) {
+                addErrorState(quantityInput, 'Number or, and unit (KG, g, L, ml)');
+                isValid = false;
+            }
+        } else {
+            addErrorState(quantityInput, 'Quantity is required');
+            isValid = false;
+        }
+        
+        if (!descriptionInput.value.trim()) {
+            addErrorState(descriptionInput, 'Description is required');
+            isValid = false;
+        }
+
+        if (isValid) {
+            submitForm(event);
+        }
+    });
     function submitForm(event) {
     event.preventDefault();
     const formData = new FormData(formElement);
@@ -335,14 +372,10 @@
             newRow.setAttribute('class', 'border-color');
             newRow.setAttribute('data-id', data.id);
             newRow.innerHTML = `
-                <!--<td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
-                    <img class="w-16 h-16 object-cover" src="../uploaded_img/">
-                </td>-->
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity}</td>
-                // <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">N/A</td>
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.description}</td>
-                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.added_at}</td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">N/A</td>
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                     <div class="flex items-center gap-4">
                         <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(${data.id})"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
@@ -378,9 +411,6 @@
             const dateResult = `${formattedDate} ${formattedTime}`;
             const updatedRow = document.querySelector(`tr[data-id="${data.id}"]`);
             updatedRow.innerHTML = `
-                <!--<td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
-                    <img class="w-16 h-16 object-cover" src="../uploaded_img/">
-                </td>-->
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity}</td>
                 <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.description === '' ? 'N/A' : data.description}</td>

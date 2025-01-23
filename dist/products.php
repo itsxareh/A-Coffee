@@ -242,12 +242,35 @@ function fadeIn(el, display) {
     });
 </script>
 <script>
-const messages = document.getElementById("message");
-const divMessage = document.getElementsByClassName('hide-message')[0];
-const submitBtn = document.getElementById('submitBtn');
-const formElement = document.getElementById('add_product'); 
-submitBtn.addEventListener('click', submitForm);
+    const messages = document.getElementById("message");
+    const divMessage = document.getElementsByClassName('hide-message')[0];
+    const submitBtn = document.getElementById('submitBtn');
+    const formElement = document.getElementById('add_product');
+    const nameInput = document.getElementById('name');
+    const categoryInput = document.getElementById('category');
+    const descriptionInput = document.getElementById('description');
 
+    formElement.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        [nameInput, descriptionInput].forEach(removeErrorState);
+        
+        let isValid = true;
+        
+        if (!nameInput.value.trim()) {
+            addErrorState(nameInput, 'Name is required');
+            isValid = false;
+        }
+        
+        if (!descriptionInput.value.trim()) {
+            addErrorState(descriptionInput, 'Description is required');
+            isValid = false;
+        }
+
+        if (isValid) {
+            submitForm(event);
+        }
+    });
 function submitForm(event) {
     event.preventDefault();
     const formData = new FormData(formElement);

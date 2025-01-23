@@ -317,7 +317,7 @@ ini_set('display_errors', 1);
                     foreach($carts as $cart){ ?>
                 <div id="totalConfirmModal" class="w-full">
                     <form id="add_order" action="" method="POST">
-                        <div class="flex flex-col align-items-end" style="align-items: end;">
+                        <div class="flex flex-col items-end" style="align-items: end;">
                             <div class="relative">
                                 <div class="absolute text-gray-600 flex items-center px-2 border-r h-10">
                                     <img width="12px" src="../images/peso-svgrepo-com.svg" alt="">
@@ -842,7 +842,7 @@ function attachDeleteEventListeners() {
                             if (data.total !== undefined && totalConfirmModal) {
                                 const totalHTML = `
                                     <form id="add_order" action="" method="POST">
-                                        <div class="flex justify-between">
+                                        <div class="flex flex-col items-end" style="align-items: end;">
                                             <div class="relative">
                                                 <div class="absolute text-gray-600 flex items-center px-2 border-r h-10">
                                                     <img width="12px" src="../images/peso-svgrepo-com.svg" alt="">
@@ -1166,7 +1166,7 @@ function addToCart(form) {
             totalConfirmModal.innerHTML = '';
             const confirmTotalHTML = `
                     <form id="add_order" action="" method="POST">
-                        <div class="flex justify-between">
+                        <div class="flex flex-col items-end" style="align-items: end;">
                             <div class="relative">
                                 <div class="absolute text-gray-600 flex items-center px-2 border-r h-10">
                                     <img width="12px" src="../images/peso-svgrepo-com.svg" alt="">
