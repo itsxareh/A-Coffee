@@ -283,7 +283,7 @@ function submitForm(event) {
         const price = row.querySelector(`input[name="variations[${index}][price]"]`).value;
         const ingredients = row.querySelector(`textarea[name="variations[${index}][ingredients]"]`).value;
         
-        if (!size || !price || !ingredients) {
+        if (!size || !price) {
             isValid = false;
         }
     });

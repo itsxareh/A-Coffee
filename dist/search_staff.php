@@ -6,29 +6,30 @@ ini_set('display_errors', 1);
 $searchTerm = isset($_GET['search']) ? '%' . $_GET['search'] . '%' : '';
 
 if ($searchTerm !== '') {
-    $select_staffs = $conn->prepare("SELECT u.id, u.image, u.name, u.uid, SUM(o.amount) AS total, SUM(o.amount) AS quantity FROM users u LEFT JOIN orders o ON u.uid = o.uid WHERE name LIKE ? AND delete_flag = 0 GROUP BY u.uid");
+    $select_staffs = $conn->prepare("SELECT u.id, u.image, u.name, u.uid, SUM(o.amount) AS total, SUM(o.amount) AS quantity FROM users u LEFT JOIN orders o ON u.uid = o.uid WHERE name LIKE ? AND u.delete_flag = 0 GROUP BY u.uid");
     $select_staffs->execute([$searchTerm]);
 
     $staffs = $select_staffs->fetchAll(PDO::FETCH_ASSOC);
     if (count($staffs) > 0) {
-        foreach ($staffs as $staff) {
-            echo '<tr class="border-color" data-id="'.$staff['id'].'">';
-                echo '<td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">';
-                    echo '<a class="cursor-pointer" href="index.php?page=view_staff&id='.$staff['id'].'">';
-                        echo '<img class="w-16 h-16 object-cover" src="../uploaded_img/'.$staff['image'].'">';
-                    echo '</a>';
-                echo '</td>';
-                echo '<td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">'.ucwords($staff['name']).'</td>';
-                echo '<td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">'.$staff['uid'].'</td>';
-                echo '<td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">'.($staff['quantity'] ? $staff['quantity'] : "0") .'</td>';
-                echo '<td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">'.($staff['total'] ? $staff['total'] : "0") .'</td>';
-                echo '<td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">';
-                    echo '<div class="flex items-center gap-4">';
-                        echo '<button class="w-6 h-6" onclick="showEditModal('.$staff['id'].')"><img src="../images/edit-svgrepo-com.svg" alt=""></button>';
-                        echo '<button  class="w-6 h-6 deleteModalBtn" onclick="showDeleteModal('.$staff['id'].')"><img src="../images/delete-svgrepo-com.svg" alt=""></button>';
-                    echo '</div>';
-                echo '</td>';
-            echo '</tr>';
+        foreach ($staffs as $staff) { ?>
+            <tr class="border-color" data-id="<?= $staff['id']; ?>">
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
+                    <button class="cursor-pointer" onclick="showViewModal(<?= $staff['id'] ?>)" title="View Staff Details">
+                        <img class="w-16 h-16 object-cover" src="../uploaded_img/<?= $staff['image']; ?>">
+                    </button>
+                </td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ucwords($staff['name']); ?></td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $staff['uid']; ?></td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ($staff['quantity'] ? $staff['quantity'] : "0") ?></td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">₱<?= ($staff['total'] ? $staff['total'] : "0") ?></td>
+                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-4">
+                        <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(<?= $staff['id'] ?>)"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
+                        <button id="deleteModalBtn" class="w-6 h-6" onclick="showDeleteModal(<?= $staff['id'] ?>)"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
+                    </div>
+                </td>
+            </tr>   
+        <?php
         }
     } else {
         echo '<tr><td colspan="6" class="text-gray text-medium font-semibold p-3 py-4 text-center">No staff found.</td></tr>';

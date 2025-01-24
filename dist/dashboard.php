@@ -40,7 +40,7 @@
         $total_amount = $get_total_amount['total_amount'];
     ?>
     <div class="rounded-lg shadow-lg bg-dark-brown text-center flex flex-col justify-around h-52">
-        <p class="text-white text-5xl line-clamp-1 hover:line-clamp-1">₱<?= $total_amount ? $total_amount : 0 ?></p>
+        <p class="text-white text-5xl line-clamp-1 hover:line-clamp-1" id="dailySalesAmount">₱<?= $total_amount ? $total_amount : 0 ?></p>
         <span class="text-gray text-2xl">Daily Sales</span>        
     </div>
 </div>
@@ -53,6 +53,7 @@
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left min-w-48 max-w-72">Orders</th>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Price</th>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Placed On</th>
+                <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Status</th>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Action</th>
             </tr>
         </thead>
@@ -83,10 +84,10 @@
             }
 
             if ($fetch_profile['user_type'] == 1) {
-                $get_orders = $conn->prepare("SELECT * FROM `orders` WHERE delete_flag = 0 ORDER BY CASE WHEN status = 2 THEN 0 WHEN status = 1 THEN 1 END, CASE WHEN status = 1 THEN id END DESC;");
+                $get_orders = $conn->prepare("SELECT * FROM `orders` WHERE delete_flag = 0 ORDER BY  id DESC;");
                 $get_orders->execute();
             } else {
-                $get_orders = $conn->prepare("SELECT * FROM `orders` WHERE uid = ? AND delete_flag = 0 ORDER BY CASE WHEN status = 2 THEN 0 WHEN status = 1 THEN 1 END, CASE WHEN status = 1 THEN id END DESC;");
+                $get_orders = $conn->prepare("SELECT * FROM `orders` WHERE uid = ? AND delete_flag = 0 ORDER BY id DESC;");
                 $get_orders->execute([$uid]);
             }
             $orders = $get_orders->fetchAll(PDO::FETCH_ASSOC);
@@ -96,9 +97,12 @@
                     <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap rosarivo"><?= $order['id'] ?></td>
                     <td class="text-gray text-medium text-sm p-3 py-4 whitespace-wrap rosarivo min-w-48 max-w-72"><?= $order['products']?></td>
                     <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap rosarivo">₱<?= $order['amount']; ?></td>
-                    <!-- <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap text-balance rosarivo">
+                    <td class="placed_on" data-timestamp="<?= $order['placed_on']; ?>">
+                        <?= getRelativeTime($order['placed_on']); ?>
+                    </td>
+                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap text-balance rosarivo">
                     <?php if ($order['status']===2) { ?>
-                        <select class="text-white text-medium text-sm bg-transparent whitespace-nowrap rosarivo status-select" name="status" data-id="<?= $order['id'] ?>">
+                        <select class="text-white text-medium text-sm bg-transparent whitespace-nowrap rosarivo status-select" name="status" data-id="<?= $order['id'] ?>" <?= $order['uid'] !== $uid ? 'disabled': ''?>>
                             <option class="text-black text-medium rosarivo " value="2" <?= $order['status'] == 2 ? 'selected' : '' ?>>On Process</option>
                             <option class="text-black text-medium rosarivo " value="1" <?= $order['status'] == 1 ? 'selected' : '' ?>>Done</option>
                         </select>
@@ -106,15 +110,12 @@
                     } else {
                         echo 'Done';
                     }?>
-                    </td> -->
-                    <td class="placed_on" data-timestamp="<?= $order['placed_on']; ?>">
-                        <?= getRelativeTime($order['placed_on']); ?>
                     </td>
                     <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap rosarivo">
                         <div class="flex items-center gap-4">
                             <?php if ($order['status'] == 2){ ?>
-                                <button id="statusBtn" class="statusBtn w-6 h-6" title="Save" data-id="<?= $order['id'] ?>"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
-                                <button id="deleteModalBtn" class="deleteModalBtn w-6 h-6" title="Delete" onclick="showDeleteModal(<?= $order['id'] ?>)"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
+                                <button id="statusBtn" class="statusBtn w-6 h-6" title="Save" data-id="<?= $order['id'] ?>" <?= $order['uid'] !== $uid ? 'disabled': ''?>><img src="../images/edit-svgrepo-com.svg" alt=""></button>
+                                <button id="deleteModalBtn" class="deleteModalBtn w-6 h-6" title="Delete" onclick="showDeleteModal(<?= $order['id'] ?>)"  <?= $order['uid'] !== $uid ? 'disabled': ''?>><img src="../images/delete-svgrepo-com.svg" alt=""></button>
                             <?php } else { ?>
                                 <button id="receiptModalBtn" class="receiptModalBtn w-6 h-6" title="View Receipt" onclick="showReceiptModal(<?= $order['id'] ?>)"><img src="../images/receipt-svgrepo-com.svg" alt=""></button>
                             <?php
@@ -255,10 +256,22 @@ document.querySelectorAll('.statusBtn').forEach(button => {
                 const response = JSON.parse(xhr.responseText);
                 console.log(response);
                 if (response.success === true) {
-                        const row = button.closest('tr');
-                        const tbody = row.parentNode;
-                        tbody.appendChild(row);
-                        window.location.href = 'index.php?page=order';
+                        const tableRow = document.querySelector(`tr[data-id="${orderId}"]`);
+                        const dailySalesAmount = document.getElementById('dailySalesAmount');
+                        dailySalesAmount.textContent = '₱' + (response.dailySalesAmount ? response.dailySalesAmount : '0');
+                        if (tableRow) {
+                            const statusCell = tableRow.querySelector('td:nth-child(5)');
+                            statusCell.innerHTML = 'Done';
+                            
+                            const actionCell = tableRow.querySelector('td:nth-child(6)');
+                            actionCell.innerHTML = `
+                                <div class="flex items-center gap-4">
+                                    <button id="receiptModalBtn" class="receiptModalBtn w-6 h-6" title="View Receipt" onclick="showReceiptModal(${orderId})">
+                                        <img src="../images/receipt-svgrepo-com.svg" alt="">
+                                    </button>
+                                </div>
+                            `;
+                        }
                         if (divMessage) {
                             divMessage.classList.remove('hidden');
                             messages.textContent = response.message;

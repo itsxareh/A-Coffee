@@ -40,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     date_default_timezone_set('Asia/Manila');
     $current_time = date('m-d-Y H:i:s');
     $uid = $_SESSION['uid'];
+    $status = 2;
     $amount = (float)$_POST['amount'];
     $cart_total = 0;
     $cart_products = [];
@@ -70,9 +71,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         $delete_cart = $conn->prepare("DELETE FROM `cart` WHERE uid = ?");
         $check_inventory = $conn->prepare("SELECT id, quantity, name FROM `inventory` WHERE delete_flag = 0");
-        $insert_order = $conn->prepare("INSERT INTO `orders`(uid, products, amount, cash, placed_on) VALUES(?,?,?,?,?)");
+        $insert_order = $conn->prepare("INSERT INTO `orders`(uid, products, amount, cash, placed_on, status) VALUES(?,?,?,?,?,?)");
         $insert_log = $conn->prepare("INSERT INTO `activity_log`(uid, log, datetime) VALUES (?,?,?)");
-        $insert_sale = $conn->prepare("INSERT INTO `sales` (order_id, amount, datetime) VALUES (?,?,?)");
         
         $conn->beginTransaction();
         $should_process_order = true;
@@ -82,8 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $product_quantity = $cart_item['quantity'];
             $ingredients = $cart_item['ingredients'];
             if (empty($ingredients)){
-                $should_process_order = true;
-                break;
+                continue;
             }
             $ingredients_array = explode(',', $ingredients);
             $parsed_ingredients = [];
@@ -157,6 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $insert_order->bindParam(3, $cart_total);
                 $insert_order->bindParam(4, $amount);
                 $insert_order->bindParam(5, $current_time);
+                $insert_order->bindParam(6, $status);
                 $insert_order->execute();
 
                 $order_id = $conn->lastInsertId();
@@ -166,8 +166,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $insert_log->bindParam(2, $log);
                 $insert_log->bindParam(3, $currentDateTime);
                 $insert_log->execute();
-
-                $insert_sale->execute([$order_id, $cart_total, $currentDateTime]);
 
                 $delete_cart->bindParam(1, $uid);
                 $delete_cart->execute();

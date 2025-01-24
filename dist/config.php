@@ -18,7 +18,7 @@ try {
     );
 
     date_default_timezone_set('Asia/Manila');
-    $currentDateTime = date('d-m-Y H:i:s');
+    $currentDateTime = date('m-d-Y H:i:s');
 } catch (PDOException $e) {
     error_log("Database Connection Error: " . $e->getMessage());
     exit("Database connection failed. Please try again later.");
