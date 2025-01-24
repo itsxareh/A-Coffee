@@ -187,6 +187,26 @@
     const formElement = document.getElementById('add_category');
     const nameInput = document.getElementById('name');
 
+    nameInput.addEventListener("input", function () {
+        const name = nameInput.value.trim();
+        const itemId = id ? id.value : null;
+
+        if (name.length > 0) {
+            fetch(`check_category_name.php?name=${encodeURIComponent(name)}&id=${encodeURIComponent(itemId)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        addErrorState(nameInput, "Name already exists.");
+                        submitBtn.disabled = true;
+                    } else {
+                        removeErrorState(nameInput);
+                    }
+                })
+                .catch(err => console.error("Error checking name:", err));
+        } else {
+            removeErrorState(nameInput);
+        }
+    });
     formElement.addEventListener('submit', function(event) {
         event.preventDefault();
         
@@ -251,6 +271,11 @@ function submitForm(event) {
                 divMessage.classList.remove('hidden');
             }
             messages.textContent = data.message;
+        } else if (data.nameDuplicate) {
+            if (divMessage) {
+                    divMessage.classList.remove('hidden');
+                }
+                messages.textContent = data.message;
         }
         setTimeout(function() {
             if (divMessage) {

@@ -7,15 +7,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $uid = $_SESSION['uid'];
       $id = $_POST['id'];
       $name = trim($_POST['name']);
-      $price = trim($_POST['price']);
+      $price = trim($_POST['price'] ?? '0');
       $category = trim($_POST['category']);
-      $ingredients = $_POST['ingredients'];
       $description = $_POST['description'];
 
       $insert_product = null;
       $update_product = null;
 
       if (!isset($id) || $id === '') {
+         // Insert new product
          $insert_product = $conn->prepare("INSERT INTO `products`(name, category, description) VALUES (?,?,?)");
          $insert_product->bindParam(1, $name);
          $insert_product->bindParam(2, $category);
@@ -24,6 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
          $last_insert_id = $conn->lastInsertId();
          
+         // Optional: Insert variations if provided
          if (isset($_POST['variations']) && is_array($_POST['variations'])) {
             $insert_variation = $conn->prepare("INSERT INTO `product_variations`(product_id, size, price, ingredients) VALUES (?,?,?,?)");
             
@@ -31,14 +32,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                if (!empty($variation['size']) && !empty($variation['price'])) {
                   $insert_variation->execute([
                      $last_insert_id,
-                     trim($variation['size']),
-                     trim($variation['price']),
-                     trim($variation['ingredients'])
+                     trim($variation['size'] ?? ''),
+                     trim($variation['price'] ?? ''),
+                     trim($variation['ingredients'] ?? '')
                   ]);
                }
             }
-         } else {
-            $data['message'] = 'No product variants were provided!';
          }
 
          $select_new_product = $conn->prepare("SELECT p.*, GROUP_CONCAT(v.id, ':', v.size, ':', v.price, ':', v.ingredients) as variations 
@@ -51,6 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
          if ($insert_product) {
             $product = $select_new_product->fetch(PDO::FETCH_ASSOC);
+            
             // Handle image upload
             $unique_id = rand(000000000, 999999999);
             $image = $_FILES['image']['name'];
@@ -98,6 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
          }
       } 
       else {
+         // Update existing product
          $update_product = $conn->prepare("UPDATE `products` SET name = ?, category = ?, description = ? WHERE id = ?");
          $update_product->bindParam(1, $name);
          $update_product->bindParam(2, $category);
@@ -109,7 +110,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
          $delete_variations = $conn->prepare("DELETE FROM `product_variations` WHERE product_id = ?");
          $delete_variations->execute([$id]);
 
-         // Insert updated variations
+         // Optional: Insert updated variations
          if (isset($_POST['variations']) && is_array($_POST['variations'])) {
             $insert_variation = $conn->prepare("INSERT INTO `product_variations`(product_id, size, price, ingredients) VALUES (?,?,?,?)");
             
@@ -123,8 +124,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                   ]);
                }
             }
-         } else {
-            $data['message'] = 'No product variants were provided!';
          }
 
          $select_product = $conn->prepare("SELECT p.*, GROUP_CONCAT(v.id, ':', v.size, ':', v.price, ':', v.ingredients) as variations 
@@ -137,6 +136,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
          if ($update_product) {
             $product = $select_product->fetch(PDO::FETCH_ASSOC);
+            
             // Handle image upload for update
             $unique_id = rand(000000000, 999999999);
             $image = $_FILES['image']['name'];

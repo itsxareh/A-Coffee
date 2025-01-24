@@ -10,6 +10,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id = $_POST['id'];
     $data = array();
 
+    $name_check_query = $conn->prepare(
+        "SELECT COUNT(*) FROM `inventory` " . 
+        (isset($id) && $id !== '' ? "WHERE name = ? AND id != ? AND delete_flag = 0" : "WHERE name = ? AND delete_flag = 0")
+    );
+
+    if (isset($id) && $id !== '') {
+        $name_check_query->bindParam(1, $name);
+        $name_check_query->bindParam(2, $id);
+    } else {
+        $name_check_query->bindParam(1, $name);
+    }
+
+    $name_check_query->execute();
+    $name_exists = $name_check_query->fetchColumn() > 0;
+
+    if ($name_exists) {
+        $data['message'] = "Name already exists.";
+        $data['nameDuplicate'] = true;
+        echo json_encode($data);
+        exit;
+    }
     if (!isset($id) || $id === '') {
         $insert_item = $conn->prepare("INSERT INTO `inventory`(name, description, quantity, added_at) VALUES (?,?,?,?)");
         $insert_item->bindParam(1, $name);

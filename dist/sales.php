@@ -116,7 +116,7 @@ if ($fetch_profile['user_type'] == 1) { ?>
                     $log = $inventory_log->fetchAll(PDO::FETCH_ASSOC);
                     if (count($log) > 0){ 
                         foreach ($log as $row) {
-                            $growth = $row['prev_sales'] ? (($row['sales'] - $row['prev_sales']) / $row['prev_sales'] * 100) : 0;
+                            $growth = $row['prev_sales'] > 0 ? (($row['sales'] - $row['prev_sales']) / $row['prev_sales'] * 100) : 0;
                             ?>
                         <tr class="border-color">
                             <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= $row['date'] ?></td>

@@ -319,10 +319,31 @@
     }
     const submitBtn = document.getElementById('submitBtn');
     const formElement = document.getElementById('add_item');
+    const id = document.getElementById('id');
     const nameInput = document.getElementById('name');
     const quantityInput = document.getElementById('quantity');
     const descriptionInput = document.getElementById('description');
 
+    nameInput.addEventListener("input", function () {
+        const name = nameInput.value.trim();
+        const itemId = id ? id.value : null;
+
+        if (name.length > 0) {
+            fetch(`check_inventory_name.php?name=${encodeURIComponent(name)}&id=${encodeURIComponent(itemId)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        addErrorState(nameInput, "Name already exists.");
+                        submitBtn.disabled = true;
+                    } else {
+                        removeErrorState(nameInput);
+                    }
+                })
+                .catch(err => console.error("Error checking name:", err));
+        } else {
+            removeErrorState(nameInput);
+        }
+    });
     formElement.addEventListener('submit', function(event) {
         event.preventDefault();
         
@@ -356,89 +377,94 @@
         }
     });
     function submitForm(event) {
-    event.preventDefault();
-    const formData = new FormData(formElement);
+        event.preventDefault();
+        const formData = new FormData(formElement);
 
-    fetch('add_item.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        formElement.reset();
-        console.log(data);
-        if (data.insert === true) {
-            const newRow = document.createElement('tr');
-            newRow.setAttribute('class', 'border-color');
-            newRow.setAttribute('data-id', data.id);
-            newRow.innerHTML = `
-                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
-                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity}</td>
-                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.description}</td>
-                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">N/A</td>
-                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
-                    <div class="flex items-center gap-4">
-                        <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(${data.id})"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
-                        <button id="deleteModalBtn" class="w-6 h-6" onclick="showDeleteModal(${data.id})"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
-                    </div>
-                </td>
-            `;
-            const tbody = document.getElementById('itemsList');
-            tbody.appendChild(newRow);
-            if (divMessage) {
-                divMessage.classList.remove('hidden');
+        fetch('add_item.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            formElement.reset();
+            console.log(data);
+            if (data.insert === true) {
+                const newRow = document.createElement('tr');
+                newRow.setAttribute('class', 'border-color');
+                newRow.setAttribute('data-id', data.id);
+                newRow.innerHTML = `
+                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
+                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity}</td>
+                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.description}</td>
+                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">N/A</td>
+                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
+                        <div class="flex items-center gap-4">
+                            <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(${data.id})"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
+                            <button id="deleteModalBtn" class="w-6 h-6" onclick="showDeleteModal(${data.id})"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
+                        </div>
+                    </td>
+                `;
+                const tbody = document.getElementById('itemsList');
+                tbody.appendChild(newRow);
+                if (divMessage) {
+                    divMessage.classList.remove('hidden');
+                }
+                messages.textContent = data.message;
+            } else if (data.update === true) {
+                const inputDate = data.updated_at;
+                const [datePart, timePart] = inputDate.split(" ");
+                const [month, day, year] = datePart.split("-");
+                const date = new Date(`${year}-${month}-${day}T${timePart}`);
+
+                // Format the date
+                const options = { year: "numeric", month: "long", day: "numeric" };
+                const formattedDate = date.toLocaleDateString("en-US", options);
+
+                // Format the time
+                let hours = date.getHours();
+                const minutes = date.getMinutes().toString().padStart(2, "0");
+                const ampm = hours >= 12 ? "PM" : "AM";
+                hours = hours % 12 || 12;
+
+                const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes} ${ampm}`;
+
+                // Combine the formatted date and time
+                const dateResult = `${formattedDate} ${formattedTime}`;
+                const updatedRow = document.querySelector(`tr[data-id="${data.id}"]`);
+                updatedRow.innerHTML = `
+                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
+                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity}</td>
+                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.description === '' ? 'N/A' : data.description}</td>
+                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${dateResult}</td>
+                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
+                        <div class="flex items-center gap-4">
+                            <button id="undoModalBtn" class="w-6 h-6" onclick="showUndoModal(${data.id})"><img src="../images/undo-left-svgrepo-com.svg" alt=""></button>
+                            <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(${data.id})"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
+                            <button id="deleteModalBtn" class="w-6 h-6" onclick="showDeleteModal(${data.id})"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
+                        </div>
+                    </td>
+                `;
+                if (divMessage) {
+                    divMessage.classList.remove('hidden');
+                }
+                messages.textContent = data.message;
+            } else if (data.nameDuplicate){
+                if (divMessage) {
+                    divMessage.classList.remove('hidden');
+                }
+                messages.textContent = data.message;
             }
-            messages.textContent = data.message;
-        } else if (data.update === true) {
-            const inputDate = data.updated_at;
-            const [datePart, timePart] = inputDate.split(" ");
-            const [month, day, year] = datePart.split("-");
-            const date = new Date(`${year}-${month}-${day}T${timePart}`);
-
-            // Format the date
-            const options = { year: "numeric", month: "long", day: "numeric" };
-            const formattedDate = date.toLocaleDateString("en-US", options);
-
-            // Format the time
-            let hours = date.getHours();
-            const minutes = date.getMinutes().toString().padStart(2, "0");
-            const ampm = hours >= 12 ? "PM" : "AM";
-            hours = hours % 12 || 12;
-
-            const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes} ${ampm}`;
-
-            // Combine the formatted date and time
-            const dateResult = `${formattedDate} ${formattedTime}`;
-            const updatedRow = document.querySelector(`tr[data-id="${data.id}"]`);
-            updatedRow.innerHTML = `
-                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
-                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity}</td>
-                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.description === '' ? 'N/A' : data.description}</td>
-                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${dateResult}</td>
-                <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
-                    <div class="flex items-center gap-4">
-                        <button id="undoModalBtn" class="w-6 h-6" onclick="showUndoModal(${data.id})"><img src="../images/undo-left-svgrepo-com.svg" alt=""></button>
-                        <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(${data.id})"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
-                        <button id="deleteModalBtn" class="w-6 h-6" onclick="showDeleteModal(${data.id})"><img src="../images/delete-svgrepo-com.svg" alt=""></button>
-                    </div>
-                </td>
-            `;
-            if (divMessage) {
-                divMessage.classList.remove('hidden');
-            }
-            messages.textContent = data.message;
-        }
-        setTimeout(function() {
-            if (divMessage) {
-                divMessage.classList.add('hidden');
-            }
-        }, 1000);
-        modalHandler(false);
-    })
-    .catch(error => {
-        console.error('Error submitting form:', error);
-    });
-}
+            setTimeout(function() {
+                if (divMessage) {
+                    divMessage.classList.add('hidden');
+                }
+            }, 1000);
+            modalHandler(false);
+        })
+        .catch(error => {
+            console.error('Error submitting form:', error);
+        });
+    }
     const confirmDeleteBtn = deleteModal.querySelector(".deleteItem");
     confirmDeleteBtn.addEventListener("click", () => {
         const itemId = confirmDeleteBtn.getAttribute("data-id");

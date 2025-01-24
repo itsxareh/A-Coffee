@@ -408,7 +408,6 @@ function submitForm(event) {
             .catch(error => console.error('Error fetching data:', error));
     }
     function addVariation(index, data = null) {
-
         const container = document.getElementById('variations-container');
         const newVariation = document.createElement('div');
         newVariation.className = 'variation-row mb-4';
@@ -434,7 +433,7 @@ function submitForm(event) {
                 </div>
                 <div class="col-span-full">
                     <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa">Ingredients</label>
-                    <textarea name="variations[${index}][ingredients]" 
+                    <textarea id="ingredients-${index}" name="variations[${index}][ingredients]" 
                         class="mt-1 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" 
                         rows="2">${data ? data.ingredients : ''}</textarea>
                 </div>
@@ -445,6 +444,48 @@ function submitForm(event) {
         `;
 
         container.appendChild(newVariation);
+
+        const textarea = newVariation.querySelector(`#ingredients-${index}`);
+        const suggestionsBox = document.createElement("div");
+        suggestionsBox.className = "suggestions";
+        suggestionsBox.style.display = "none";
+        textarea.parentElement.appendChild(suggestionsBox);
+
+        textarea.addEventListener("input", function () {
+        const query = this.value.split(/\s+/).pop();
+        if (query.length > 1) {
+            fetch(`get_ingredients_suggestions.php?name=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    suggestionsBox.innerHTML = "";
+                    if (data.length > 0) {
+                        suggestionsBox.style.display = "block";
+                        suggestionsBox.classList.add("p-2", "text-black", "bg-gray-100", "rounded-md");
+                        data.forEach(item => {
+                            const div = document.createElement("div");
+                            div.textContent = item;
+                            div.classList.add("suggestion-item", "text-black", "hover:bg-gray-200", "p-2", "cursor-pointer");
+
+                            div.addEventListener("click", () => {
+                                const words = textarea.value.split(/\s+/);
+                                words.pop(); 
+                                words.push(item); 
+                                textarea.value = words.join(" "); 
+                                
+                                suggestionsBox.style.display = "none";
+                            });
+
+                            suggestionsBox.appendChild(div);
+                        });
+                    } else {
+                        suggestionsBox.style.display = "none";
+                    }
+                })
+                .catch(err => console.error("Error fetching suggestions:", err));
+        } else {
+            suggestionsBox.style.display = "none";
+        }
+    });
 
         const removeButton = newVariation.querySelector('.remove-variation');
         removeButton.addEventListener('click', () => {
@@ -474,7 +515,6 @@ function submitForm(event) {
         const currentCount = container.getElementsByClassName('variation-row').length;
         addVariation(currentCount);
     });
-
     function showDeleteModal(productId) {
         const deleteBtn = deleteModal.querySelector(".deleteProduct");
         deleteBtn.setAttribute("data-id", productId);
@@ -534,7 +574,7 @@ function showViewModal(id) {
             document.getElementById('viewName').innerHTML = data.name;
             document.getElementById('viewCategory').innerHTML = data.category_name;
             document.getElementById('viewDescription').innerHTML = data.description;
-            document.getElementById('viewImage').src = '../uploaded_img/' + data.image;
+            document.getElementById('viewImage').src = '../uploaded_img/' + (data.image != null ? data.image : 'CoffeeFrappuccino.jpg');
 
             // Handle variations
             const variationsContainer = document.getElementById('variationsContainer');

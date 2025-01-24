@@ -17,7 +17,7 @@ function addErrorState(element, message) {
     element.classList.add('border-red-500');
     
     const errorDiv = document.createElement('div');
-    errorDiv.className = 'text-red-500 text-xs mt-1';
+    errorDiv.className = 'text-red-500 text-xs';
     errorDiv.textContent = message;
     
     element.parentNode.insertBefore(errorDiv, element.nextSibling);

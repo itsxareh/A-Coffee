@@ -5,7 +5,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $uid = $_SESSION['uid'];
     $id = $_POST['id'];
     $data = array();
+    $insert_item = null;
+    $update_item = null;
     
+    $name_check_query = $conn->prepare(
+        "SELECT COUNT(*) FROM `category` " . 
+        (isset($id) && $id !== '' ? "WHERE category_name = ? AND id != ? AND delete_flag = 0" : "WHERE category_name = ? AND delete_flag = 0")
+    );
+
+    if (isset($id) && $id !== '') {
+        $name_check_query->bindParam(1, $name);
+        $name_check_query->bindParam(2, $id);
+    } else {
+        $name_check_query->bindParam(1, $name);
+    }
+
+    $name_check_query->execute();
+    $name_exists = $name_check_query->fetchColumn() > 0;
+
+    if ($name_exists) {
+        $data['message'] = "Name already exists.";
+        $data['nameDuplicate'] = true;
+        echo json_encode($data);
+        exit;
+    }
     if (!isset($id) || $id === '') {
         $insert_item = $conn->prepare("INSERT INTO category (category_name) VALUES (?)");
         $insert_item->bindParam(1, $name);
