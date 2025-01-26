@@ -66,18 +66,7 @@ if (isset($_SESSION['uid'])){
                     <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="password">New Password</label>
                     <input title="New Password" name="npassword" id="npassword" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border" placeholder="********" type="password" autocomplete="off" required>
                 </div>
-                <div class="col-span-1">
-                    <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="usertype">User Type</label>
-                    <select title="User Type" name="usertype" id="usertype" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-400 font-normal w-full h-10 flex items-center pl-3 text-sm border-gray-300 rounded border">
-                        <?php 
-                            if(isset($profile['user_type']) && $profile['user_type'] == 0){
-                                echo '<option value="0" selected disabled>Staff</option>';
-                            } else {
-                                echo '<option value="1" selected disabled>Admin</option>';
-                            }
-                        ?>
-                    </select>
-                </div>
+                
                 <div class="col-span-full">
                     <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="address">Address</label>
                     <input value="<?= $profile['address'] ? $profile['address'] : 'N/A' ?>" title="Address" name="address" id="address" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" rows="3" autocomplete="off" placeholder="12 Zamora St. Sampaloc, Manila City" required></input>
@@ -115,41 +104,43 @@ function validatePhone(phone) {
 function validateForm() {
     if (!name.value.trim()) {
         messages.textContent = "Name is required";
+        showMessage(messages.textContent);
         return false;
     }
 
     if (!pnumber.value.trim() || !validatePhone(pnumber.value.trim())) {
         messages.textContent = "Valid phone number (11 digits) is required";
+        showMessage(messages.textContent);
         return false;
     }
 
     if (!email.value.trim() || !validateEmail(email.value.trim())) {
         messages.textContent = "Valid email is required";
+        showMessage(messages.textContent);
         return false;
     }
 
     if (!gender.value) {
         messages.textContent = "Gender is required";
+        showMessage(messages.textContent);
         return false;
     }
 
     if (!birthdate.value) {
         messages.textContent = "Birthdate is required";
-        return false;
-    }
-
-    if (!usertype.value) {
-        messages.textContent = "User type is required";
+        showMessage(messages.textContent);
         return false;
     }
 
     if (!address.value.trim()) {
         messages.textContent = "Address is required";
+        showMessage(messages.textContent);
         return false;
     }
 
     if (nPassword.value && !password.value) {
         messages.textContent = "Current password is required to set new password";
+        showMessage(messages.textContent);
         return false;
     }
 
@@ -176,8 +167,8 @@ function updateFormFields(data) {
     document.getElementById('birthdate').value = data.bdate;
     document.getElementById('npassword').value = '';
     document.getElementById('password').value = '';
-    document.getElementById('old_image').value = data.image;
-    document.getElementById('previewImage').src = '../uploaded_img/' + data.image;
+    document.getElementById('old_image').value = (data.image !== null ? data.image : '');
+    document.getElementById('previewImage').src = '../uploaded_img/' + (data.image !== null ? data.image : 'default-profile.png');
 }
 
 async function submitForm(event) {
@@ -196,7 +187,7 @@ async function submitForm(event) {
         });
 
         const data = await response.json();
-        
+        console.log(data);
         if (data.update === true) {
             updateFormFields(data);
         }

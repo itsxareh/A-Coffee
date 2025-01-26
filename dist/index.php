@@ -169,7 +169,7 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
             <div class="relative h-full">
               <div class="w-full overflow-y-auto h-full">
                 <div class="flex flex-col text-sm pb-9">
-                  <div class="header sticky top-0 mb-1.5 flex items-center justify-between z-10 h-14 p-2 font-semibold bg-dark-brown" style="background-color: #000;">
+                  <div class="header sticky top-0 mb-1.5 flex items-center justify-between z-10 h-16 p-2 font-semibold bg-dark-brown" style="background-color: #000;">
                     <div id="svpBtn" class="hidden">
                       <button class="relative rounded-md w-10 h-10 flex items-center justify-center">
                         <img class="w-full h-full" src="../images/hamburger-svgrepo-com.svg" alt="">
@@ -177,7 +177,7 @@ $fetch_profile = $select_profile->fetch(PDO::FETCH_ASSOC);
                     </div>
                     <div class="flex items-center gap-2">
                       <!-- <div class="coffee-name"><span class="text-white text-2xl rosarivo">A Coffee</span></div> -->
-                      <img src="../images/A-coffee-logo.jpg" alt="A Coffee" class="w-40 h-20 pointer-events-none">
+                      <img src="../images/A-coffee-logo.jpg" alt="A Coffee" class="w-40 h-14 pointer-events-none">
                     </div>
                     <div class="user">
                       <div id="profileBtn">

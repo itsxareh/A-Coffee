@@ -1,17 +1,20 @@
 <?php
 include 'config.php';
 ob_start();
-
+if (isset(($_SESSION['uid']))){
+    header('location: index.php');
+    exit();
+};
 if (isset($_POST['login'])) {
     $uid = trim($_POST['uid']);
     $password = trim($_POST['password']);
 
-    $sql = "SELECT * FROM `users` WHERE uid = ?";
+    $sql = "SELECT * FROM `users` WHERE uid = :uid";
     $stmt = $conn->prepare($sql);
-    $stmt->execute([$uid]);
+    $stmt->execute(['uid' => $uid]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($row && password_verify($password, $row['password']) || $uid === 'admin' && $password === 'admin') {
+    if ($row && password_verify($password, $row['password'])) {
         if ($row['user_type'] == 0 || $row['user_type'] == 1) {
             $_SESSION['uid'] = $row['uid'];
             $_SESSION['name'] = $row['name'];

@@ -20,6 +20,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $check_cart_numbers = $conn->prepare("SELECT *, cart.id as id, product_variations.price as price, product_variations.size as variation FROM `cart` LEFT JOIN product_variations ON cart.variation_id = product_variations.id WHERE uid = ?");
     $check_cart_numbers->execute([$uid]);
     $carts = $check_cart_numbers->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($carts as $cart){
+        if ($cart['image'] === '' ? 'default-coffee.svg' : $cart['image']);
+    }
 
     $totalPlaceOrder = 0;
     foreach ($carts as $cart){

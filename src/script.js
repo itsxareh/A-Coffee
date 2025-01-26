@@ -29,3 +29,12 @@ function removeErrorState(element) {
     const errorDiv = element.parentNode.querySelector('.text-red-500');
     if (errorDiv) errorDiv.remove();
 }
+function showMessage(message, duration = 1500) {
+    if (divMessage) {
+        divMessage.classList.remove('hidden');
+        messages.textContent = message;
+        setTimeout(() => {
+            divMessage.classList.add('hidden');
+        }, duration);
+    }
+}

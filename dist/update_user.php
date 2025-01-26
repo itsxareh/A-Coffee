@@ -19,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $email = trim($_POST['email']);
     $gender = $_POST['gender'];
     $birthdate = date('m-d-Y', strtotime($_POST['birthdate']));
-    $user_type = $_POST['usertype'];
     $address = $_POST['address'];
 
     $select_staff = $conn->prepare("SELECT * FROM users WHERE uid = ? AND delete_flag = 0");
@@ -80,7 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 email = :email, 
                 gender = :gender, 
                 birthdate = :birthdate, 
-                user_type = :user_type, 
                 address = :address 
                 WHERE uid = :uid AND delete_flag = 0");
 
@@ -90,7 +88,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 ':email' => $email,
                 ':gender' => $gender,
                 ':birthdate' => $birthdate,
-                ':user_type' => $user_type,
                 ':address' => $address,
                 ':uid' => $uid
             );

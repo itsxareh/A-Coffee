@@ -59,7 +59,7 @@ if (count($products) > 0) {
                                 <img class="rounded-md" src="../images/cart-arrow-down-svgrepo-com.svg">
                             </button>
                         </div>
-                        <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= $product['image'] ?>"/>
+                        <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= $product['image'] ?>" onerror="this.src='../uploaded_img/default-coffee.svg';"/>
                     </div>
                     <div class="flex justify-center items-center">
                         <p style="padding: 0.25rem;" class="text-center text-white salsa text-md p-1"><?= ucwords($product['name']) ?></p>
@@ -84,7 +84,7 @@ if (count($products) > 0) {
                                 </button>
                             </form>
                         </div>
-                        <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= $product['image'] ?>"/>
+                        <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= $product['image'] ?>" onerror="this.src='../uploaded_img/default-coffee.svg';"/>
                     </div>
                     <div class="flex justify-center items-center">
                         <p style="padding: 0.25rem;" class="text-white salsa text-md p-1"><?= ucwords($product['name']) ?></p>

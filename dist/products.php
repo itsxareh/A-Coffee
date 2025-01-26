@@ -32,7 +32,7 @@
                 <button type="button" id="view-btn" class="view-btn w-full h-full absolute cart-btn rounded-md cursor-pointer hidden" onclick="showViewModal(<?= $product['id'] ?>)">
                     <center><img title="View" class="rounded-md w-12 h-12 text-center" src="../images/details-more-svgrepo-com.svg"></center>
                 </button>
-                <img class="productImg w-full h-full object-cover rounded-md" src="../uploaded_img/<?= isset($product['image']) ? $product['image'] : 'CoffeeFrappuccino.jpg' ?>">
+                <img class="productImg w-full h-full object-cover rounded-md" src="../uploaded_img/<?= isset($product['image']) ? $product['image'] : 'default-coffee.svg' ?>">
             </div>
         </div>
         <?php 
@@ -259,11 +259,13 @@ function fadeIn(el, display) {
         
         if (!nameInput.value.trim()) {
             addErrorState(nameInput, 'Name is required');
+            showMessage('Name is required');
             isValid = false;
         }
         
         if (!descriptionInput.value.trim()) {
             addErrorState(descriptionInput, 'Description is required');
+            showMessage("Description is required")
             isValid = false;
         }
 
@@ -277,26 +279,53 @@ function submitForm(event) {
     const container = document.getElementById('variations-container');
     const variations = container.querySelectorAll('.variation-row');
     let isValid = true;
-    
+
+    // Regex for individual ingredient validation
+    const ingredientPattern = /^(\d+(?:\.\d+)?)\s*([a-zA-Z]+)?\s*(\([^)]*\)|[a-zA-Z\d\s]+)$/;
+
     variations.forEach((row, index) => {
         const size = row.querySelector(`input[name="variations[${index}][size]"]`).value;
         const price = row.querySelector(`input[name="variations[${index}][price]"]`).value;
         const ingredients = row.querySelector(`textarea[name="variations[${index}][ingredients]"]`).value;
-        
-        if (!size || !price) {
+
+        if (!size.trim()) {
+            addErrorState(size, "Size is required");
+            showMessage("Size is required");
             isValid = false;
         }
-    });
-    if (!isValid) {
-        if (divMessage) {
-            messages.textContent = 'Please fill up all fields.';
-            divMessage.classList.remove('hidden'); 
-            setTimeout(function() {
-                divMessage.classList.add('hidden'); 
-            }, 3000);
+
+        if (!price.trim()) {
+            addErrorState(price, "Price is required");
+            showMessage("Price is required");
+            isValid = false;
         }
+
+        if (ingredients.trim()) {
+            const ingredientList = ingredients.split(',').map(item => item.trim());
+            ingredientList.forEach((ingredient) => {
+                const match = ingredient.match(ingredientPattern);
+                
+                if (!match) {
+                    showMessage(`Invalid ingredient format: "${ingredient}". Example: '100ml Whole Milk', '1.5 kg Instant Coffee', or '1 12oz Cup'`);
+                    isValid = false;
+                    return;
+                }
+
+                const [, quantity, unit, itemName] = match;
+                
+                // Additional validations
+                if (!quantity || parseFloat(quantity) <= 0) {
+                    showMessage(`Invalid quantity in ingredient: "${ingredient}"`);
+                    isValid = false;
+                }
+            });
+        }
+    });
+
+    if (!isValid) {
         return;
     }
+
     fetch('add_product.php', {
             method: 'POST',
             body: formData
@@ -326,7 +355,7 @@ function submitForm(event) {
                         <button type="button" id="view-btn" class="view-btn w-full h-full absolute cart-btn rounded-md cursor-pointer hidden" onclick="showViewModal(${data.id})">
                             <center><img title="View" class="rounded-md w-12 h-12 text-center" src="../images/details-more-svgrepo-com.svg"></center>
                         </button>
-                        <img class="productImg w-full h-full object-cover rounded-md" src="../uploaded_img/${(data.image !== null ? data.image : 'CoffeeFrappuccino.jpg')}">
+                        <img class="productImg w-full h-full object-cover rounded-md" src="../uploaded_img/${(data.image !== null ? data.image : 'default-coffee.svg')}">
                     </div>
                 `;
                 productsList.appendChild(newProduct);
@@ -336,7 +365,7 @@ function submitForm(event) {
                 messages.textContent = data.message;
             } else if (data.update === true) {
                 const updatedRow = document.querySelector(`div[data-id="${data.id}"]`);
-                updatedRow.querySelector('.productImg').src = '../uploaded_img/' + (data.image !== null ? data.image : 'CoffeeFrappuccino.jpg');  
+                updatedRow.querySelector('.productImg').src = '../uploaded_img/' + (data.image !== null ? data.image : 'default-coffee.svg');  
                 updatedRow.querySelector('button.edit-btn').setAttribute('onclick', `showEditModal(${data.id})`);
                 updatedRow.querySelector('button.delete-btn').setAttribute('onclick', `showDeleteModal(${data.id})`);
                 updatedRow.querySelector('button.view-btn').setAttribute('onclick', `showViewModal(${data.id})`);
@@ -388,10 +417,10 @@ function submitForm(event) {
                         .catch(error => console.error('Error fetching categories:', error));
                 }
                 document.getElementById('description').value = data.description;
-                const defaultImage = '../uploaded_img/CoffeeFrappuccino.jpg';
+                const defaultImage = '../uploaded_img/default-coffee.svg';
                 const imagePath = data.image ? '../uploaded_img/' + data.image : defaultImage;
 
-                document.getElementById('old_image').value = data.image || 'CoffeeFrappuccino.jpg';
+                document.getElementById('old_image').value = data.image || 'default-coffee.svg';
                 document.getElementById('previewImage').src = imagePath;
 
                 // Clear existing variations
@@ -574,7 +603,7 @@ function showViewModal(id) {
             document.getElementById('viewName').innerHTML = data.name;
             document.getElementById('viewCategory').innerHTML = data.category_name;
             document.getElementById('viewDescription').innerHTML = data.description;
-            document.getElementById('viewImage').src = '../uploaded_img/' + (data.image != null ? data.image : 'CoffeeFrappuccino.jpg');
+            document.getElementById('viewImage').src = '../uploaded_img/' + (data.image != null ? data.image : 'default-coffee.svg');
 
             // Handle variations
             const variationsContainer = document.getElementById('variationsContainer');

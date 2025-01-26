@@ -79,7 +79,7 @@ ini_set('display_errors', 1);
                                 $check_product_variation->execute([$product['id']]);
                                 $product_variations = $check_product_variation->fetchAll(PDO::FETCH_ASSOC);
                                 
-                                if (count($product_variations) > 1){ ?>
+                                if (count($product_variations) > 0){ ?>
                                     <div class="products relative rounded-lg p-4 cursor-pointer shadow-lg bg-dark-brown h-56" data-id="<?= $product['id'] ?>">
                                         <div class="flex flex-col justify-center">
                                             <div class="rounded-md relative w-full h-36 flex flex-col items-center justify-center">
@@ -89,7 +89,7 @@ ini_set('display_errors', 1);
                                                         <img class="rounded-md" src="../images/cart-arrow-down-svgrepo-com.svg">
                                                     </button>
                                                 </div>
-                                                <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= isset($product['image']) ? $product['image'] : 'CoffeeFrappuccino.jpg' ?>"/>
+                                                <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= isset($product['image']) ? $product['image'] : 'default-coffee.svg' ?>"/>
                                             </div>
                                             <div class="flex justify-center items-center">
                                                 <p style="padding: 0.25rem;" class="text-center text-white salsa text-md p-1"><?= ucwords($product['name']) ?></p>
@@ -108,13 +108,13 @@ ini_set('display_errors', 1);
                                                         <input type="text" class="hidden" id="name" name="name" value="<?= $product['name']?>" autocomplete="off">
                                                         <input type="text" class="hidden" id="price" name="price" value="<?= $product_variations[0]['price']?>">
                                                         <input type="text" class="hidden" id="quantity" name="quantity" value="1">
-                                                        <input type="text" class="hidden" id="image" name="image" value="<?= isset($product['image']) ? $product['image'] : 'CoffeeFrappuccino.jpg'?>">
+                                                        <input type="text" class="hidden" id="image" name="image" value="<?= isset($product['image']) ? $product['image'] : 'default-coffee.svg'?>">
                                                         <button type="submit" id="cartBtn" class="cart-btn rounded-md p-2 cursor-pointer hidden">
                                                             <img class="rounded-md" src="../images/cart-arrow-down-svgrepo-com.svg">
                                                         </button>
                                                     </form>
                                                 </div>
-                                                <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= isset($product['image']) ? $product['image'] : 'CoffeeFrappuccino.jpg' ?>"/>
+                                                <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= isset($product['image']) ? $product['image'] : 'default-coffee.svg' ?>"/>
                                             </div>
                                             <div class="flex justify-center items-center">
                                                 <p style="padding: 0.25rem;" class="text-white salsa text-md p-1"><?= ucwords($product['name']) ?></p>
@@ -132,13 +132,13 @@ ini_set('display_errors', 1);
                                                         <input type="text" class="hidden" id="name" name="name" value="<?= $product['name']?>" autocomplete="off">
                                                         <input type="text" class="hidden" id="price" name="price" value="<0">
                                                         <input type="text" class="hidden" id="quantity" name="quantity" value="1">
-                                                        <input type="text" class="hidden" id="image" name="image" value="<?= isset($product['image']) ? $product['image'] : 'CoffeeFrappuccino.jpg'?>">
+                                                        <input type="text" class="hidden" id="image" name="image" value="<?= isset($product['image']) ? $product['image'] : 'default-coffee.svg'?>">
                                                         <button type="submit" id="cartBtn" class="cart-btn rounded-md p-2 cursor-pointer hidden">
                                                             <img class="rounded-md" src="../images/cart-arrow-down-svgrepo-com.svg">
                                                         </button>
                                                     </form>
                                                 </div>
-                                                <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= isset($product['image']) ? $product['image'] : 'CoffeeFrappuccino.jpg' ?>"/>
+                                                <img class="w-full h-full object-cover rounded-md" src="../uploaded_img/<?= isset($product['image']) ? $product['image'] : 'default-coffee.svg' ?>"/>
                                             </div>
                                             <div class="flex justify-center items-center">
                                                 <p style="padding: 0.25rem;" class="text-white salsa text-md p-1"><?= ucwords($product['name']) ?></p>
@@ -211,7 +211,7 @@ ini_set('display_errors', 1);
                                 foreach($carts as $cart){ ?>
                                     <div class="cart relative rounded-md bg-dark-brown flex flex-start items-center h-28" data-id="<?= $cart['id'] ?>">
                                         <div class="w-28 h-full">
-                                            <img class="rounded-tl-md rounded-bl-md w-full h-full object-cover" src="../uploaded_img/<?=$cart['image']?>">
+                                            <img class="rounded-tl-md rounded-bl-md w-full h-full object-cover" src="../uploaded_img/<?=$cart['image']?>" onerror="this.src='../uploaded_img/default-coffee.svg';">
                                         </div>
                                         <div class="flex-1 ml-2 p-2">
                                             <h3 class="text-white font-normal text-sm capitalize rosarivo leading-3">
@@ -317,7 +317,7 @@ ini_set('display_errors', 1);
                     foreach($carts as $cart){ ?>
                     <div class="mb-4 ms-4">            
                         <div class="flex items-center">
-                            <img class="w-14 h-14 rounded-md mr-5" src="../uploaded_img/<?= $cart['image']?>" alt="">
+                            <img class="w-14 h-14 rounded-md mr-5" src="../uploaded_img/<?= $cart['image']?>" onerror="this.src='../uploaded_img/default-coffee.svg';">
                             <div class="flex-1 cart-item" data-id="<?= $cart['id'] ?>">
                                 <h3 class="flex items-start mb-1 text-lg font-medium text-gray-900"><?= ucwords($cart['name']) ?> <?= !empty($cart['variation']) ? '('.$cart['variation'].')' : '' ?> 
                                 <p class="ml-1" id="confirm-temperature">
@@ -368,11 +368,29 @@ ini_set('display_errors', 1);
         </div>
     </div>
 </div>
+<div class="py-20 px-4 transition duration-150 ease-in-out z-10 fixed top-0 right-0 bottom-0 left-0 h-full hidden flex items-center justify-center" id="success-order-modal">
+    <div class="absolute opacity-80 inset-0 z-0" style="background-color: rgba(0, 0, 0, 0.7);"></div>
+    <div class="w-full max-w-xl px-5 py-6 relative mx-auto my-auto rounded-xl shadow-lg bg-white">
+        <div class="flex justify-center">
+            <img class="w-16 h-16" src="../images/check-1-svgrepo-com.svg" alt="">
+        </div>
+        <h2 class="text-center text-2xl font-bold mt-4 mb-8 text-black">Ordered successful</h2>
+        <p class="text-center text-md text-gray-800 mb-2">Would you like to go the dashboard or make an order again?</p>
+        <div class="text-center space-x-4 md:block">
+            <button class="md:mb-0 bg-amber-600 px-5 py-2 text-sm font-medium tracking-wider border text-white rounded-full hover:shadow-lg hover:bg-amber-400" onclick="goToDashboard()">Go to Dashboard</button>
+            <button class="md:mb-0 bg-amber-500 px-5 py-2 text-sm font-medium tracking-wider border text-white rounded-full hover:shadow-lg hover:bg-amber-400" onclick="successModalHandler()">Order again</button>
+        </div>
+    </div>
+</div>
 <script>
+function goToDashboard(){
+    window.location.href = 'index.php?page=dashboard';
+}
 const messages = document.getElementById("message");
 const divMessage = document.getElementsByClassName('hide-message')[0];
 const notification = document.getElementById("notification");
 const divNotification = document.getElementById("notification-modal");
+
 document.addEventListener('DOMContentLoaded', function() {
     const categoryHeaders = document.querySelectorAll('.category-header');
     
@@ -559,7 +577,7 @@ function initializeProductEventListeners() {
                                 const cartHTML = `
                                 <div class="cart relative rounded-md bg-dark-brown flex flex-start items-center h-28" data-id="${cartItem.id}">
                                     <div class="w-28 h-full">
-                                        <img class="rounded-tl-md rounded-bl-md w-full h-full object-cover" src="../uploaded_img/${cartItem.image}" />
+                                        <img class="rounded-tl-md rounded-bl-md w-full h-full object-cover" src="../uploaded_img/${cartItem.image || 'default-coffee.svg'}" onerror="this.src='../uploaded_img/default-coffee.svg';"/>
                                     </div>
                                     <div class="flex-1 ml-2 p-2">
                                         <h3 class="text-white font-normal text-sm capitalize rosarivo leading-3">${cartItem.name} ${cartItem.variation ? '(' + cartItem.variation + ')' : ''}</h3>
@@ -628,7 +646,7 @@ function initializeProductEventListeners() {
                         const confirmHTML = `
                         <div class="mb-4 ms-4">            
                             <div class="flex items-center">
-                                <img class="w-14 h-14 rounded-md mr-5" src="../uploaded_img/${cartItem.image}" alt=""/>
+                                <img class="w-14 h-14 rounded-md mr-5" src="../uploaded_img/${cartItem.image || 'default-coffee.svg'}" onerror="this.src='../uploaded_img/default-coffee.svg';"/>
                                 <div class="flex-1" data-id="${cartItem.id}">
                                     <h3 class="flex items-start mb-1 text-lg font-medium text-gray-900">${cartItem.name} ${cartItem.variation ? '(' + cartItem.variation + ')' : ''}<p class="salsa bg-blue-100 text-black text-sm font-medium mr-2 px-2.5 py-0.5 rounded ms-3">x<span id="confirm-quantity">${cartItem.quantity}</span></p></h3>
                                     <p class="block mb-3 text-sm font-normal leading-none text-gray-500">₱<span id="confirm-price" class="salsa">${cartItem.price * cartItem.quantity}</span></p>
@@ -712,6 +730,20 @@ function variationModalHandler(val) {
         fadeOut(variationModal);
     }
 }
+
+const successModal = document.getElementById("success-order-modal");
+function showSuccessModal() {
+    fadeIn(successModal);
+}
+function successModalHandler(val) {
+    if (val) {
+        fadeIn(successModal);
+    } else {
+        fadeOut(successModal);
+    }
+}
+
+const deleteModal = document.getElementById("delete-modal");
 function deleteModalHandler(val) {
     if (val) {
         fadeIn(deleteModal);
@@ -1030,6 +1062,7 @@ function addOrder() {
     })
     .then(response => response.json())
     .then(data => {
+        console.log(data);
         if (data.success === true){
             handleInventoryResponse(data);
             const ordersNo = document.querySelector('#ordersNo');
@@ -1043,6 +1076,7 @@ function addOrder() {
             totalConfirmModal.innerHTML = '';
             
             fadeOut(confirmModal);
+            fadeIn(successModal);
         }
         if (data.message) {
             divMessage.classList.remove('hidden');
@@ -1102,7 +1136,7 @@ function addToCart(form) {
                         const cartHTML = `
                         <div class="cart relative rounded-md bg-dark-brown flex flex-start items-center h-28" data-id="${cartItem.id}">
                             <div class="w-28 h-full">
-                                <img class="rounded-tl-md rounded-bl-md w-full h-full object-cover" src="../uploaded_img/${cartItem.image}" />
+                                <img class="rounded-tl-md rounded-bl-md w-full h-full object-cover" src="../uploaded_img/${cartItem.image || 'default-coffee.svg'}" onerror="this.src='../uploaded_img/default-coffee.svg';" />
                             </div>
                             <div class="flex-1 ml-2 p-2">
                                 <h3 class="text-white font-normal text-sm capitalize rosarivo leading-3">${cartItem.name} ${cartItem.variation ? '(' + cartItem.variation + ')' : ''}</h3>
@@ -1167,7 +1201,7 @@ function addToCart(form) {
                 const confirmHTML = `
                 <div class="mb-4 ms-4">            
                     <div class="flex items-center">
-                        <img class="w-14 h-14 rounded-md mr-5" src="../uploaded_img/${cartItem.image}" alt=""/>
+                        <img class="w-14 h-14 rounded-md mr-5" src="../uploaded_img/${cartItem.image || 'default-coffee.svg'}" onerror="this.src='../uploaded_img/default-coffee.svg';"/>
                         <div class="flex-1" data-id="${cartItem.id}">
                             <h3 class="flex items-start mb-1 text-lg font-medium text-gray-900">${cartItem.name} ${cartItem.variation ? '(' + cartItem.variation + ')' : ''}
                             <p class="ml-1" id="confirm-temperature">

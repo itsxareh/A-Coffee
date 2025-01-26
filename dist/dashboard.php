@@ -44,9 +44,28 @@
         <span class="text-gray text-2xl">Daily Sales</span>        
     </div>
 </div>
-<div class="text-3xl text-center text-white rosarivo">Orders</div>
+<div class="upper flex justify-between mb-4">
+        <span class="text-gray text-center  text-2xl salsa title flex-1">Orders</span>
+        <div class="button-input flex gap-2">
+            <select class="rounded-md w-24 px-2 text-black" name="orders" id="orders" onchange="fetchOrders()">
+                <option value="all">All</option>
+                <option value="today">Today</option>
+                <option value="yesterday">Yesterday</option>
+                <option value="week">Week</option>
+            </select>
+            <?php 
+             if ($fetch_profile['user_type'] == 1) {
+                echo '
+                <button onclick="printOrders()" class="bg-amber-500 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded">
+                    Print
+                </button>
+                ';
+             }
+            ?>
+        </div>
+    </div>
 <div class="overflow-x-auto">
-    <table class="orderLists indent-0 border-collapse py-6 px-2  w-full">
+    <table class="indent-0 border-collapse py-6 px-2  w-full" id="itemsTable">
         <thead>
             <tr>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Order ID</th>
@@ -61,7 +80,7 @@
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Action</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="ordersList">
             <?php
             function getRelativeTime($placedOn) {
                 $timestamp = strtotime($placedOn);
@@ -109,25 +128,28 @@
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap rosarivo">' . $order['name'] . '</td>'
                     ?>
                     <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap text-balance rosarivo">
-                    <?php if ($order['status']===2) { ?>
-                        <select class="text-white text-medium text-sm bg-transparent whitespace-nowrap rosarivo status-select" name="status" id="status" data-id="<?= $order['id'] ?>" <?= $order['uid'] !== $uid ? 'disabled': ''?>>
-                            <option class="text-black text-medium rosarivo " value="2" <?= $order['status'] == 2 ? 'selected' : '' ?>>On Process</option>
-                            <option class="text-black text-medium rosarivo " value="1" <?= $order['status'] == 1 ? 'selected' : '' ?>>Done</option>
-                        </select>
-                        <?php
-                    } else {
-                        echo 'Done';
-                    }?>
+                    <?php  
+                        if ($fetch_profile['user_type'] == 1) {
+                            echo $order['status'] == 1 ? 'Done' : 'On process';
+                        } else {
+                            if ($order['status']===2) { ?>
+                                <select class="text-white text-medium text-sm bg-transparent whitespace-nowrap rosarivo status-select" name="status" id="status" data-id="<?= $order['id'] ?>" <?= $order['uid'] !== $uid ? 'disabled': ''?>>
+                                    <option class="text-black text-medium rosarivo " value="2" <?= $order['status'] == 2 ? 'selected' : '' ?>>On Process</option>
+                                    <option class="text-black text-medium rosarivo " value="1" <?= $order['status'] == 1 ? 'selected' : '' ?>>Done</option>
+                                </select>
+                                <?php
+                            } else {
+                                echo 'Done';
+                            }
+                        }
+
+                    ?>
                     </td>
                     <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap rosarivo">
+                            <!-- <button id="statusBtn" class="statusBtn w-6 h-6" title="Save" data-id="<?= $order['id'] ?>" <?= $order['uid'] !== $uid ? 'disabled': ''?>><img src="../images/edit-svgrepo-com.svg" alt=""></button>
+                            <button id="deleteModalBtn" class="deleteModalBtn w-6 h-6" title="Delete" onclick="showDeleteModal(<?= $order['id'] ?>)"  <?= $order['uid'] !== $uid ? 'disabled': ''?>><img src="../images/delete-svgrepo-com.svg" alt=""></button> -->
                         <div class="flex items-center gap-4">
-                            <?php if ($order['status'] == 2){ ?>
-                                <!-- <button id="statusBtn" class="statusBtn w-6 h-6" title="Save" data-id="<?= $order['id'] ?>" <?= $order['uid'] !== $uid ? 'disabled': ''?>><img src="../images/edit-svgrepo-com.svg" alt=""></button>
-                                <button id="deleteModalBtn" class="deleteModalBtn w-6 h-6" title="Delete" onclick="showDeleteModal(<?= $order['id'] ?>)"  <?= $order['uid'] !== $uid ? 'disabled': ''?>><img src="../images/delete-svgrepo-com.svg" alt=""></button> -->
-                            <?php } else { ?>
-                                <button id="receiptModalBtn" class="receiptModalBtn w-6 h-6" title="View Receipt" onclick="showReceiptModal(<?= $order['id'] ?>)"><img src="../images/receipt-svgrepo-com.svg" alt=""></button>
-                            <?php
-                            } ?>
+                            <button id="receiptModalBtn" class="receiptModalBtn w-6 h-6" title="View Receipt" onclick="showReceiptModal(<?= $order['id'] ?>)"><img src="../images/receipt-svgrepo-com.svg" alt=""></button>
                         </div>
                     </td>
                 </tr>
@@ -253,64 +275,68 @@ const divNotification = document.getElementById("notification-modal");
 
 const statusSelector = document.getElementById("status");
 
-document.querySelectorAll('.status-select').forEach(statusSelector => {
-    statusSelector.addEventListener('change', function() {
-        const orderId = this.getAttribute('data-id');
-        const status = this.value;
+function attachStatusUpdateListeners() {
+    document.querySelectorAll('.status-select').forEach(statusSelector => {
+        statusSelector.addEventListener('change', function() {
+            const orderId = this.getAttribute('data-id');
+            const status = this.value;
 
-        if (status == 2) {
-            return;
-        }
-
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', 'update_status.php', true);
-        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                const response = JSON.parse(xhr.responseText);
-                console.log(response);
-
-                if (response.success === true) {
-                    const tableRow = document.querySelector(`tr[data-id="${orderId}"]`);
-                    const dailySalesAmount = document.getElementById('dailySalesAmount');
-
-                    dailySalesAmount.textContent = '₱' + (response.dailySalesAmount ? response.dailySalesAmount : '0');
-
-                    if (tableRow) {
-                        const statusCell = tableRow.querySelector('td:nth-child(5)');
-                        statusCell.innerHTML = 'Done';
-
-                        const actionCell = tableRow.querySelector('td:nth-child(6)');
-                        actionCell.innerHTML = `
-                            <div class="flex items-center gap-4">
-                                <button id="receiptModalBtn" class="receiptModalBtn w-6 h-6" title="View Receipt" onclick="showReceiptModal(${orderId})">
-                                    <img src="../images/receipt-svgrepo-com.svg" alt="">
-                                </button>
-                            </div>
-                        `;
-                    }   
-                    if (divMessage) {
-                        divMessage.classList.remove('hidden');
-                        messages.textContent = response.message;
-                    }
-                    setTimeout(function() {
-                        if (divMessage) {
-                            divMessage.classList.add('hidden');
-                        }
-                    }, 1500);
-                    if (response.notification !== '') {
-                        divNotification.classList.remove('hidden');
-                        notification.textContent = response.notification;
-                    }
-                } else {
-                    console.error('Error updating status');
-                }
+            if (status == 2) {
+                return;
             }
-        };
 
-        xhr.send('orderId=' + orderId + '&status=' + status);
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'update_status.php', true);
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+
+                    if (response.success === true) {
+                        const tableRow = document.querySelector(`tr[data-id="${orderId}"]`);
+                        const dailySalesAmount = document.getElementById('dailySalesAmount');
+
+                        dailySalesAmount.textContent = '₱' + (response.dailySalesAmount ? response.dailySalesAmount : '0');
+
+                        if (tableRow) {
+                            const statusCell = tableRow.querySelector('td:nth-child(5)');
+                            statusCell.innerHTML = 'Done';
+
+                            const actionCell = tableRow.querySelector('td:nth-child(6)');
+                            actionCell.innerHTML = `
+                                <div class="flex items-center gap-4">
+                                    <button id="receiptModalBtn" class="receiptModalBtn w-6 h-6" title="View Receipt" onclick="showReceiptModal(${orderId})">
+                                        <img src="../images/receipt-svgrepo-com.svg" alt="">
+                                    </button>
+                                </div>
+                            `;
+                        }
+                        if (divMessage) {
+                            divMessage.classList.remove('hidden');
+                            messages.textContent = response.message;
+                        }
+                        setTimeout(function() {
+                            if (divMessage) {
+                                divMessage.classList.add('hidden');
+                            }
+                        }, 1500);
+                        if (response.notification !== '') {
+                            const divNotification = document.getElementById('divNotification');
+                            divNotification.classList.remove('hidden');
+                            divNotification.textContent = response.notification;
+                        }
+                    } else {
+                        console.error('Error updating status');
+                    }
+                }
+            };
+
+            xhr.send('orderId=' + orderId + '&status=' + status);
+        });
     });
-});
+}
+document.addEventListener("DOMContentLoaded", function() { fetchOrders(); });
+
 function checkInventory() {
     fetch('check_inventory_status.php', {
         method: 'GET',
@@ -356,19 +382,15 @@ function showNotification(message) {
     divNotification.classList.remove('hidden');
 }
 
-// Check inventory periodically
 const INVENTORY_CHECK_INTERVAL = 30000; // 30 seconds
 let inventoryChecker = setInterval(checkInventory, INVENTORY_CHECK_INTERVAL);
 
-// Initial check when page loads
 document.addEventListener('DOMContentLoaded', checkInventory);
 
-// Cleanup interval when page unloads
 window.addEventListener('unload', () => {
     clearInterval(inventoryChecker);
 });
 
-// Close modal with Escape key
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !divNotification.classList.contains('hidden')) {
         notificationModalHandler(false);
@@ -507,4 +529,80 @@ document.addEventListener('keydown', (e) => {
             console.error("Error deleting order:", error);
         });
     });
+    function fetchOrders() {
+        var selectedOption = document.getElementById("orders").value;
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "fetch_orders.php?option=" + selectedOption, true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                document.getElementById("ordersList").innerHTML = xhr.responseText;
+            }
+            const timestamps = document.querySelectorAll('.placed_on');
+            timestamps.forEach(element => {
+                const originalDate = element.getAttribute('data-timestamp');
+                if (originalDate) {
+                    element.textContent = getRelativeTime(originalDate);
+                }
+            });
+            attachStatusUpdateListeners();
+        };
+        xhr.send();
+    }
+    function printOrders() { 
+        // Clone the table to manipulate it without affecting the DOM
+        const tableClone = document.getElementById('itemsTable').cloneNode(true);
+
+        // Remove the Action column (last column) from the table
+        tableClone.querySelectorAll('th:last-child, td:last-child').forEach(cell => cell.remove());
+
+        // Get the updated table content
+        const tableContent = tableClone.outerHTML;
+
+        // Open a print window and format the content
+        const printWindow = window.open('', '', 'width=800,height=600');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Print Sales</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 0;
+                        padding: 0;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin: 20px 0;
+                    }
+                    th, td {
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                        text-align: left;
+                    }
+                    th {
+                        background-color: #f4f4f4;
+                        font-weight: bold;
+                    }
+                    h1 {
+                        text-align: center;
+                        font-size: 24px;
+                        margin-bottom: 20px;
+                        color: #333;
+                    }
+                </style>
+            </head>
+            <body>
+                <h1>A Coffee Orders</h1>
+                <table>${tableContent}</table>
+                <script>
+                    window.print();
+                    window.onafterprint = () => { window.close(); };
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    }
 </script>

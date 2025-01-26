@@ -197,6 +197,7 @@
                 .then(data => {
                     if (data.exists) {
                         addErrorState(nameInput, "Name already exists.");
+                        showMessage("Name already exists")
                         submitBtn.disabled = true;
                     } else {
                         removeErrorState(nameInput);
@@ -214,6 +215,7 @@
         
         if (!nameInput.value.trim()) {
             addErrorState(nameInput, 'Category name is required');
+            showMessage("Category name is required")
             return;
         }
         

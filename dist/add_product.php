@@ -29,16 +29,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $insert_variation = $conn->prepare("INSERT INTO `product_variations`(product_id, size, price, ingredients) VALUES (?,?,?,?)");
             
             foreach ($_POST['variations'] as $variation) {
-               if (!empty($variation['size']) && !empty($variation['price'])) {
-                  $insert_variation->execute([
-                     $last_insert_id,
-                     trim($variation['size'] ?? ''),
-                     trim($variation['price'] ?? ''),
-                     trim($variation['ingredients'] ?? '')
-                  ]);
-               }
+                if (!empty($variation['size']) && !empty($variation['price'])) {
+                    $ingredients = trim($variation['ingredients'] ?? '');
+                    $ingredients = preg_replace('/,(\S)/', ', $1', $ingredients);
+        
+                    $insert_variation->execute([
+                        $last_insert_id,
+                        trim($variation['size'] ?? ''),
+                        trim($variation['price'] ?? ''),
+                        $ingredients
+                    ]);
+                }
             }
-         }
+        }
 
          $select_new_product = $conn->prepare("SELECT p.*, GROUP_CONCAT(v.id, ':', v.size, ':', v.price, ':', v.ingredients) as variations 
                                              FROM products p 

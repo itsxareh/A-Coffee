@@ -104,7 +104,7 @@
                     </div>
                     <div class="col-span-full">
                         <label class="text-gray-800 text-sm font-medium leading-tight tracking-normal salsa" for="description">Description</label>
-                        <textarea name="description" id="description" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" rows="3" autocomplete="off" required></textarea>
+                        <textarea name="description" id="description" class="mb-5 mt-2 text-gray-600 focus:outline-none focus:border focus:border-amber-600 font-normal w-full flex items-center pl-3 py-2 text-sm border-gray-300 rounded border" rows="3" autocomplete="off"></textarea>
                     </div>
                 </div>
                 <i class="text-sm mb-4 text-gray-700">Note: Please be aware that modifying the quantity will increase the existing quantity.</i></p>
@@ -347,12 +347,13 @@
     formElement.addEventListener('submit', function(event) {
         event.preventDefault();
         
-        [nameInput, quantityInput, descriptionInput].forEach(removeErrorState);
+        [nameInput, quantityInput].forEach(removeErrorState);
         
         let isValid = true;
         
         if (!nameInput.value.trim()) {
             addErrorState(nameInput, 'Name is required');
+            showMessage("Name is required.")
             isValid = false;
         }
         
@@ -360,17 +361,19 @@
             const quantityPattern = /^(\d*\.?\d+)\s*(piece\/s|KG|g|L|ml|)$/i;
             if (!quantityPattern.test(quantityInput.value)) {
                 addErrorState(quantityInput, 'Number or, and unit (KG, g, L, ml)');
+                showMessage("Number or, and unit (KG, g, L, ml)")
                 isValid = false;
             }
         } else {
             addErrorState(quantityInput, 'Quantity is required');
+            showMessage("Quantity is required")
             isValid = false;
         }
         
-        if (!descriptionInput.value.trim()) {
-            addErrorState(descriptionInput, 'Description is required');
-            isValid = false;
-        }
+        // if (!descriptionInput.value.trim()) {
+        //     addErrorState(descriptionInput, 'Description is required');
+        //     isValid = false;
+        // }
 
         if (isValid) {
             submitForm(event);
@@ -395,7 +398,7 @@
                 newRow.innerHTML = `
                     <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
                     <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity}</td>
-                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.description}</td>
+                    <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${(data.description !== null ? data.description : 'N/A')}</td>
                     <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">N/A</td>
                     <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                         <div class="flex items-center gap-4">

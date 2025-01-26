@@ -76,29 +76,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         $conn->beginTransaction();
         $should_process_order = true;
+        $pattern = '/^\s*(\d*\.?\d+)?\s*([a-zA-Z]+)?\s*(.+)$/';
 
         foreach ($cart_products as $cart_item) {
             $product_id = $cart_item['product_id'];
             $product_quantity = $cart_item['quantity'];
             $ingredients = $cart_item['ingredients'];
-            if (empty($ingredients)){
+
+            if (empty($ingredients)) {
                 continue;
             }
-            $ingredients_array = explode(',', $ingredients);
+
+            $ingredients_array = explode(', ', $ingredients);
             $parsed_ingredients = [];
 
             foreach ($ingredients_array as $ingredient) {
-                if (strpos(trim($ingredient), ' ') === false) {
-                    $quantity = $product_quantity;
-                    $itemName = trim($ingredient);
-                    $unit = '';
-                } else {
-                    $pattern = '/(?:(\d*\.?\d+)\s*([a-z]*)\s+)?(.+)/i';
-                    preg_match($pattern, trim($ingredient), $matches);
+                preg_match($pattern, trim($ingredient), $matches);
 
-                    $quantity = !empty($matches[1]) ? (float)$matches[1] : $product_quantity;
-                    $unit = !empty($matches[2]) ? $matches[2] : '';
-                    $itemName = $matches[3];
+                $quantity = !empty($matches[1]) ? (float)$matches[1] : $product_quantity; // Quantity
+                $unit = !empty($matches[2]) && ctype_alpha($matches[2]) ? $matches[2] : ''; // Unit (letters only)
+                $itemName = !empty($matches[3]) ? $matches[3] : ''; // Remaining text as item name
+
+                // Check for misplaced units
+                if (!empty($unit) && str_word_count($itemName) === 1) {
+                    $itemName = "$unit $itemName";
+                    $unit = '';
                 }
 
                 $parsed_ingredients[] = [
@@ -107,33 +109,49 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     'unit' => $unit,
                 ];
             }
+            //print_r($parsed_ingredients);
             foreach ($parsed_ingredients as $ingredient) {
                 $ingredient_quantity = $ingredient['quantity'];
                 $itemName = $ingredient['itemName'];
                 $unit = $ingredient['unit'];
+            
                 $inventory_query = $conn->prepare("SELECT quantity FROM `inventory` WHERE name = ? AND delete_flag = 0");
                 $inventory_query->bindParam(1, $itemName);
                 $inventory_query->execute();
-
+            
                 if ($inventory_query->rowCount() === 0) {
                     $response['message'] = "Failed to retrieve quantity for " . ucwords($itemName);
                     $should_process_order = false;
+                    break; 
                 } else {
                     $current_quantity = $inventory_query->fetchColumn();
-                    preg_match('/(\d*\.?\d+)\s*([a-zA-Z]+)/', $current_quantity, $matches);
+                    preg_match('/(\d*\.?\d+)\s*([a-zA-Z]*)/', $current_quantity, $matches);
+            
                     $db_value = (float)$matches[1];
-                    $db_unit = strtolower($matches[2]);
-                    $standard_quantity = convertToBaseUnit($ingredient_quantity, $unit, $db_unit);
-                    $total_quantity = number_format((floatval($db_value) - floatval($standard_quantity)), 3, '.', '') . '' . $db_unit;
-                    if ($db_value === false || $db_value === 0) {
-                        $response['message'] = "Failed to retrieve quantity for " . ucwords($itemName);
-                        $should_process_order = false;
-                    } elseif ($db_value < $standard_quantity) {
+                    $db_unit = strtolower(trim($matches[2] ?? ''));
+            
+                    if (empty($db_unit)) {
+                        if (empty($unit)) {
+                            $standard_quantity = $ingredient_quantity;
+                        } else {
+                            $response['message'] = "Unit mismatch: '$itemName' has no unit in inventory.";
+                            $should_process_order = false;
+                            break;
+                        }
+                    } else {
+                        $standard_quantity = convertToBaseUnit($ingredient_quantity, $unit, $db_unit);
+                    }
+            
+                    $total_quantity = $db_value - $standard_quantity;
+            
+                    if ($db_value === 0 || $db_value < $standard_quantity) {
                         $response['message'] = "Insufficient quantity for " . ucwords($itemName);
                         $should_process_order = false;
-                    } else { 
+                        break;
+                    } else {
+                        $new_quantity = number_format($total_quantity, 3, '.', '') . $db_unit;
                         $update_inventory = $conn->prepare("UPDATE `inventory` SET quantity = ? WHERE name = ?");
-                        $update_inventory->execute([$total_quantity, $itemName]);
+                        $update_inventory->execute([$new_quantity, $itemName]);
                     }
                 }
             }
@@ -213,7 +231,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
                 $response['success'] = true;
                 $response['message'] = "Product Ordered successfully";
-                $response['msg'] = $parsed_ingredients;
             } catch (PDOException $e) {
                 $conn->rollBack();
                 $response['success'] = false;
