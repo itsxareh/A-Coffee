@@ -48,7 +48,7 @@
                     <tr class="border-color" data-id="<?= $staff['id']; ?>">
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                             <button class="cursor-pointer" onclick="showViewModal(<?= $staff['id'] ?>)" title="View Staff Details">
-                                <img class="w-16 h-16 object-cover" src="../uploaded_img/<?= $staff['image']; ?>">
+                                <img class="w-16 h-16 object-cover" src="../uploaded_img/<?= ($staff['image'] !== NULL ? $staff['image'] : 'default-profile.png');   ?>">
                             </button>
                         </td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap"><?= ucwords($staff['name']); ?></td>
@@ -311,7 +311,7 @@
                 document.getElementById('viewBirthdate').textContent = birthFormattedDate;
                 document.getElementById('viewUsertype').textContent = data.user_type;
                 document.getElementById('viewAddress').textContent = data.address;
-                document.getElementById('viewImage').src = '../uploaded_img/' + data.image;
+                document.getElementById('viewImage').src = '../uploaded_img/' + (data.image !== null ? data.image : 'default-profile-black.png');
                 
                 fadeIn(viewModal);
             })
@@ -331,7 +331,7 @@
                 document.getElementById('usertype').value = data.user_type;
                 document.getElementById('address').value = data.address;
                 document.getElementById('old_image').value = data.image;
-                document.getElementById('previewImage').src = '../uploaded_img/'+ data.image;
+                document.getElementById('previewImage').src = '../uploaded_img/'+ (data.image !== null ? data.image : 'default-profile-black.png');
                 fadeIn(modal);
             })
             .catch(error => console.error('Error fetching data:', error));
@@ -402,14 +402,14 @@
                 newRow.innerHTML = `
                     <tr class="border-color" data-id="${data.id}">
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
-                            <a class="cursor-pointer" href="index.php?page=view_staff&id=${data.id}" title="View Staff Details">
-                                <img class="w-16 h-16 object-cover" src="../uploaded_img/${data.image}">
-                            </a>
+                            <button class="cursor-pointer" onclick="showViewModal(${data.id})" title="View Staff Details">
+                                <img class="w-16 h-16 object-cover" src="../uploaded_img/${(data.image !== null ? data.image : 'default-profile.png')}">
+                            </button>
                         </td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.uid}</td>
-                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.quantity}</td>
-                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">₱${data.total}</td>
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">0</td>
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">₱0</td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
                             <div class="flex items-center gap-4">
                                 <button id="editModalBtn" class="w-6 h-6" onclick="showEditModal(${data.id})"><img src="../images/edit-svgrepo-com.svg" alt=""></button>
@@ -429,9 +429,9 @@
                 updatedRow.innerHTML = `
                     <tr class="border-color" data-id="${data.id}">
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">
-                            <a class="cursor-pointer" href="index.php?page=view_staff&id=${data.id}" title="View Staff Details">
-                                <img class="w-16 h-16 object-cover" src="../uploaded_img/${data.image}">
-                            </a>
+                            <button class="cursor-pointer" onclick="showViewModal(${data.id})" title="View Staff Details">
+                                <img class="w-16 h-16 object-cover" src="../uploaded_img/${(data.image !== null ? data.image : 'default-profile.png')}">
+                            </button>
                         </td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.name}</td>
                         <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap">${data.uid}</td>

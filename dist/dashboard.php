@@ -53,6 +53,10 @@
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left min-w-48 max-w-72">Orders</th>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Price</th>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Placed On</th>
+                <?php 
+                if ($fetch_profile['user_type'] == 1) echo '
+                    <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Placed By</th>'
+                ?>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Status</th>
                 <th class="text-semibold text-sm salsa shadow-lg p-3 text-white text-left">Action</th>
             </tr>
@@ -84,7 +88,7 @@
             }
 
             if ($fetch_profile['user_type'] == 1) {
-                $get_orders = $conn->prepare("SELECT * FROM `orders` WHERE delete_flag = 0 ORDER BY  id DESC;");
+                $get_orders = $conn->prepare("SELECT *, orders.id as id FROM `orders` LEFT JOIN users ON orders.uid = users.uid WHERE orders.delete_flag = 0 ORDER BY  orders.id DESC;");
                 $get_orders->execute();
             } else {
                 $get_orders = $conn->prepare("SELECT * FROM `orders` WHERE uid = ? AND delete_flag = 0 ORDER BY id DESC;");
@@ -100,9 +104,13 @@
                     <td class="placed_on" data-timestamp="<?= $order['placed_on']; ?>">
                         <?= getRelativeTime($order['placed_on']); ?>
                     </td>
+                    <?php 
+                    if ($fetch_profile['user_type'] == 1) echo '
+                        <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap rosarivo">' . $order['name'] . '</td>'
+                    ?>
                     <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap text-balance rosarivo">
                     <?php if ($order['status']===2) { ?>
-                        <select class="text-white text-medium text-sm bg-transparent whitespace-nowrap rosarivo status-select" name="status" data-id="<?= $order['id'] ?>" <?= $order['uid'] !== $uid ? 'disabled': ''?>>
+                        <select class="text-white text-medium text-sm bg-transparent whitespace-nowrap rosarivo status-select" name="status" id="status" data-id="<?= $order['id'] ?>" <?= $order['uid'] !== $uid ? 'disabled': ''?>>
                             <option class="text-black text-medium rosarivo " value="2" <?= $order['status'] == 2 ? 'selected' : '' ?>>On Process</option>
                             <option class="text-black text-medium rosarivo " value="1" <?= $order['status'] == 1 ? 'selected' : '' ?>>Done</option>
                         </select>
@@ -114,8 +122,8 @@
                     <td class="text-gray text-medium text-sm p-3 py-4 whitespace-nowrap rosarivo">
                         <div class="flex items-center gap-4">
                             <?php if ($order['status'] == 2){ ?>
-                                <button id="statusBtn" class="statusBtn w-6 h-6" title="Save" data-id="<?= $order['id'] ?>" <?= $order['uid'] !== $uid ? 'disabled': ''?>><img src="../images/edit-svgrepo-com.svg" alt=""></button>
-                                <button id="deleteModalBtn" class="deleteModalBtn w-6 h-6" title="Delete" onclick="showDeleteModal(<?= $order['id'] ?>)"  <?= $order['uid'] !== $uid ? 'disabled': ''?>><img src="../images/delete-svgrepo-com.svg" alt=""></button>
+                                <!-- <button id="statusBtn" class="statusBtn w-6 h-6" title="Save" data-id="<?= $order['id'] ?>" <?= $order['uid'] !== $uid ? 'disabled': ''?>><img src="../images/edit-svgrepo-com.svg" alt=""></button>
+                                <button id="deleteModalBtn" class="deleteModalBtn w-6 h-6" title="Delete" onclick="showDeleteModal(<?= $order['id'] ?>)"  <?= $order['uid'] !== $uid ? 'disabled': ''?>><img src="../images/delete-svgrepo-com.svg" alt=""></button> -->
                             <?php } else { ?>
                                 <button id="receiptModalBtn" class="receiptModalBtn w-6 h-6" title="View Receipt" onclick="showReceiptModal(<?= $order['id'] ?>)"><img src="../images/receipt-svgrepo-com.svg" alt=""></button>
                             <?php
@@ -242,11 +250,17 @@ const messages = document.getElementById("message");
 const divMessage = document.getElementsByClassName('hide-message')[0];
 const notification = document.getElementById("notification");
 const divNotification = document.getElementById("notification-modal");
-document.querySelectorAll('.statusBtn').forEach(button => {
-    button.addEventListener('click', function() {
+
+const statusSelector = document.getElementById("status");
+
+document.querySelectorAll('.status-select').forEach(statusSelector => {
+    statusSelector.addEventListener('change', function() {
         const orderId = this.getAttribute('data-id');
-        const statusSelect = document.querySelector(`.status-select[data-id="${orderId}"]`);
-        const status = statusSelect.value;
+        const status = this.value;
+
+        if (status == 2) {
+            return;
+        }
 
         const xhr = new XMLHttpRequest();
         xhr.open('POST', 'update_status.php', true);
@@ -255,33 +269,36 @@ document.querySelectorAll('.statusBtn').forEach(button => {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 const response = JSON.parse(xhr.responseText);
                 console.log(response);
+
                 if (response.success === true) {
-                        const tableRow = document.querySelector(`tr[data-id="${orderId}"]`);
-                        const dailySalesAmount = document.getElementById('dailySalesAmount');
-                        dailySalesAmount.textContent = '₱' + (response.dailySalesAmount ? response.dailySalesAmount : '0');
-                        if (tableRow) {
-                            const statusCell = tableRow.querySelector('td:nth-child(5)');
-                            statusCell.innerHTML = 'Done';
-                            
-                            const actionCell = tableRow.querySelector('td:nth-child(6)');
-                            actionCell.innerHTML = `
-                                <div class="flex items-center gap-4">
-                                    <button id="receiptModalBtn" class="receiptModalBtn w-6 h-6" title="View Receipt" onclick="showReceiptModal(${orderId})">
-                                        <img src="../images/receipt-svgrepo-com.svg" alt="">
-                                    </button>
-                                </div>
-                            `;
-                        }
+                    const tableRow = document.querySelector(`tr[data-id="${orderId}"]`);
+                    const dailySalesAmount = document.getElementById('dailySalesAmount');
+
+                    dailySalesAmount.textContent = '₱' + (response.dailySalesAmount ? response.dailySalesAmount : '0');
+
+                    if (tableRow) {
+                        const statusCell = tableRow.querySelector('td:nth-child(5)');
+                        statusCell.innerHTML = 'Done';
+
+                        const actionCell = tableRow.querySelector('td:nth-child(6)');
+                        actionCell.innerHTML = `
+                            <div class="flex items-center gap-4">
+                                <button id="receiptModalBtn" class="receiptModalBtn w-6 h-6" title="View Receipt" onclick="showReceiptModal(${orderId})">
+                                    <img src="../images/receipt-svgrepo-com.svg" alt="">
+                                </button>
+                            </div>
+                        `;
+                    }   
+                    if (divMessage) {
+                        divMessage.classList.remove('hidden');
+                        messages.textContent = response.message;
+                    }
+                    setTimeout(function() {
                         if (divMessage) {
-                            divMessage.classList.remove('hidden');
-                            messages.textContent = response.message;
+                            divMessage.classList.add('hidden');
                         }
-                        setTimeout(function() {
-                            if (divMessage) {
-                                divMessage.classList.add('hidden');
-                            }
-                        }, 1500); 
-                    if (response.notification !== '' || !empty(response.notification)) {
+                    }, 1500);
+                    if (response.notification !== '') {
                         divNotification.classList.remove('hidden');
                         notification.textContent = response.notification;
                     }
@@ -290,6 +307,7 @@ document.querySelectorAll('.statusBtn').forEach(button => {
                 }
             }
         };
+
         xhr.send('orderId=' + orderId + '&status=' + status);
     });
 });

@@ -88,7 +88,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $select_staff = $conn->prepare("SELECT * FROM users WHERE uid = ?");
                 $select_staff->bindParam(1, $uid);
                 $select_staff->execute();
-
+                $new_staff = $select_staff->fetch(PDO::FETCH_ASSOC);
+                $data = $new_staff;
+                
                 $log = $_SESSION['name']. " added a new staff: ". $name;
                 $insertLog = $conn->prepare("INSERT INTO activity_log (uid, log, datetime) VALUES (?, ?, ?)");
                 $insertLog->bindParam(1, $uid);
