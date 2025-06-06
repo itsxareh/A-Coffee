@@ -1,7 +1,7 @@
 <?php
 include 'config.php';
 ob_start();
-if (isset(($_SESSION['uid']))){
+if (isset($_SESSION['uid'])){
     header('location: index.php');
     exit();
 };
@@ -78,16 +78,16 @@ ob_end_flush();
     }
 
     ?>
-    <h2 class="text-8xl select-none text-white" style="font-family: 'Rosarivo', cursive;">A Coffee</h2>
+    <h2 class="text-8xl select-none text-white">A Coffee</h2>
     <div class="p-8 rounded-lg shadow-md w-96" style="background-color: #1C0A00">
         <form class="space-y-4" method="post">
             <div>
-                <label for="uid" class="text-white block text-lg font-medium" style="font-family: 'Rosarivo', cursive;">UID</label>
-                <input type="text" name="uid" id="uid" style="font-family: 'Rosarivo', cursive;" class="mt-1 block w-full rounded-md border-gray-300 shadow focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 p-2">
+                <label for="uid" class="text-white block text-lg font-medium">UID</label>
+                <input type="text" name="uid" id="uid"   class="mt-1 block w-full rounded-md border-gray-300 shadow focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 p-2">
             </div>
             <div>
-                <label for="password" class="text-white block text-lg font-medium" style="font-family: 'Rosarivo', cursive;">Password</label>
-                <input type="password" name="password" id="password" style="font-family: 'Rosarivo', cursive;" class="mt-1 block w-full rounded-md border-gray-300 shadow focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 p-2">
+                <label for="password" class="text-white block text-lg font-medium">Password</label>
+                <input type="password" name="password" id="password" class="mt-1 block w-full rounded-md border-gray-300 shadow focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 p-2">
             </div>
             <div>
             <center>

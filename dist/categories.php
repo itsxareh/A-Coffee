@@ -158,7 +158,7 @@
     searchInput.addEventListener('input', function(){
         const searchTerm = this.value.trim();
 
-        fetch(`search_item.php?search=${searchTerm}`)
+        fetch(`search_category.php?search=${searchTerm}`)
         .then(response => response.text())
         .then(data => {
             itemsList.innerHTML = data;
